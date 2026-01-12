@@ -39,8 +39,8 @@ func TestUserAgentHeader(t *testing.T) {
 		}),
 	)
 	client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if userAgent != fmt.Sprintf("Ark/Go %s", internal.PackageVersion) {
@@ -67,8 +67,8 @@ func TestRetryAfter(t *testing.T) {
 		}),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err == nil {
@@ -106,8 +106,8 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 		option.WithHeaderDel("X-Stainless-Retry-Count"),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err == nil {
@@ -140,8 +140,8 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 		option.WithHeader("X-Stainless-Retry-Count", "42"),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err == nil {
@@ -173,8 +173,8 @@ func TestRetryAfterMs(t *testing.T) {
 		}),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err == nil {
@@ -200,8 +200,8 @@ func TestContextCancel(t *testing.T) {
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	cancel()
 	_, err := client.Emails.Send(cancelCtx, ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err == nil {
@@ -224,8 +224,8 @@ func TestContextCancelDelay(t *testing.T) {
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 2*time.Millisecond)
 	defer cancel()
 	_, err := client.Emails.Send(cancelCtx, ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err == nil {
@@ -254,8 +254,8 @@ func TestContextDeadline(t *testing.T) {
 			}),
 		)
 		_, err := client.Emails.Send(deadlineCtx, ark.EmailSendParams{
-			From:    "Security <security@myapp.com>",
-			Subject: "Reset your password",
+			From:    "Acme <hello@acme.com>",
+			Subject: "Hello World",
 			To:      []string{"user@example.com"},
 		})
 		if err == nil {
