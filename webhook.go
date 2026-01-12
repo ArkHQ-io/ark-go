@@ -161,8 +161,6 @@ type WebhookResponseData struct {
 	// Webhook endpoint URL
 	URL  string `json:"url,required" format:"uri"`
 	Uuid string `json:"uuid,required" format:"uuid"`
-	// Whether the webhook payloads are signed (always true for new webhooks)
-	Signed bool `json:"signed"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -173,7 +171,6 @@ type WebhookResponseData struct {
 		Name        respjson.Field
 		URL         respjson.Field
 		Uuid        respjson.Field
-		Signed      respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -229,8 +226,6 @@ type WebhookListResponseDataWebhook struct {
 	Events  []string `json:"events,required"`
 	Name    string   `json:"name,required"`
 	URL     string   `json:"url,required" format:"uri"`
-	// Whether webhook payloads are signed
-	Signed bool `json:"signed"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -238,7 +233,6 @@ type WebhookListResponseDataWebhook struct {
 		Events      respjson.Field
 		Name        respjson.Field
 		URL         respjson.Field
-		Signed      respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
