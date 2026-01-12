@@ -134,8 +134,8 @@ func TestEmailSendWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		Attachments: []ark.EmailSendParamsAttachment{{
 			Content:     "content",
@@ -147,10 +147,10 @@ func TestEmailSendWithOptionalParams(t *testing.T) {
 		Headers: map[string]string{
 			"foo": "string",
 		},
-		HTML:           ark.String(`<p>Click <a href="https://myapp.com/reset?token=abc123">here</a> to reset your password. This link expires in 1 hour.</p>`),
+		HTML:           ark.String("<h1>Welcome!</h1><p>Thanks for signing up.</p>"),
 		ReplyTo:        ark.String("dev@stainless.com"),
-		Tag:            ark.String("password-reset"),
-		Text:           ark.String("Reset your password by visiting: https://myapp.com/reset?token=abc123"),
+		Tag:            ark.String("tag"),
+		Text:           ark.String("text"),
 		IdempotencyKey: ark.String("user_123_order_456"),
 	})
 	if err != nil {

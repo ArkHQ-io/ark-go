@@ -57,8 +57,8 @@ func main() {
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("ARK_API_KEY")
 	)
 	sendEmail, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err != nil {
@@ -302,8 +302,8 @@ To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
 _, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-	From:    "Security <security@myapp.com>",
-	Subject: "Reset your password",
+	From:    "Acme <hello@acme.com>",
+	Subject: "Hello World",
 	To:      []string{"user@example.com"},
 })
 if err != nil {
@@ -333,8 +333,8 @@ defer cancel()
 client.Emails.Send(
 	ctx,
 	ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	},
 	// This sets the per-retry timeout
@@ -373,8 +373,8 @@ client := ark.NewClient(
 client.Emails.Send(
 	context.TODO(),
 	ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	},
 	option.WithMaxRetries(5),
@@ -392,8 +392,8 @@ var response *http.Response
 sendEmail, err := client.Emails.Send(
 	context.TODO(),
 	ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	},
 	option.WithResponseInto(&response),
