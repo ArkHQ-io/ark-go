@@ -26,8 +26,8 @@ func TestUsage(t *testing.T) {
 	)
 	t.Skip("Prism tests are disabled")
 	sendEmail, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-		From:    "Security <security@myapp.com>",
-		Subject: "Reset your password",
+		From:    "Acme <hello@acme.com>",
+		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 	})
 	if err != nil {
