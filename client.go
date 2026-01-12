@@ -8,8 +8,8 @@ import (
 	"os"
 	"slices"
 
-	"github.com/stainless-sdks/ark-go/internal/requestconfig"
-	"github.com/stainless-sdks/ark-go/option"
+	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
+	"github.com/ArkHQ-io/ark-go/option"
 )
 
 // Client creates a struct with services and top level methods that help with

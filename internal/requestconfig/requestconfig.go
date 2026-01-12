@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stainless-sdks/ark-go/internal"
-	"github.com/stainless-sdks/ark-go/internal/apierror"
-	"github.com/stainless-sdks/ark-go/internal/apiform"
-	"github.com/stainless-sdks/ark-go/internal/apiquery"
+	"github.com/ArkHQ-io/ark-go/internal"
+	"github.com/ArkHQ-io/ark-go/internal/apierror"
+	"github.com/ArkHQ-io/ark-go/internal/apiform"
+	"github.com/ArkHQ-io/ark-go/internal/apiquery"
 )
 
 func getDefaultHeaders() map[string]string {

@@ -1,4 +1,4 @@
-module github.com/stainless-sdks/ark-go
+module github.com/ArkHQ-io/ark-go
 
 go 1.22
 

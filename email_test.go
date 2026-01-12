@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stainless-sdks/ark-go"
-	"github.com/stainless-sdks/ark-go/internal/testutil"
-	"github.com/stainless-sdks/ark-go/option"
+	"github.com/ArkHQ-io/ark-go"
+	"github.com/ArkHQ-io/ark-go/internal/testutil"
+	"github.com/ArkHQ-io/ark-go/option"
 )
 
 func TestEmailGetWithOptionalParams(t *testing.T) {

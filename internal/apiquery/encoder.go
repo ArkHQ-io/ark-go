@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stainless-sdks/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/packages/param"
 )
 
 var encoders sync.Map // map[reflect.Type]encoderFunc

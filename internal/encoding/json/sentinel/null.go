@@ -1,7 +1,7 @@
 package sentinel
 
 import (
-	"github.com/stainless-sdks/ark-go/internal/encoding/json/shims"
+	"github.com/ArkHQ-io/ark-go/internal/encoding/json/shims"
 	"reflect"
 	"sync"
 )
