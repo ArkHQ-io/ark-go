@@ -3,8 +3,8 @@
 package ark
 
 import (
-	"github.com/stainless-sdks/ark-go/internal/apierror"
-	"github.com/stainless-sdks/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/internal/apierror"
+	"github.com/ArkHQ-io/ark-go/packages/param"
 )
 
 // aliased to make [param.APIUnion] private when embedding

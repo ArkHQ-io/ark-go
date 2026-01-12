@@ -7,7 +7,7 @@ package apijson
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/packages/param"
 	"reflect"
 	"strconv"
 	"sync"

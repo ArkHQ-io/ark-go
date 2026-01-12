@@ -1,8 +1,8 @@
 package sentinel_test
 
 import (
-	"github.com/stainless-sdks/ark-go/internal/encoding/json/sentinel"
-	"github.com/stainless-sdks/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/internal/encoding/json/sentinel"
+	"github.com/ArkHQ-io/ark-go/packages/param"
 	"reflect"
 	"slices"
 	"testing"

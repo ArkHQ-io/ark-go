@@ -1,7 +1,7 @@
 package apijson
 
 import (
-	"github.com/stainless-sdks/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/packages/respjson"
 	"reflect"
 )
 

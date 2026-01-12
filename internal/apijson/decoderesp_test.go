@@ -2,8 +2,8 @@ package apijson_test
 
 import (
 	"encoding/json"
-	"github.com/stainless-sdks/ark-go/internal/apijson"
-	"github.com/stainless-sdks/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/internal/apijson"
+	"github.com/ArkHQ-io/ark-go/packages/respjson"
 	"testing"
 )
 

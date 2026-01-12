@@ -1,7 +1,7 @@
 package ark
 
 import (
-	"github.com/stainless-sdks/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/packages/param"
 	"io"
 	"time"
 )

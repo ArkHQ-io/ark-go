@@ -10,11 +10,11 @@ import (
 	"slices"
 	"time"
 
-	"github.com/stainless-sdks/ark-go/internal/apijson"
-	"github.com/stainless-sdks/ark-go/internal/requestconfig"
-	"github.com/stainless-sdks/ark-go/option"
-	"github.com/stainless-sdks/ark-go/packages/param"
-	"github.com/stainless-sdks/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/internal/apijson"
+	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
+	"github.com/ArkHQ-io/ark-go/option"
+	"github.com/ArkHQ-io/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/packages/respjson"
 )
 
 // WebhookService contains methods and other services that help with interacting

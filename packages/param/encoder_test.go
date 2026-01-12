@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/packages/param"
 )
 
 type Struct struct {
