@@ -3,8 +3,8 @@ package respjson_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/ark-go/internal/apijson"
-	rj "github.com/stainless-sdks/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/internal/apijson"
+	rj "github.com/ArkHQ-io/ark-go/packages/respjson"
 	"reflect"
 	"testing"
 )

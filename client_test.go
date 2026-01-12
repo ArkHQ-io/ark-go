@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/ark-go"
-	"github.com/stainless-sdks/ark-go/internal"
-	"github.com/stainless-sdks/ark-go/option"
+	"github.com/ArkHQ-io/ark-go"
+	"github.com/ArkHQ-io/ark-go/internal"
+	"github.com/ArkHQ-io/ark-go/option"
 )
 
 type closureTransport struct {

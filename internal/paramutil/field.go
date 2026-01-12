@@ -1,8 +1,8 @@
 package paramutil
 
 import (
-	"github.com/stainless-sdks/ark-go/packages/param"
-	"github.com/stainless-sdks/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/packages/respjson"
 )
 
 func AddrIfPresent[T comparable](v param.Opt[T]) *T {

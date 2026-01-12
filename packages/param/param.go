@@ -2,7 +2,7 @@ package param
 
 import (
 	"encoding/json"
-	"github.com/stainless-sdks/ark-go/internal/encoding/json/sentinel"
+	"github.com/ArkHQ-io/ark-go/internal/encoding/json/sentinel"
 	"reflect"
 )
 

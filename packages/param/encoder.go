@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	shimjson "github.com/stainless-sdks/ark-go/internal/encoding/json"
+	shimjson "github.com/ArkHQ-io/ark-go/internal/encoding/json"
 
 	"github.com/tidwall/sjson"
 )
