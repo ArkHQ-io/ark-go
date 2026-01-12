@@ -98,7 +98,7 @@ func (r *EmailService) Retry(ctx context.Context, emailID string, opts ...option
 	return
 }
 
-// Send a single email message. The email is queued for immediate delivery and
+// Send a single email message. The email is accepted for immediate delivery and
 // typically delivered within seconds.
 //
 // **Example use case:** Send a password reset email to a user.
@@ -240,7 +240,7 @@ type SendEmailData struct {
 	ID string `json:"id,required"`
 	// Current delivery status
 	//
-	// Any of "queued", "sent".
+	// Any of "pending", "sent".
 	Status string `json:"status,required"`
 	// List of recipient addresses
 	To []string `json:"to,required" format:"email"`
@@ -301,13 +301,12 @@ type EmailGetResponseData struct {
 	//
 	// - `pending` - Email accepted, waiting to be processed
 	// - `sent` - Email transmitted to recipient's mail server
-	// - `delivered` - Recipient's server confirmed receipt
-	// - `bounced` - Permanently rejected (hard bounce)
-	// - `failed` - Delivery failed after all retry attempts
-	// - `delayed` - Temporary failure, will retry automatically
+	// - `softfail` - Temporary delivery failure, will retry
+	// - `hardfail` - Permanent delivery failure
+	// - `bounced` - Email bounced back
 	// - `held` - Held for manual review
 	//
-	// Any of "pending", "sent", "delivered", "bounced", "failed", "delayed", "held".
+	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
 	Status string `json:"status,required"`
 	// Email subject line
 	Subject string `json:"subject,required"`
@@ -411,13 +410,12 @@ type EmailListResponseDataMessage struct {
 	//
 	// - `pending` - Email accepted, waiting to be processed
 	// - `sent` - Email transmitted to recipient's mail server
-	// - `delivered` - Recipient's server confirmed receipt
-	// - `bounced` - Permanently rejected (hard bounce)
-	// - `failed` - Delivery failed after all retry attempts
-	// - `delayed` - Temporary failure, will retry automatically
+	// - `softfail` - Temporary delivery failure, will retry
+	// - `hardfail` - Permanent delivery failure
+	// - `bounced` - Email bounced back
 	// - `held` - Held for manual review
 	//
-	// Any of "pending", "sent", "delivered", "bounced", "failed", "delayed", "held".
+	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
 	Status       string    `json:"status,required"`
 	Subject      string    `json:"subject,required"`
 	Timestamp    float64   `json:"timestamp,required"`
@@ -545,19 +543,19 @@ func (r *EmailSendBatchResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendBatchResponseData struct {
+	// Successfully accepted emails
+	Accepted int64 `json:"accepted,required"`
 	// Failed emails
 	Failed int64 `json:"failed,required"`
 	// Map of recipient email to message info
 	Messages map[string]EmailSendBatchResponseDataMessage `json:"messages,required"`
-	// Successfully queued emails
-	Queued int64 `json:"queued,required"`
 	// Total emails in the batch
 	Total int64 `json:"total,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		Accepted    respjson.Field
 		Failed      respjson.Field
 		Messages    respjson.Field
-		Queued      respjson.Field
 		Total       respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -625,15 +623,14 @@ type EmailListParams struct {
 	To param.Opt[string] `query:"to,omitzero" format:"email" json:"-"`
 	// Filter by delivery status:
 	//
-	// - `queued` - Email accepted and waiting to be sent
+	// - `pending` - Email accepted, waiting to be processed
 	// - `sent` - Email transmitted to recipient's mail server
-	// - `delivered` - Recipient's server confirmed receipt
-	// - `bounced` - Permanently rejected (hard bounce)
-	// - `failed` - Delivery failed after all retry attempts
-	// - `delayed` - Temporary failure, will retry
+	// - `softfail` - Temporary delivery failure, will retry
+	// - `hardfail` - Permanent delivery failure
+	// - `bounced` - Email bounced back
 	// - `held` - Held for manual review
 	//
-	// Any of "queued", "sent", "delivered", "bounced", "failed", "delayed", "held".
+	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
 	Status EmailListParamsStatus `query:"status,omitzero" json:"-"`
 	paramObj
 }
@@ -648,28 +645,33 @@ func (r EmailListParams) URLQuery() (v url.Values, err error) {
 
 // Filter by delivery status:
 //
-// - `queued` - Email accepted and waiting to be sent
+// - `pending` - Email accepted, waiting to be processed
 // - `sent` - Email transmitted to recipient's mail server
-// - `delivered` - Recipient's server confirmed receipt
-// - `bounced` - Permanently rejected (hard bounce)
-// - `failed` - Delivery failed after all retry attempts
-// - `delayed` - Temporary failure, will retry
+// - `softfail` - Temporary delivery failure, will retry
+// - `hardfail` - Permanent delivery failure
+// - `bounced` - Email bounced back
 // - `held` - Held for manual review
 type EmailListParamsStatus string
 
 const (
-	EmailListParamsStatusQueued    EmailListParamsStatus = "queued"
-	EmailListParamsStatusSent      EmailListParamsStatus = "sent"
-	EmailListParamsStatusDelivered EmailListParamsStatus = "delivered"
-	EmailListParamsStatusBounced   EmailListParamsStatus = "bounced"
-	EmailListParamsStatusFailed    EmailListParamsStatus = "failed"
-	EmailListParamsStatusDelayed   EmailListParamsStatus = "delayed"
-	EmailListParamsStatusHeld      EmailListParamsStatus = "held"
+	EmailListParamsStatusPending  EmailListParamsStatus = "pending"
+	EmailListParamsStatusSent     EmailListParamsStatus = "sent"
+	EmailListParamsStatusSoftfail EmailListParamsStatus = "softfail"
+	EmailListParamsStatusHardfail EmailListParamsStatus = "hardfail"
+	EmailListParamsStatusBounced  EmailListParamsStatus = "bounced"
+	EmailListParamsStatusHeld     EmailListParamsStatus = "held"
 )
 
 type EmailSendParams struct {
-	// Sender email. Can include name: "Name <email@domain.com>" Must be from a
-	// verified domain.
+	// Sender email address. Must be from a verified domain.
+	//
+	// **Supported formats:**
+	//
+	// - Email only: `hello@yourdomain.com`
+	// - With display name: `Acme <hello@yourdomain.com>`
+	// - With quoted name: `"Acme Support" <support@yourdomain.com>`
+	//
+	// The domain portion must match a verified sending domain in your account.
 	From string `json:"from,required"`
 	// Email subject line
 	Subject string `json:"subject,required"`
