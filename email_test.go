@@ -61,7 +61,7 @@ func TestEmailListWithOptionalParams(t *testing.T) {
 		From:    ark.String("dev@stainless.com"),
 		Page:    ark.Int(1),
 		PerPage: ark.Int(1),
-		Status:  ark.EmailListParamsStatusQueued,
+		Status:  ark.EmailListParamsStatusPending,
 		Tag:     ark.String("tag"),
 		To:      ark.String("dev@stainless.com"),
 	})
