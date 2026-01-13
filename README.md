@@ -6,7 +6,7 @@
 
 <!-- x-release-please-end -->
 
-The Ark Go library provides convenient access to the [Ark REST API](https://arkhq.io/support)
+The Ark Go library provides convenient access to the [Ark REST API](https://arkhq.io/docs)
 from applications written in Go.
 
 It is generated with [Stainless](https://www.stainless.com/).
@@ -57,9 +57,10 @@ func main() {
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("ARK_API_KEY")
 	)
 	sendEmail, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err != nil {
 		panic(err.Error())
@@ -302,9 +303,10 @@ To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
 _, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-	From:    "Acme <hello@acme.com>",
+	From:    "hello@yourdomain.com",
 	Subject: "Hello World",
 	To:      []string{"user@example.com"},
+	HTML:    ark.String("<h1>Welcome!</h1>"),
 })
 if err != nil {
 	var apierr *ark.Error
@@ -333,9 +335,10 @@ defer cancel()
 client.Emails.Send(
 	ctx,
 	ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
@@ -373,9 +376,10 @@ client := ark.NewClient(
 client.Emails.Send(
 	context.TODO(),
 	ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	},
 	option.WithMaxRetries(5),
 )
@@ -392,9 +396,10 @@ var response *http.Response
 sendEmail, err := client.Emails.Send(
 	context.TODO(),
 	ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	},
 	option.WithResponseInto(&response),
 )
