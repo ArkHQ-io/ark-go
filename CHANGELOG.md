@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1 (2026-01-13)
+
+Full Changelog: [v0.4.0...v0.4.1](https://github.com/ArkHQ-io/ark-go/compare/v0.4.0...v0.4.1)
+
+### Chores
+
+* configure new SDK language ([6d99ded](https://github.com/ArkHQ-io/ark-go/commit/6d99dedde8a84abb646b218178a197a09a9f4bc2))
+
 ## 0.4.0 (2026-01-13)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/ArkHQ-io/ark-go/compare/v0.3.0...v0.4.0)
