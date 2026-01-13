@@ -15,7 +15,6 @@ import (
 	"github.com/ArkHQ-io/ark-go/internal/apiquery"
 	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
 	"github.com/ArkHQ-io/ark-go/option"
-	"github.com/ArkHQ-io/ark-go/packages/pagination"
 	"github.com/ArkHQ-io/ark-go/packages/param"
 	"github.com/ArkHQ-io/ark-go/packages/respjson"
 	"github.com/ArkHQ-io/ark-go/shared"
@@ -63,27 +62,11 @@ func (r *SuppressionService) Get(ctx context.Context, email string, opts ...opti
 
 // Get all email addresses on the suppression list. These addresses will not
 // receive any emails.
-func (r *SuppressionService) List(ctx context.Context, query SuppressionListParams, opts ...option.RequestOption) (res *pagination.PageNumberPagination[SuppressionListResponse], err error) {
-	var raw *http.Response
+func (r *SuppressionService) List(ctx context.Context, query SuppressionListParams, opts ...option.RequestOption) (res *SuppressionListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "suppressions"
-	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
-	if err != nil {
-		return nil, err
-	}
-	err = cfg.Execute()
-	if err != nil {
-		return nil, err
-	}
-	res.SetPageConfig(cfg, raw)
-	return res, nil
-}
-
-// Get all email addresses on the suppression list. These addresses will not
-// receive any emails.
-func (r *SuppressionService) ListAutoPaging(ctx context.Context, query SuppressionListParams, opts ...option.RequestOption) *pagination.PageNumberPaginationAutoPager[SuppressionListResponse] {
-	return pagination.NewPageNumberPaginationAutoPager(r.List(ctx, query, opts...))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return
 }
 
 // Remove an email address from the suppression list. The address will be able to
@@ -108,9 +91,10 @@ func (r *SuppressionService) BulkNew(ctx context.Context, body SuppressionBulkNe
 }
 
 type SuppressionNewResponse struct {
-	Data    SuppressionNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta             `json:"meta,required"`
-	Success bool                       `json:"success,required"`
+	Data SuppressionNewResponseData `json:"data,required"`
+	Meta shared.APIMeta             `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -152,13 +136,11 @@ func (r *SuppressionNewResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionGetResponse struct {
-	Data    SuppressionGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta             `json:"meta,required"`
-	Success bool                       `json:"success,required"`
+	Data    SuppressionGetResponseData `json:"data"`
+	Success bool                       `json:"success"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
-		Meta        respjson.Field
 		Success     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -172,20 +154,16 @@ func (r *SuppressionGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionGetResponseData struct {
-	// The email address that was checked
-	Address string `json:"address,required" format:"email"`
-	// Whether the address is currently suppressed
-	Suppressed bool `json:"suppressed,required"`
-	// When the suppression was created (if suppressed)
-	CreatedAt time.Time `json:"createdAt,nullable" format:"date-time"`
-	// Reason for suppression (if suppressed)
-	Reason string `json:"reason,nullable"`
+	Address    string    `json:"address"`
+	CreatedAt  time.Time `json:"createdAt,nullable" format:"date-time"`
+	Reason     string    `json:"reason,nullable"`
+	Suppressed bool      `json:"suppressed"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Address     respjson.Field
-		Suppressed  respjson.Field
 		CreatedAt   respjson.Field
 		Reason      respjson.Field
+		Suppressed  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -198,6 +176,71 @@ func (r *SuppressionGetResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionListResponse struct {
+	Data SuppressionListResponseData `json:"data,required"`
+	Meta shared.APIMeta              `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SuppressionListResponse) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type SuppressionListResponseData struct {
+	Pagination   SuppressionListResponseDataPagination    `json:"pagination,required"`
+	Suppressions []SuppressionListResponseDataSuppression `json:"suppressions,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Pagination   respjson.Field
+		Suppressions respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SuppressionListResponseData) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionListResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type SuppressionListResponseDataPagination struct {
+	// Current page number (1-indexed)
+	Page int64 `json:"page,required"`
+	// Items per page
+	PerPage int64 `json:"perPage,required"`
+	// Total number of items
+	Total int64 `json:"total,required"`
+	// Total number of pages
+	TotalPages int64 `json:"totalPages,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Page        respjson.Field
+		PerPage     respjson.Field
+		Total       respjson.Field
+		TotalPages  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SuppressionListResponseDataPagination) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionListResponseDataPagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type SuppressionListResponseDataSuppression struct {
 	// Suppression ID
 	ID        string    `json:"id,required"`
 	Address   string    `json:"address,required" format:"email"`
@@ -215,15 +258,16 @@ type SuppressionListResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r SuppressionListResponse) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionListResponse) UnmarshalJSON(data []byte) error {
+func (r SuppressionListResponseDataSuppression) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionListResponseDataSuppression) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 type SuppressionDeleteResponse struct {
-	Data    SuppressionDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta                `json:"meta,required"`
-	Success bool                          `json:"success,required"`
+	Data SuppressionDeleteResponseData `json:"data,required"`
+	Meta shared.APIMeta                `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -257,9 +301,10 @@ func (r *SuppressionDeleteResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionBulkNewResponse struct {
-	Data    SuppressionBulkNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta                 `json:"meta,required"`
-	Success bool                           `json:"success,required"`
+	Data SuppressionBulkNewResponseData `json:"data,required"`
+	Meta shared.APIMeta                 `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
