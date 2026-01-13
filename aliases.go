@@ -5,6 +5,7 @@ package ark
 import (
 	"github.com/ArkHQ-io/ark-go/internal/apierror"
 	"github.com/ArkHQ-io/ark-go/packages/param"
+	"github.com/ArkHQ-io/ark-go/shared"
 )
 
 // aliased to make [param.APIUnion] private when embedding
@@ -14,3 +15,6 @@ type paramUnion = param.APIUnion
 type paramObj = param.APIObject
 
 type Error = apierror.Error
+
+// This is an alias to an internal type.
+type APIMeta = shared.APIMeta

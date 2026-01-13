@@ -24,8 +24,7 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	t.Skip("Prism tests are disabled")
-	sendEmail, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
+	response, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
 		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
@@ -34,5 +33,5 @@ func TestUsage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
-	t.Logf("%+v\n", sendEmail.Data)
+	t.Logf("%+v\n", response.Data)
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 	"github.com/ArkHQ-io/ark-go/packages/param"
 	"github.com/ArkHQ-io/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/shared"
 )
 
 // WebhookService contains methods and other services that help with interacting
@@ -48,7 +49,7 @@ func NewWebhookService(opts ...option.RequestOption) (r WebhookService) {
 // - `MessageLinkClicked` - Recipient clicked a link
 // - `MessageLoaded` - Recipient opened the email
 // - `DomainDNSError` - Domain DNS issue detected
-func (r *WebhookService) New(ctx context.Context, body WebhookNewParams, opts ...option.RequestOption) (res *WebhookResponse, err error) {
+func (r *WebhookService) New(ctx context.Context, body WebhookNewParams, opts ...option.RequestOption) (res *WebhookNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "webhooks"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -56,7 +57,7 @@ func (r *WebhookService) New(ctx context.Context, body WebhookNewParams, opts ..
 }
 
 // Get webhook details
-func (r *WebhookService) Get(ctx context.Context, webhookID string, opts ...option.RequestOption) (res *WebhookResponse, err error) {
+func (r *WebhookService) Get(ctx context.Context, webhookID string, opts ...option.RequestOption) (res *WebhookGetResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
@@ -68,7 +69,7 @@ func (r *WebhookService) Get(ctx context.Context, webhookID string, opts ...opti
 }
 
 // Update a webhook
-func (r *WebhookService) Update(ctx context.Context, webhookID string, body WebhookUpdateParams, opts ...option.RequestOption) (res *WebhookResponse, err error) {
+func (r *WebhookService) Update(ctx context.Context, webhookID string, body WebhookUpdateParams, opts ...option.RequestOption) (res *WebhookUpdateResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
@@ -88,7 +89,7 @@ func (r *WebhookService) List(ctx context.Context, opts ...option.RequestOption)
 }
 
 // Delete a webhook
-func (r *WebhookService) Delete(ctx context.Context, webhookID string, opts ...option.RequestOption) (res *SuccessResponse, err error) {
+func (r *WebhookService) Delete(ctx context.Context, webhookID string, opts ...option.RequestOption) (res *WebhookDeleteResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
@@ -122,11 +123,10 @@ func (r *WebhookService) Test(ctx context.Context, webhookID string, body Webhoo
 	return
 }
 
-type WebhookResponse struct {
-	Data WebhookResponseData `json:"data,required"`
-	Meta APIMeta             `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+type WebhookNewResponse struct {
+	Data    WebhookNewResponseData `json:"data,required"`
+	Meta    shared.APIMeta         `json:"meta,required"`
+	Success bool                   `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -138,12 +138,12 @@ type WebhookResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r WebhookResponse) RawJSON() string { return r.JSON.raw }
-func (r *WebhookResponse) UnmarshalJSON(data []byte) error {
+func (r WebhookNewResponse) RawJSON() string { return r.JSON.raw }
+func (r *WebhookNewResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type WebhookResponseData struct {
+type WebhookNewResponseData struct {
 	// Webhook ID
 	ID string `json:"id,required"`
 	// Whether subscribed to all events
@@ -177,16 +177,133 @@ type WebhookResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r WebhookResponseData) RawJSON() string { return r.JSON.raw }
-func (r *WebhookResponseData) UnmarshalJSON(data []byte) error {
+func (r WebhookNewResponseData) RawJSON() string { return r.JSON.raw }
+func (r *WebhookNewResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type WebhookGetResponse struct {
+	Data    WebhookGetResponseData `json:"data,required"`
+	Meta    shared.APIMeta         `json:"meta,required"`
+	Success bool                   `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r WebhookGetResponse) RawJSON() string { return r.JSON.raw }
+func (r *WebhookGetResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type WebhookGetResponseData struct {
+	// Webhook ID
+	ID string `json:"id,required"`
+	// Whether subscribed to all events
+	AllEvents bool      `json:"allEvents,required"`
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	// Whether the webhook is active
+	Enabled bool `json:"enabled,required"`
+	// Subscribed events
+	//
+	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
+	Events []string `json:"events,required"`
+	// Webhook name for identification
+	Name string `json:"name,required"`
+	// Webhook endpoint URL
+	URL  string `json:"url,required" format:"uri"`
+	Uuid string `json:"uuid,required" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		AllEvents   respjson.Field
+		CreatedAt   respjson.Field
+		Enabled     respjson.Field
+		Events      respjson.Field
+		Name        respjson.Field
+		URL         respjson.Field
+		Uuid        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r WebhookGetResponseData) RawJSON() string { return r.JSON.raw }
+func (r *WebhookGetResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type WebhookUpdateResponse struct {
+	Data    WebhookUpdateResponseData `json:"data,required"`
+	Meta    shared.APIMeta            `json:"meta,required"`
+	Success bool                      `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r WebhookUpdateResponse) RawJSON() string { return r.JSON.raw }
+func (r *WebhookUpdateResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type WebhookUpdateResponseData struct {
+	// Webhook ID
+	ID string `json:"id,required"`
+	// Whether subscribed to all events
+	AllEvents bool      `json:"allEvents,required"`
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	// Whether the webhook is active
+	Enabled bool `json:"enabled,required"`
+	// Subscribed events
+	//
+	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
+	Events []string `json:"events,required"`
+	// Webhook name for identification
+	Name string `json:"name,required"`
+	// Webhook endpoint URL
+	URL  string `json:"url,required" format:"uri"`
+	Uuid string `json:"uuid,required" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		AllEvents   respjson.Field
+		CreatedAt   respjson.Field
+		Enabled     respjson.Field
+		Events      respjson.Field
+		Name        respjson.Field
+		URL         respjson.Field
+		Uuid        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r WebhookUpdateResponseData) RawJSON() string { return r.JSON.raw }
+func (r *WebhookUpdateResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 type WebhookListResponse struct {
-	Data WebhookListResponseData `json:"data,required"`
-	Meta APIMeta                 `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    WebhookListResponseData `json:"data,required"`
+	Meta    shared.APIMeta          `json:"meta,required"`
+	Success bool                    `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -244,11 +361,46 @@ func (r *WebhookListResponseDataWebhook) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type WebhookDeleteResponse struct {
+	Data    WebhookDeleteResponseData `json:"data,required"`
+	Meta    shared.APIMeta            `json:"meta,required"`
+	Success bool                      `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r WebhookDeleteResponse) RawJSON() string { return r.JSON.raw }
+func (r *WebhookDeleteResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type WebhookDeleteResponseData struct {
+	Message string `json:"message,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Message     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r WebhookDeleteResponseData) RawJSON() string { return r.JSON.raw }
+func (r *WebhookDeleteResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type WebhookTestResponse struct {
-	Data WebhookTestResponseData `json:"data,required"`
-	Meta APIMeta                 `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    WebhookTestResponseData `json:"data,required"`
+	Meta    shared.APIMeta          `json:"meta,required"`
+	Success bool                    `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

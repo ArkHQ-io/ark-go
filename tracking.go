@@ -15,6 +15,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 	"github.com/ArkHQ-io/ark-go/packages/param"
 	"github.com/ArkHQ-io/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/shared"
 )
 
 // TrackingService contains methods and other services that help with interacting
@@ -40,7 +41,7 @@ func NewTrackingService(opts ...option.RequestOption) (r TrackingService) {
 //
 // After creation, you must configure a CNAME record pointing to the provided DNS
 // value before tracking will work.
-func (r *TrackingService) New(ctx context.Context, body TrackingNewParams, opts ...option.RequestOption) (res *TrackDomainResponse, err error) {
+func (r *TrackingService) New(ctx context.Context, body TrackingNewParams, opts ...option.RequestOption) (res *TrackingNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "tracking"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -48,7 +49,7 @@ func (r *TrackingService) New(ctx context.Context, body TrackingNewParams, opts 
 }
 
 // Get details of a specific track domain including DNS configuration
-func (r *TrackingService) Get(ctx context.Context, trackingID string, opts ...option.RequestOption) (res *TrackDomainResponse, err error) {
+func (r *TrackingService) Get(ctx context.Context, trackingID string, opts ...option.RequestOption) (res *TrackingGetResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
@@ -67,7 +68,7 @@ func (r *TrackingService) Get(ctx context.Context, trackingID string, opts ...op
 // - Enable/disable open tracking
 // - Enable/disable SSL
 // - Set excluded click domains
-func (r *TrackingService) Update(ctx context.Context, trackingID string, body TrackingUpdateParams, opts ...option.RequestOption) (res *TrackDomainResponse, err error) {
+func (r *TrackingService) Update(ctx context.Context, trackingID string, body TrackingUpdateParams, opts ...option.RequestOption) (res *TrackingUpdateResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
@@ -89,7 +90,7 @@ func (r *TrackingService) List(ctx context.Context, opts ...option.RequestOption
 
 // Delete a track domain. This will disable tracking for any emails using this
 // domain.
-func (r *TrackingService) Delete(ctx context.Context, trackingID string, opts ...option.RequestOption) (res *SuccessResponse, err error) {
+func (r *TrackingService) Delete(ctx context.Context, trackingID string, opts ...option.RequestOption) (res *TrackingDeleteResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
@@ -113,23 +114,6 @@ func (r *TrackingService) Verify(ctx context.Context, trackingID string, opts ..
 	path := fmt.Sprintf("tracking/%s/verify", trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
 	return
-}
-
-type APIMeta struct {
-	// Unique request identifier for debugging and support
-	RequestID string `json:"requestId,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		RequestID   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r APIMeta) RawJSON() string { return r.JSON.raw }
-func (r *APIMeta) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
 }
 
 type TrackDomain struct {
@@ -226,11 +210,10 @@ const (
 	TrackDomainDNSStatusInvalid TrackDomainDNSStatus = "invalid"
 )
 
-type TrackDomainResponse struct {
-	Data TrackDomain `json:"data,required"`
-	Meta APIMeta     `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+type TrackingNewResponse struct {
+	Data    TrackDomain    `json:"data,required"`
+	Meta    shared.APIMeta `json:"meta,required"`
+	Success bool           `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -242,16 +225,55 @@ type TrackDomainResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackDomainResponse) RawJSON() string { return r.JSON.raw }
-func (r *TrackDomainResponse) UnmarshalJSON(data []byte) error {
+func (r TrackingNewResponse) RawJSON() string { return r.JSON.raw }
+func (r *TrackingNewResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type TrackingGetResponse struct {
+	Data    TrackDomain    `json:"data,required"`
+	Meta    shared.APIMeta `json:"meta,required"`
+	Success bool           `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r TrackingGetResponse) RawJSON() string { return r.JSON.raw }
+func (r *TrackingGetResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type TrackingUpdateResponse struct {
+	Data    TrackDomain    `json:"data,required"`
+	Meta    shared.APIMeta `json:"meta,required"`
+	Success bool           `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r TrackingUpdateResponse) RawJSON() string { return r.JSON.raw }
+func (r *TrackingUpdateResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 type TrackingListResponse struct {
-	Data TrackingListResponseData `json:"data,required"`
-	Meta APIMeta                  `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    TrackingListResponseData `json:"data,required"`
+	Meta    shared.APIMeta           `json:"meta,required"`
+	Success bool                     `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -284,11 +306,46 @@ func (r *TrackingListResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type TrackingDeleteResponse struct {
+	Data    TrackingDeleteResponseData `json:"data,required"`
+	Meta    shared.APIMeta             `json:"meta,required"`
+	Success bool                       `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r TrackingDeleteResponse) RawJSON() string { return r.JSON.raw }
+func (r *TrackingDeleteResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type TrackingDeleteResponseData struct {
+	Message string `json:"message,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Message     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r TrackingDeleteResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TrackingDeleteResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type TrackingVerifyResponse struct {
-	Data TrackingVerifyResponseData `json:"data,required"`
-	Meta APIMeta                    `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    TrackingVerifyResponseData `json:"data,required"`
+	Meta    shared.APIMeta             `json:"meta,required"`
+	Success bool                       `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
