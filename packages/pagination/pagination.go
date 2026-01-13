@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/ArkHQ-io/ark-go/internal/apijson"
 	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
@@ -34,6 +35,49 @@ type PageNumberPaginationData[T any] struct {
 // Returns the unmodified JSON received from the API
 func (r PageNumberPaginationData[T]) RawJSON() string { return r.JSON.raw }
 func (r *PageNumberPaginationData[T]) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PageNumberPaginationDataMessage struct {
+	// Internal message ID
+	ID    string `json:"id,required"`
+	Token string `json:"token,required"`
+	From  string `json:"from,required"`
+	// Current delivery status:
+	//
+	// - `pending` - Email accepted, waiting to be processed
+	// - `sent` - Email transmitted to recipient's mail server
+	// - `softfail` - Temporary delivery failure, will retry
+	// - `hardfail` - Permanent delivery failure
+	// - `bounced` - Email bounced back
+	// - `held` - Held for manual review
+	//
+	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
+	Status       string    `json:"status,required"`
+	Subject      string    `json:"subject,required"`
+	Timestamp    float64   `json:"timestamp,required"`
+	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	To           string    `json:"to,required" format:"email"`
+	Tag          string    `json:"tag"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		Token        respjson.Field
+		From         respjson.Field
+		Status       respjson.Field
+		Subject      respjson.Field
+		Timestamp    respjson.Field
+		TimestampISO respjson.Field
+		To           respjson.Field
+		Tag          respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PageNumberPaginationDataMessage) RawJSON() string { return r.JSON.raw }
+func (r *PageNumberPaginationDataMessage) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -185,6 +229,29 @@ type SuppressionsPaginationDataPagination struct {
 // Returns the unmodified JSON received from the API
 func (r SuppressionsPaginationDataPagination) RawJSON() string { return r.JSON.raw }
 func (r *SuppressionsPaginationDataPagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type SuppressionsPaginationDataSuppression struct {
+	// Suppression ID
+	ID        string    `json:"id,required"`
+	Address   string    `json:"address,required" format:"email"`
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	Reason    string    `json:"reason"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Address     respjson.Field
+		CreatedAt   respjson.Field
+		Reason      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SuppressionsPaginationDataSuppression) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionsPaginationDataSuppression) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
