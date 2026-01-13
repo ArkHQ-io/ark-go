@@ -26,7 +26,7 @@ func TestTrackingNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Tracking.New(context.TODO(), ark.TrackingNewParams{
-		DomainID:    "123",
+		DomainID:    123,
 		Name:        "track",
 		SslEnabled:  ark.Bool(true),
 		TrackClicks: ark.Bool(true),

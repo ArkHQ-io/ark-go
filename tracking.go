@@ -422,14 +422,14 @@ func (r *TrackingVerifyResponseDataDNSRecord) UnmarshalJSON(data []byte) error {
 
 type TrackingNewParams struct {
 	// ID of the sending domain to attach this track domain to
-	DomainID string `json:"domainId,required"`
+	DomainID int64 `json:"domainId,required"`
 	// Subdomain name (e.g., 'track' for track.yourdomain.com)
 	Name string `json:"name,required"`
-	// Enable SSL for tracking URLs (recommended)
+	// Enable SSL for tracking URLs (accepts null, defaults to true)
 	SslEnabled param.Opt[bool] `json:"sslEnabled,omitzero"`
-	// Enable click tracking
+	// Enable click tracking (accepts null, defaults to true)
 	TrackClicks param.Opt[bool] `json:"trackClicks,omitzero"`
-	// Enable open tracking (tracking pixel)
+	// Enable open tracking (tracking pixel, accepts null, defaults to true)
 	TrackOpens param.Opt[bool] `json:"trackOpens,omitzero"`
 	paramObj
 }
@@ -443,13 +443,13 @@ func (r *TrackingNewParams) UnmarshalJSON(data []byte) error {
 }
 
 type TrackingUpdateParams struct {
-	// Comma-separated list of domains to exclude from click tracking
+	// Comma-separated list of domains to exclude from click tracking (accepts null)
 	ExcludedClickDomains param.Opt[string] `json:"excludedClickDomains,omitzero"`
-	// Enable or disable SSL for tracking URLs
+	// Enable or disable SSL for tracking URLs (accepts null)
 	SslEnabled param.Opt[bool] `json:"sslEnabled,omitzero"`
-	// Enable or disable click tracking
+	// Enable or disable click tracking (accepts null)
 	TrackClicks param.Opt[bool] `json:"trackClicks,omitzero"`
-	// Enable or disable open tracking
+	// Enable or disable open tracking (accepts null)
 	TrackOpens param.Opt[bool] `json:"trackOpens,omitzero"`
 	paramObj
 }
