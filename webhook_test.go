@@ -26,11 +26,11 @@ func TestWebhookNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Webhooks.New(context.TODO(), ark.WebhookNewParams{
-		Events:    []string{"MessageSent", "MessageDeliveryFailed", "MessageBounced"},
 		Name:      "My App Webhook",
 		URL:       "https://myapp.com/webhooks/email",
 		AllEvents: ark.Bool(true),
 		Enabled:   ark.Bool(true),
+		Events:    []string{"MessageSent", "MessageDeliveryFailed", "MessageBounced"},
 	})
 	if err != nil {
 		var apierr *ark.Error
