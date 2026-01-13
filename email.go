@@ -740,22 +740,22 @@ type EmailSendParams struct {
 	Subject string `json:"subject,required"`
 	// Recipient email addresses (max 50)
 	To []string `json:"to,omitzero,required" format:"email"`
+	// Reply-to address (accepts null)
+	ReplyTo param.Opt[string] `json:"replyTo,omitzero" format:"email"`
 	// HTML body content. Maximum 5MB (5,242,880 characters). Combined with
 	// attachments, the total message must not exceed 14MB.
 	HTML param.Opt[string] `json:"html,omitzero"`
-	// Reply-to address
-	ReplyTo param.Opt[string] `json:"replyTo,omitzero" format:"email"`
 	// Tag for categorization and filtering
 	Tag param.Opt[string] `json:"tag,omitzero"`
 	// Plain text body (auto-generated from HTML if not provided). Maximum 5MB
 	// (5,242,880 characters).
 	Text           param.Opt[string] `json:"text,omitzero"`
 	IdempotencyKey param.Opt[string] `header:"Idempotency-Key,omitzero" json:"-"`
-	// File attachments
+	// File attachments (accepts null)
 	Attachments []EmailSendParamsAttachment `json:"attachments,omitzero"`
-	// BCC recipients
+	// BCC recipients (accepts null)
 	Bcc []string `json:"bcc,omitzero" format:"email"`
-	// CC recipients
+	// CC recipients (accepts null)
 	Cc []string `json:"cc,omitzero" format:"email"`
 	// Custom email headers
 	Headers map[string]string `json:"headers,omitzero"`
@@ -830,6 +830,8 @@ type EmailSendRawParams struct {
 	MailFrom string `json:"mailFrom,required" format:"email"`
 	// Envelope recipient addresses
 	RcptTo []string `json:"rcptTo,omitzero,required" format:"email"`
+	// Whether this is a bounce message (accepts null)
+	Bounce param.Opt[bool] `json:"bounce,omitzero"`
 	paramObj
 }
 

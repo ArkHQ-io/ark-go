@@ -450,7 +450,15 @@ func (r *WebhookTestResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type WebhookNewParams struct {
-	// Events to subscribe to:
+	// Webhook name for identification
+	Name string `json:"name,required"`
+	// HTTPS endpoint URL
+	URL string `json:"url,required" format:"uri"`
+	// Subscribe to all events (ignores events array, accepts null)
+	AllEvents param.Opt[bool] `json:"allEvents,omitzero"`
+	// Whether the webhook is enabled (accepts null)
+	Enabled param.Opt[bool] `json:"enabled,omitzero"`
+	// Events to subscribe to (accepts null):
 	//
 	// - `MessageSent` - Email successfully delivered to recipient's server
 	// - `MessageDelayed` - Temporary delivery failure, will retry
@@ -463,14 +471,7 @@ type WebhookNewParams struct {
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
 	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
-	Events []string `json:"events,omitzero,required"`
-	// Webhook name for identification
-	Name string `json:"name,required"`
-	// HTTPS endpoint URL
-	URL string `json:"url,required" format:"uri"`
-	// Subscribe to all events (ignores events array)
-	AllEvents param.Opt[bool] `json:"allEvents,omitzero"`
-	Enabled   param.Opt[bool] `json:"enabled,omitzero"`
+	Events []string `json:"events,omitzero"`
 	paramObj
 }
 
