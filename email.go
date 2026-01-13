@@ -239,9 +239,10 @@ func (r *Pagination) UnmarshalJSON(data []byte) error {
 }
 
 type SendEmail struct {
-	Data    SendEmailData `json:"data,required"`
-	Meta    APIMeta       `json:"meta,required"`
-	Success bool          `json:"success,required"`
+	Data SendEmailData `json:"data,required"`
+	Meta APIMeta       `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -287,9 +288,10 @@ func (r *SendEmailData) UnmarshalJSON(data []byte) error {
 }
 
 type EmailGetResponse struct {
-	Data    EmailGetResponseData `json:"data,required"`
-	Meta    APIMeta              `json:"meta,required"`
-	Success bool                 `json:"success,required"`
+	Data EmailGetResponseData `json:"data,required"`
+	Meta APIMeta              `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -447,9 +449,10 @@ const (
 )
 
 type EmailGetDeliveriesResponse struct {
-	Data    EmailGetDeliveriesResponseData `json:"data,required"`
-	Meta    APIMeta                        `json:"meta,required"`
-	Success bool                           `json:"success,required"`
+	Data EmailGetDeliveriesResponseData `json:"data,required"`
+	Meta APIMeta                        `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -523,9 +526,10 @@ func (r *EmailRetryResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendBatchResponse struct {
-	Data    EmailSendBatchResponseData `json:"data,required"`
-	Meta    APIMeta                    `json:"meta,required"`
-	Success bool                       `json:"success,required"`
+	Data EmailSendBatchResponseData `json:"data,required"`
+	Meta APIMeta                    `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
