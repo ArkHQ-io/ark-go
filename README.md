@@ -56,7 +56,7 @@ func main() {
 	client := ark.NewClient(
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("ARK_API_KEY")
 	)
-	sendEmail, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
+	response, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
 		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
@@ -65,7 +65,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", sendEmail.Data)
+	fmt.Printf("%+v\n", response.Data)
 }
 
 ```
@@ -424,7 +424,7 @@ you need to examine response headers, status codes, or other details.
 ```go
 // Create a variable to store the HTTP response
 var response *http.Response
-sendEmail, err := client.Emails.Send(
+response, err := client.Emails.Send(
 	context.TODO(),
 	ark.EmailSendParams{
 		From:    "hello@yourdomain.com",
@@ -437,7 +437,7 @@ sendEmail, err := client.Emails.Send(
 if err != nil {
 	// handle error
 }
-fmt.Printf("%+v\n", sendEmail)
+fmt.Printf("%+v\n", response)
 
 fmt.Printf("Status Code: %d\n", response.StatusCode)
 fmt.Printf("Headers: %+#v\n", response.Header)

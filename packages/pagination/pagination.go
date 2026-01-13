@@ -19,9 +19,9 @@ type paramUnion = param.APIUnion
 // aliased to make [param.APIObject] private when embedding
 type paramObj = param.APIObject
 
-type EmailsPageData[T any] struct {
-	Messages   []T                      `json:"messages,required"`
-	Pagination EmailsPageDataPagination `json:"pagination,required"`
+type PageNumberPaginationData[T any] struct {
+	Messages   []T                                `json:"messages"`
+	Pagination PageNumberPaginationDataPagination `json:"pagination"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Messages    respjson.Field
@@ -32,21 +32,17 @@ type EmailsPageData[T any] struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r EmailsPageData[T]) RawJSON() string { return r.JSON.raw }
-func (r *EmailsPageData[T]) UnmarshalJSON(data []byte) error {
+func (r PageNumberPaginationData[T]) RawJSON() string { return r.JSON.raw }
+func (r *PageNumberPaginationData[T]) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type EmailsPageDataPagination struct {
-	Page       int64 `json:"page,required"`
-	PerPage    int64 `json:"perPage,required"`
-	Total      int64 `json:"total,required"`
-	TotalPages int64 `json:"totalPages,required"`
+type PageNumberPaginationDataPagination struct {
+	Page       int64 `json:"page"`
+	TotalPages int64 `json:"totalPages"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Page        respjson.Field
-		PerPage     respjson.Field
-		Total       respjson.Field
 		TotalPages  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -54,36 +50,16 @@ type EmailsPageDataPagination struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r EmailsPageDataPagination) RawJSON() string { return r.JSON.raw }
-func (r *EmailsPageDataPagination) UnmarshalJSON(data []byte) error {
+func (r PageNumberPaginationDataPagination) RawJSON() string { return r.JSON.raw }
+func (r *PageNumberPaginationDataPagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type EmailsPageMeta struct {
-	RequestID string `json:"requestId"`
+type PageNumberPagination[T any] struct {
+	Data PageNumberPaginationData[T] `json:"data"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		RequestID   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r EmailsPageMeta) RawJSON() string { return r.JSON.raw }
-func (r *EmailsPageMeta) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type EmailsPage[T any] struct {
-	Success bool              `json:"success"`
-	Data    EmailsPageData[T] `json:"data"`
-	Meta    EmailsPageMeta    `json:"meta"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Success     respjson.Field
 		Data        respjson.Field
-		Meta        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -92,15 +68,15 @@ type EmailsPage[T any] struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r EmailsPage[T]) RawJSON() string { return r.JSON.raw }
-func (r *EmailsPage[T]) UnmarshalJSON(data []byte) error {
+func (r PageNumberPagination[T]) RawJSON() string { return r.JSON.raw }
+func (r *PageNumberPagination[T]) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // GetNextPage returns the next page as defined by this pagination style. When
 // there is no next page, this function will return a 'nil' for the page value, but
 // will not return an error
-func (r *EmailsPage[T]) GetNextPage() (res *EmailsPage[T], err error) {
+func (r *PageNumberPagination[T]) GetNextPage() (res *PageNumberPagination[T], err error) {
 	if len(r.Data.Messages) == 0 {
 		return nil, nil
 	}
@@ -123,16 +99,16 @@ func (r *EmailsPage[T]) GetNextPage() (res *EmailsPage[T], err error) {
 	return res, nil
 }
 
-func (r *EmailsPage[T]) SetPageConfig(cfg *requestconfig.RequestConfig, res *http.Response) {
+func (r *PageNumberPagination[T]) SetPageConfig(cfg *requestconfig.RequestConfig, res *http.Response) {
 	if r == nil {
-		r = &EmailsPage[T]{}
+		r = &PageNumberPagination[T]{}
 	}
 	r.cfg = cfg
 	r.res = res
 }
 
-type EmailsPageAutoPager[T any] struct {
-	page *EmailsPage[T]
+type PageNumberPaginationAutoPager[T any] struct {
+	page *PageNumberPagination[T]
 	cur  T
 	idx  int
 	run  int
@@ -140,14 +116,14 @@ type EmailsPageAutoPager[T any] struct {
 	paramObj
 }
 
-func NewEmailsPageAutoPager[T any](page *EmailsPage[T], err error) *EmailsPageAutoPager[T] {
-	return &EmailsPageAutoPager[T]{
+func NewPageNumberPaginationAutoPager[T any](page *PageNumberPagination[T], err error) *PageNumberPaginationAutoPager[T] {
+	return &PageNumberPaginationAutoPager[T]{
 		page: page,
 		err:  err,
 	}
 }
 
-func (r *EmailsPageAutoPager[T]) Next() bool {
+func (r *PageNumberPaginationAutoPager[T]) Next() bool {
 	if r.page == nil || len(r.page.Data.Messages) == 0 {
 		return false
 	}
@@ -164,21 +140,21 @@ func (r *EmailsPageAutoPager[T]) Next() bool {
 	return true
 }
 
-func (r *EmailsPageAutoPager[T]) Current() T {
+func (r *PageNumberPaginationAutoPager[T]) Current() T {
 	return r.cur
 }
 
-func (r *EmailsPageAutoPager[T]) Err() error {
+func (r *PageNumberPaginationAutoPager[T]) Err() error {
 	return r.err
 }
 
-func (r *EmailsPageAutoPager[T]) Index() int {
+func (r *PageNumberPaginationAutoPager[T]) Index() int {
 	return r.run
 }
 
-type SuppressionsPageData[T any] struct {
-	Pagination   SuppressionsPageDataPagination `json:"pagination,required"`
-	Suppressions []T                            `json:"suppressions,required"`
+type SuppressionsPaginationData[T any] struct {
+	Pagination   SuppressionsPaginationDataPagination `json:"pagination"`
+	Suppressions []T                                  `json:"suppressions"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Pagination   respjson.Field
@@ -189,21 +165,17 @@ type SuppressionsPageData[T any] struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r SuppressionsPageData[T]) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionsPageData[T]) UnmarshalJSON(data []byte) error {
+func (r SuppressionsPaginationData[T]) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionsPaginationData[T]) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type SuppressionsPageDataPagination struct {
-	Page       int64 `json:"page,required"`
-	PerPage    int64 `json:"perPage,required"`
-	Total      int64 `json:"total,required"`
-	TotalPages int64 `json:"totalPages,required"`
+type SuppressionsPaginationDataPagination struct {
+	Page       int64 `json:"page"`
+	TotalPages int64 `json:"totalPages"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Page        respjson.Field
-		PerPage     respjson.Field
-		Total       respjson.Field
 		TotalPages  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -211,36 +183,16 @@ type SuppressionsPageDataPagination struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r SuppressionsPageDataPagination) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionsPageDataPagination) UnmarshalJSON(data []byte) error {
+func (r SuppressionsPaginationDataPagination) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionsPaginationDataPagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type SuppressionsPageMeta struct {
-	RequestID string `json:"requestId"`
+type SuppressionsPagination[T any] struct {
+	Data SuppressionsPaginationData[T] `json:"data"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		RequestID   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SuppressionsPageMeta) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionsPageMeta) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type SuppressionsPage[T any] struct {
-	Success bool                    `json:"success"`
-	Data    SuppressionsPageData[T] `json:"data"`
-	Meta    SuppressionsPageMeta    `json:"meta"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Success     respjson.Field
 		Data        respjson.Field
-		Meta        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -249,15 +201,15 @@ type SuppressionsPage[T any] struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r SuppressionsPage[T]) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionsPage[T]) UnmarshalJSON(data []byte) error {
+func (r SuppressionsPagination[T]) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionsPagination[T]) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // GetNextPage returns the next page as defined by this pagination style. When
 // there is no next page, this function will return a 'nil' for the page value, but
 // will not return an error
-func (r *SuppressionsPage[T]) GetNextPage() (res *SuppressionsPage[T], err error) {
+func (r *SuppressionsPagination[T]) GetNextPage() (res *SuppressionsPagination[T], err error) {
 	if len(r.Data.Suppressions) == 0 {
 		return nil, nil
 	}
@@ -280,16 +232,16 @@ func (r *SuppressionsPage[T]) GetNextPage() (res *SuppressionsPage[T], err error
 	return res, nil
 }
 
-func (r *SuppressionsPage[T]) SetPageConfig(cfg *requestconfig.RequestConfig, res *http.Response) {
+func (r *SuppressionsPagination[T]) SetPageConfig(cfg *requestconfig.RequestConfig, res *http.Response) {
 	if r == nil {
-		r = &SuppressionsPage[T]{}
+		r = &SuppressionsPagination[T]{}
 	}
 	r.cfg = cfg
 	r.res = res
 }
 
-type SuppressionsPageAutoPager[T any] struct {
-	page *SuppressionsPage[T]
+type SuppressionsPaginationAutoPager[T any] struct {
+	page *SuppressionsPagination[T]
 	cur  T
 	idx  int
 	run  int
@@ -297,14 +249,14 @@ type SuppressionsPageAutoPager[T any] struct {
 	paramObj
 }
 
-func NewSuppressionsPageAutoPager[T any](page *SuppressionsPage[T], err error) *SuppressionsPageAutoPager[T] {
-	return &SuppressionsPageAutoPager[T]{
+func NewSuppressionsPaginationAutoPager[T any](page *SuppressionsPagination[T], err error) *SuppressionsPaginationAutoPager[T] {
+	return &SuppressionsPaginationAutoPager[T]{
 		page: page,
 		err:  err,
 	}
 }
 
-func (r *SuppressionsPageAutoPager[T]) Next() bool {
+func (r *SuppressionsPaginationAutoPager[T]) Next() bool {
 	if r.page == nil || len(r.page.Data.Suppressions) == 0 {
 		return false
 	}
@@ -321,14 +273,14 @@ func (r *SuppressionsPageAutoPager[T]) Next() bool {
 	return true
 }
 
-func (r *SuppressionsPageAutoPager[T]) Current() T {
+func (r *SuppressionsPaginationAutoPager[T]) Current() T {
 	return r.cur
 }
 
-func (r *SuppressionsPageAutoPager[T]) Err() error {
+func (r *SuppressionsPaginationAutoPager[T]) Err() error {
 	return r.err
 }
 
-func (r *SuppressionsPageAutoPager[T]) Index() int {
+func (r *SuppressionsPaginationAutoPager[T]) Index() int {
 	return r.run
 }

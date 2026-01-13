@@ -18,6 +18,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/packages/pagination"
 	"github.com/ArkHQ-io/ark-go/packages/param"
 	"github.com/ArkHQ-io/ark-go/packages/respjson"
+	"github.com/ArkHQ-io/ark-go/shared"
 )
 
 // EmailService contains methods and other services that help with interacting with
@@ -64,7 +65,7 @@ func (r *EmailService) Get(ctx context.Context, emailID string, query EmailGetPa
 //
 // - `GET /emails/{id}` - Get full details of a specific email
 // - `POST /emails` - Send a new email
-func (r *EmailService) List(ctx context.Context, query EmailListParams, opts ...option.RequestOption) (res *pagination.EmailsPage[EmailListResponse], err error) {
+func (r *EmailService) List(ctx context.Context, query EmailListParams, opts ...option.RequestOption) (res *pagination.PageNumberPagination[EmailListResponse], err error) {
 	var raw *http.Response
 	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -90,8 +91,8 @@ func (r *EmailService) List(ctx context.Context, query EmailListParams, opts ...
 //
 // - `GET /emails/{id}` - Get full details of a specific email
 // - `POST /emails` - Send a new email
-func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams, opts ...option.RequestOption) *pagination.EmailsPageAutoPager[EmailListResponse] {
-	return pagination.NewEmailsPageAutoPager(r.List(ctx, query, opts...))
+func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams, opts ...option.RequestOption) *pagination.PageNumberPaginationAutoPager[EmailListResponse] {
+	return pagination.NewPageNumberPaginationAutoPager(r.List(ctx, query, opts...))
 }
 
 // Get the history of delivery attempts for an email, including SMTP response codes
@@ -136,7 +137,7 @@ func (r *EmailService) Retry(ctx context.Context, emailID string, opts ...option
 // - `GET /emails/{id}` - Track delivery status
 // - `GET /emails/{id}/deliveries` - View delivery attempts
 // - `POST /emails/{id}/retry` - Retry failed delivery
-func (r *EmailService) Send(ctx context.Context, params EmailSendParams, opts ...option.RequestOption) (res *SendEmail, err error) {
+func (r *EmailService) Send(ctx context.Context, params EmailSendParams, opts ...option.RequestOption) (res *EmailSendResponse, err error) {
 	if !param.IsOmitted(params.IdempotencyKey) {
 		opts = append(opts, option.WithHeader("Idempotency-Key", fmt.Sprintf("%s", params.IdempotencyKey.Value)))
 	}
@@ -167,131 +168,17 @@ func (r *EmailService) SendBatch(ctx context.Context, params EmailSendBatchParam
 // when migrating from systems that generate raw email content.
 //
 // The `data` field should contain the base64-encoded raw email.
-func (r *EmailService) SendRaw(ctx context.Context, body EmailSendRawParams, opts ...option.RequestOption) (res *SendEmail, err error) {
+func (r *EmailService) SendRaw(ctx context.Context, body EmailSendRawParams, opts ...option.RequestOption) (res *EmailSendRawResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "emails/raw"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
-type Delivery struct {
-	// Delivery attempt ID
-	ID string `json:"id,required"`
-	// Delivery status (lowercase)
-	Status string `json:"status,required"`
-	// Unix timestamp
-	Timestamp float64 `json:"timestamp,required"`
-	// ISO 8601 timestamp
-	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
-	// SMTP response code
-	Code int64 `json:"code"`
-	// Status details
-	Details string `json:"details"`
-	// SMTP server response from the receiving mail server
-	Output string `json:"output"`
-	// Whether TLS was used
-	SentWithSsl bool `json:"sentWithSsl"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID           respjson.Field
-		Status       respjson.Field
-		Timestamp    respjson.Field
-		TimestampISO respjson.Field
-		Code         respjson.Field
-		Details      respjson.Field
-		Output       respjson.Field
-		SentWithSsl  respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r Delivery) RawJSON() string { return r.JSON.raw }
-func (r *Delivery) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type Pagination struct {
-	// Current page number (1-indexed)
-	Page int64 `json:"page,required"`
-	// Items per page
-	PerPage int64 `json:"perPage,required"`
-	// Total number of items
-	Total int64 `json:"total,required"`
-	// Total number of pages
-	TotalPages int64 `json:"totalPages,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Page        respjson.Field
-		PerPage     respjson.Field
-		Total       respjson.Field
-		TotalPages  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r Pagination) RawJSON() string { return r.JSON.raw }
-func (r *Pagination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type SendEmail struct {
-	Data SendEmailData `json:"data,required"`
-	Meta APIMeta       `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Data        respjson.Field
-		Meta        respjson.Field
-		Success     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SendEmail) RawJSON() string { return r.JSON.raw }
-func (r *SendEmail) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type SendEmailData struct {
-	// Unique message ID (format: msg*{id}*{token})
-	ID string `json:"id,required"`
-	// Current delivery status
-	//
-	// Any of "pending", "sent".
-	Status string `json:"status,required"`
-	// List of recipient addresses
-	To []string `json:"to,required" format:"email"`
-	// SMTP Message-ID header value
-	MessageID string `json:"messageId"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		Status      respjson.Field
-		To          respjson.Field
-		MessageID   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SendEmailData) RawJSON() string { return r.JSON.raw }
-func (r *SendEmailData) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type EmailGetResponse struct {
-	Data EmailGetResponseData `json:"data,required"`
-	Meta APIMeta              `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    EmailGetResponseData `json:"data,required"`
+	Meta    shared.APIMeta       `json:"meta,required"`
+	Success bool                 `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -341,7 +228,7 @@ type EmailGetResponseData struct {
 	// Recipient address
 	To string `json:"to,required" format:"email"`
 	// Delivery attempt history (included if expand=deliveries)
-	Deliveries []Delivery `json:"deliveries"`
+	Deliveries []EmailGetResponseDataDelivery `json:"deliveries"`
 	// Email headers (included if expand=headers)
 	Headers map[string]string `json:"headers"`
 	// HTML body content (included if expand=content)
@@ -383,6 +270,44 @@ type EmailGetResponseData struct {
 // Returns the unmodified JSON received from the API
 func (r EmailGetResponseData) RawJSON() string { return r.JSON.raw }
 func (r *EmailGetResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailGetResponseDataDelivery struct {
+	// Delivery attempt ID
+	ID string `json:"id,required"`
+	// Delivery status (lowercase)
+	Status string `json:"status,required"`
+	// Unix timestamp
+	Timestamp float64 `json:"timestamp,required"`
+	// ISO 8601 timestamp
+	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	// SMTP response code
+	Code int64 `json:"code"`
+	// Status details
+	Details string `json:"details"`
+	// SMTP server response from the receiving mail server
+	Output string `json:"output"`
+	// Whether TLS was used
+	SentWithSsl bool `json:"sentWithSsl"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		Status       respjson.Field
+		Timestamp    respjson.Field
+		TimestampISO respjson.Field
+		Code         respjson.Field
+		Details      respjson.Field
+		Output       respjson.Field
+		SentWithSsl  respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailGetResponseDataDelivery) RawJSON() string { return r.JSON.raw }
+func (r *EmailGetResponseDataDelivery) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -449,10 +374,9 @@ const (
 )
 
 type EmailGetDeliveriesResponse struct {
-	Data EmailGetDeliveriesResponseData `json:"data,required"`
-	Meta APIMeta                        `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    EmailGetDeliveriesResponseData `json:"data,required"`
+	Meta    shared.APIMeta                 `json:"meta,required"`
+	Success bool                           `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -470,7 +394,7 @@ func (r *EmailGetDeliveriesResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailGetDeliveriesResponseData struct {
-	Deliveries []Delivery `json:"deliveries,required"`
+	Deliveries []EmailGetDeliveriesResponseDataDelivery `json:"deliveries,required"`
 	// Internal message ID
 	MessageID string `json:"messageId,required"`
 	// Message token
@@ -488,6 +412,44 @@ type EmailGetDeliveriesResponseData struct {
 // Returns the unmodified JSON received from the API
 func (r EmailGetDeliveriesResponseData) RawJSON() string { return r.JSON.raw }
 func (r *EmailGetDeliveriesResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailGetDeliveriesResponseDataDelivery struct {
+	// Delivery attempt ID
+	ID string `json:"id,required"`
+	// Delivery status (lowercase)
+	Status string `json:"status,required"`
+	// Unix timestamp
+	Timestamp float64 `json:"timestamp,required"`
+	// ISO 8601 timestamp
+	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	// SMTP response code
+	Code int64 `json:"code"`
+	// Status details
+	Details string `json:"details"`
+	// SMTP server response from the receiving mail server
+	Output string `json:"output"`
+	// Whether TLS was used
+	SentWithSsl bool `json:"sentWithSsl"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		Status       respjson.Field
+		Timestamp    respjson.Field
+		TimestampISO respjson.Field
+		Code         respjson.Field
+		Details      respjson.Field
+		Output       respjson.Field
+		SentWithSsl  respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailGetDeliveriesResponseDataDelivery) RawJSON() string { return r.JSON.raw }
+func (r *EmailGetDeliveriesResponseDataDelivery) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -525,11 +487,58 @@ func (r *EmailRetryResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type EmailSendResponse struct {
+	Data    EmailSendResponseData `json:"data,required"`
+	Meta    shared.APIMeta        `json:"meta,required"`
+	Success bool                  `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailSendResponse) RawJSON() string { return r.JSON.raw }
+func (r *EmailSendResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailSendResponseData struct {
+	// Unique message ID (format: msg*{id}*{token})
+	ID string `json:"id,required"`
+	// Current delivery status
+	//
+	// Any of "pending", "sent".
+	Status string `json:"status,required"`
+	// List of recipient addresses
+	To []string `json:"to,required" format:"email"`
+	// SMTP Message-ID header value
+	MessageID string `json:"messageId"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Status      respjson.Field
+		To          respjson.Field
+		MessageID   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailSendResponseData) RawJSON() string { return r.JSON.raw }
+func (r *EmailSendResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type EmailSendBatchResponse struct {
-	Data EmailSendBatchResponseData `json:"data,required"`
-	Meta APIMeta                    `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    EmailSendBatchResponseData `json:"data,required"`
+	Meta    shared.APIMeta             `json:"meta,required"`
+	Success bool                       `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -588,6 +597,54 @@ type EmailSendBatchResponseDataMessage struct {
 // Returns the unmodified JSON received from the API
 func (r EmailSendBatchResponseDataMessage) RawJSON() string { return r.JSON.raw }
 func (r *EmailSendBatchResponseDataMessage) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailSendRawResponse struct {
+	Data    EmailSendRawResponseData `json:"data,required"`
+	Meta    shared.APIMeta           `json:"meta,required"`
+	Success bool                     `json:"success,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Meta        respjson.Field
+		Success     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailSendRawResponse) RawJSON() string { return r.JSON.raw }
+func (r *EmailSendRawResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailSendRawResponseData struct {
+	// Unique message ID (format: msg*{id}*{token})
+	ID string `json:"id,required"`
+	// Current delivery status
+	//
+	// Any of "pending", "sent".
+	Status string `json:"status,required"`
+	// List of recipient addresses
+	To []string `json:"to,required" format:"email"`
+	// SMTP Message-ID header value
+	MessageID string `json:"messageId"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Status      respjson.Field
+		To          respjson.Field
+		MessageID   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailSendRawResponseData) RawJSON() string { return r.JSON.raw }
+func (r *EmailSendRawResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
