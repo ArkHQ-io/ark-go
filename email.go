@@ -15,6 +15,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/internal/apiquery"
 	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
 	"github.com/ArkHQ-io/ark-go/option"
+	"github.com/ArkHQ-io/ark-go/packages/pagination"
 	"github.com/ArkHQ-io/ark-go/packages/param"
 	"github.com/ArkHQ-io/ark-go/packages/respjson"
 )
@@ -63,11 +64,34 @@ func (r *EmailService) Get(ctx context.Context, emailID string, query EmailGetPa
 //
 // - `GET /emails/{id}` - Get full details of a specific email
 // - `POST /emails` - Send a new email
-func (r *EmailService) List(ctx context.Context, query EmailListParams, opts ...option.RequestOption) (res *EmailListResponse, err error) {
+func (r *EmailService) List(ctx context.Context, query EmailListParams, opts ...option.RequestOption) (res *pagination.EmailsPage[EmailListResponse], err error) {
+	var raw *http.Response
 	opts = slices.Concat(r.Options, opts)
+	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "emails"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
+	if err != nil {
+		return nil, err
+	}
+	err = cfg.Execute()
+	if err != nil {
+		return nil, err
+	}
+	res.SetPageConfig(cfg, raw)
+	return res, nil
+}
+
+// Retrieve a paginated list of sent emails. Results are ordered by send time,
+// newest first.
+//
+// Use filters to narrow down results by status, recipient, sender, or tag.
+//
+// **Related endpoints:**
+//
+// - `GET /emails/{id}` - Get full details of a specific email
+// - `POST /emails` - Send a new email
+func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams, opts ...option.RequestOption) *pagination.EmailsPageAutoPager[EmailListResponse] {
+	return pagination.NewEmailsPageAutoPager(r.List(ctx, query, opts...))
 }
 
 // Get the history of delivery attempts for an email, including SMTP response codes
@@ -363,45 +387,6 @@ func (r *EmailGetResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type EmailListResponse struct {
-	Data EmailListResponseData `json:"data,required"`
-	Meta APIMeta               `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Data        respjson.Field
-		Meta        respjson.Field
-		Success     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r EmailListResponse) RawJSON() string { return r.JSON.raw }
-func (r *EmailListResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type EmailListResponseData struct {
-	Messages   []EmailListResponseDataMessage `json:"messages,required"`
-	Pagination Pagination                     `json:"pagination,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Messages    respjson.Field
-		Pagination  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r EmailListResponseData) RawJSON() string { return r.JSON.raw }
-func (r *EmailListResponseData) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type EmailListResponseDataMessage struct {
 	// Internal message ID
 	ID    string `json:"id,required"`
 	Token string `json:"token,required"`
@@ -416,12 +401,12 @@ type EmailListResponseDataMessage struct {
 	// - `held` - Held for manual review
 	//
 	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
-	Status       string    `json:"status,required"`
-	Subject      string    `json:"subject,required"`
-	Timestamp    float64   `json:"timestamp,required"`
-	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
-	To           string    `json:"to,required" format:"email"`
-	Tag          string    `json:"tag"`
+	Status       EmailListResponseStatus `json:"status,required"`
+	Subject      string                  `json:"subject,required"`
+	Timestamp    float64                 `json:"timestamp,required"`
+	TimestampISO time.Time               `json:"timestampIso,required" format:"date-time"`
+	To           string                  `json:"to,required" format:"email"`
+	Tag          string                  `json:"tag"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
@@ -439,10 +424,29 @@ type EmailListResponseDataMessage struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r EmailListResponseDataMessage) RawJSON() string { return r.JSON.raw }
-func (r *EmailListResponseDataMessage) UnmarshalJSON(data []byte) error {
+func (r EmailListResponse) RawJSON() string { return r.JSON.raw }
+func (r *EmailListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Current delivery status:
+//
+// - `pending` - Email accepted, waiting to be processed
+// - `sent` - Email transmitted to recipient's mail server
+// - `softfail` - Temporary delivery failure, will retry
+// - `hardfail` - Permanent delivery failure
+// - `bounced` - Email bounced back
+// - `held` - Held for manual review
+type EmailListResponseStatus string
+
+const (
+	EmailListResponseStatusPending  EmailListResponseStatus = "pending"
+	EmailListResponseStatusSent     EmailListResponseStatus = "sent"
+	EmailListResponseStatusSoftfail EmailListResponseStatus = "softfail"
+	EmailListResponseStatusHardfail EmailListResponseStatus = "hardfail"
+	EmailListResponseStatusBounced  EmailListResponseStatus = "bounced"
+	EmailListResponseStatusHeld     EmailListResponseStatus = "held"
+)
 
 type EmailGetDeliveriesResponse struct {
 	Data EmailGetDeliveriesResponseData `json:"data,required"`
