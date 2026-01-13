@@ -152,11 +152,13 @@ func (r *SuppressionNewResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionGetResponse struct {
-	Data    SuppressionGetResponseData `json:"data"`
-	Success bool                       `json:"success"`
+	Data    SuppressionGetResponseData `json:"data,required"`
+	Meta    shared.APIMeta             `json:"meta,required"`
+	Success bool                       `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
+		Meta        respjson.Field
 		Success     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -170,16 +172,20 @@ func (r *SuppressionGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionGetResponseData struct {
-	Address    string    `json:"address"`
-	CreatedAt  time.Time `json:"createdAt,nullable" format:"date-time"`
-	Reason     string    `json:"reason,nullable"`
-	Suppressed bool      `json:"suppressed"`
+	// The email address that was checked
+	Address string `json:"address,required" format:"email"`
+	// Whether the address is currently suppressed
+	Suppressed bool `json:"suppressed,required"`
+	// When the suppression was created (if suppressed)
+	CreatedAt time.Time `json:"createdAt,nullable" format:"date-time"`
+	// Reason for suppression (if suppressed)
+	Reason string `json:"reason,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Address     respjson.Field
+		Suppressed  respjson.Field
 		CreatedAt   respjson.Field
 		Reason      respjson.Field
-		Suppressed  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`

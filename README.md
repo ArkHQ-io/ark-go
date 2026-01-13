@@ -313,7 +313,7 @@ page, err := client.Emails.List(context.TODO(), ark.EmailListParams{
 	PerPage: ark.Int(10),
 })
 for page != nil {
-	for _, email := range page.Data.Messages {
+	for _, email := range page.Data {
 		fmt.Printf("%+v\n", email)
 	}
 	page, err = page.GetNextPage()
