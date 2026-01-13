@@ -107,10 +107,9 @@ func (r *SuppressionService) BulkNew(ctx context.Context, body SuppressionBulkNe
 }
 
 type SuppressionNewResponse struct {
-	Data SuppressionNewResponseData `json:"data,required"`
-	Meta APIMeta                    `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    SuppressionNewResponseData `json:"data,required"`
+	Meta    APIMeta                    `json:"meta,required"`
+	Success bool                       `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -192,10 +191,9 @@ func (r *SuppressionGetResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionListResponse struct {
-	Data SuppressionListResponseData `json:"data,required"`
-	Meta APIMeta                     `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    SuppressionListResponseData `json:"data,required"`
+	Meta    APIMeta                     `json:"meta,required"`
+	Success bool                        `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -254,10 +252,9 @@ func (r *SuppressionListResponseDataSuppression) UnmarshalJSON(data []byte) erro
 }
 
 type SuppressionBulkNewResponse struct {
-	Data SuppressionBulkNewResponseData `json:"data,required"`
-	Meta APIMeta                        `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    SuppressionBulkNewResponseData `json:"data,required"`
+	Meta    APIMeta                        `json:"meta,required"`
+	Success bool                           `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
