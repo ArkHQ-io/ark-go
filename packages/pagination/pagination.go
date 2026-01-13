@@ -38,10 +38,10 @@ func (r *EmailsPageData[T]) UnmarshalJSON(data []byte) error {
 }
 
 type EmailsPageDataPagination struct {
-	Page       int64 `json:"page"`
-	PerPage    int64 `json:"perPage"`
-	Total      int64 `json:"total"`
-	TotalPages int64 `json:"totalPages"`
+	Page       int64 `json:"page,required"`
+	PerPage    int64 `json:"perPage,required"`
+	Total      int64 `json:"total,required"`
+	TotalPages int64 `json:"totalPages,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Page        respjson.Field
@@ -195,10 +195,10 @@ func (r *SuppressionsPageData[T]) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionsPageDataPagination struct {
-	Page       int64 `json:"page"`
-	PerPage    int64 `json:"perPage"`
-	Total      int64 `json:"total"`
-	TotalPages int64 `json:"totalPages"`
+	Page       int64 `json:"page,required"`
+	PerPage    int64 `json:"perPage,required"`
+	Total      int64 `json:"total,required"`
+	TotalPages int64 `json:"totalPages,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Page        respjson.Field
