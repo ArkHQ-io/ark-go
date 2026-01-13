@@ -39,9 +39,10 @@ func TestUserAgentHeader(t *testing.T) {
 		}),
 	)
 	client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if userAgent != fmt.Sprintf("Ark/Go %s", internal.PackageVersion) {
 		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
@@ -67,9 +68,10 @@ func TestRetryAfter(t *testing.T) {
 		}),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -106,9 +108,10 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 		option.WithHeaderDel("X-Stainless-Retry-Count"),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -140,9 +143,10 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 		option.WithHeader("X-Stainless-Retry-Count", "42"),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -173,9 +177,10 @@ func TestRetryAfterMs(t *testing.T) {
 		}),
 	)
 	_, err := client.Emails.Send(context.Background(), ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -200,9 +205,10 @@ func TestContextCancel(t *testing.T) {
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	cancel()
 	_, err := client.Emails.Send(cancelCtx, ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -224,9 +230,10 @@ func TestContextCancelDelay(t *testing.T) {
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 2*time.Millisecond)
 	defer cancel()
 	_, err := client.Emails.Send(cancelCtx, ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err == nil {
 		t.Error("expected there to be a cancel error")
@@ -254,9 +261,10 @@ func TestContextDeadline(t *testing.T) {
 			}),
 		)
 		_, err := client.Emails.Send(deadlineCtx, ark.EmailSendParams{
-			From:    "Acme <hello@acme.com>",
+			From:    "hello@yourdomain.com",
 			Subject: "Hello World",
 			To:      []string{"user@example.com"},
+			HTML:    ark.String("<h1>Welcome!</h1>"),
 		})
 		if err == nil {
 			t.Error("expected there to be a deadline error")

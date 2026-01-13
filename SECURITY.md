@@ -20,7 +20,7 @@ or products provided by Ark, please follow the respective company's security rep
 
 ### Ark Terms and Policies
 
-Please contact support@arkhq.io for any questions or concerns regarding the security of our services.
+Please contact hi@arkhq.io for any questions or concerns regarding the security of our services.
 
 ---
 
