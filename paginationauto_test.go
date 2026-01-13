@@ -31,7 +31,7 @@ func TestAutoPagination(t *testing.T) {
 	// Prism mock isn't going to give us real pagination
 	for i := 0; i < 3 && iter.Next(); i++ {
 		email := iter.Current()
-		t.Logf("%+v\n", email.ID)
+		t.Logf("%+v\n", email.Data)
 	}
 	if err := iter.Err(); err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
