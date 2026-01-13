@@ -19,45 +19,37 @@ type paramUnion = param.APIUnion
 // aliased to make [param.APIObject] private when embedding
 type paramObj = param.APIObject
 
-type PageNumberPaginationData struct {
-	Pagination PageNumberPaginationDataPagination `json:"pagination"`
+type PageNumberPaginationMeta struct {
+	RequestID string `json:"requestId"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Pagination  respjson.Field
+		RequestID   respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r PageNumberPaginationData) RawJSON() string { return r.JSON.raw }
-func (r *PageNumberPaginationData) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type PageNumberPaginationDataPagination struct {
-	Page       int64 `json:"page"`
-	TotalPages int64 `json:"totalPages"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Page        respjson.Field
-		TotalPages  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PageNumberPaginationDataPagination) RawJSON() string { return r.JSON.raw }
-func (r *PageNumberPaginationDataPagination) UnmarshalJSON(data []byte) error {
+func (r PageNumberPaginationMeta) RawJSON() string { return r.JSON.raw }
+func (r *PageNumberPaginationMeta) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 type PageNumberPagination[T any] struct {
-	Data PageNumberPaginationData `json:"data"`
+	Data       []T                      `json:"data"`
+	Page       int64                    `json:"page"`
+	PerPage    int64                    `json:"perPage"`
+	Total      int64                    `json:"total"`
+	TotalPages int64                    `json:"totalPages"`
+	Meta       PageNumberPaginationMeta `json:"meta"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
+		Page        respjson.Field
+		PerPage     respjson.Field
+		Total       respjson.Field
+		TotalPages  respjson.Field
+		Meta        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -78,8 +70,8 @@ func (r *PageNumberPagination[T]) GetNextPage() (res *PageNumberPagination[T], e
 	if len(r.Data) == 0 {
 		return nil, nil
 	}
-	currentPage := r.Data.Pagination.Page
-	if currentPage >= r.Data.Pagination.TotalPages {
+	currentPage := r.Page
+	if currentPage >= r.TotalPages {
 		return nil, nil
 	}
 	cfg := r.cfg.Clone(context.Background())

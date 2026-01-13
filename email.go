@@ -312,44 +312,6 @@ func (r *EmailGetResponseDataDelivery) UnmarshalJSON(data []byte) error {
 }
 
 type EmailListResponse struct {
-	Data    EmailListResponseData `json:"data,required"`
-	Meta    shared.APIMeta        `json:"meta,required"`
-	Success bool                  `json:"success,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Data        respjson.Field
-		Meta        respjson.Field
-		Success     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r EmailListResponse) RawJSON() string { return r.JSON.raw }
-func (r *EmailListResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type EmailListResponseData struct {
-	Messages   []EmailListResponseDataMessage  `json:"messages,required"`
-	Pagination EmailListResponseDataPagination `json:"pagination,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Messages    respjson.Field
-		Pagination  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r EmailListResponseData) RawJSON() string { return r.JSON.raw }
-func (r *EmailListResponseData) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type EmailListResponseDataMessage struct {
 	// Internal message ID
 	ID    string `json:"id,required"`
 	Token string `json:"token,required"`
@@ -364,12 +326,12 @@ type EmailListResponseDataMessage struct {
 	// - `held` - Held for manual review
 	//
 	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
-	Status       string    `json:"status,required"`
-	Subject      string    `json:"subject,required"`
-	Timestamp    float64   `json:"timestamp,required"`
-	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
-	To           string    `json:"to,required" format:"email"`
-	Tag          string    `json:"tag"`
+	Status       EmailListResponseStatus `json:"status,required"`
+	Subject      string                  `json:"subject,required"`
+	Timestamp    float64                 `json:"timestamp,required"`
+	TimestampISO time.Time               `json:"timestampIso,required" format:"date-time"`
+	To           string                  `json:"to,required" format:"email"`
+	Tag          string                  `json:"tag"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
@@ -387,36 +349,29 @@ type EmailListResponseDataMessage struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r EmailListResponseDataMessage) RawJSON() string { return r.JSON.raw }
-func (r *EmailListResponseDataMessage) UnmarshalJSON(data []byte) error {
+func (r EmailListResponse) RawJSON() string { return r.JSON.raw }
+func (r *EmailListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type EmailListResponseDataPagination struct {
-	// Current page number (1-indexed)
-	Page int64 `json:"page,required"`
-	// Items per page
-	PerPage int64 `json:"perPage,required"`
-	// Total number of items
-	Total int64 `json:"total,required"`
-	// Total number of pages
-	TotalPages int64 `json:"totalPages,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Page        respjson.Field
-		PerPage     respjson.Field
-		Total       respjson.Field
-		TotalPages  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
+// Current delivery status:
+//
+// - `pending` - Email accepted, waiting to be processed
+// - `sent` - Email transmitted to recipient's mail server
+// - `softfail` - Temporary delivery failure, will retry
+// - `hardfail` - Permanent delivery failure
+// - `bounced` - Email bounced back
+// - `held` - Held for manual review
+type EmailListResponseStatus string
 
-// Returns the unmodified JSON received from the API
-func (r EmailListResponseDataPagination) RawJSON() string { return r.JSON.raw }
-func (r *EmailListResponseDataPagination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
+const (
+	EmailListResponseStatusPending  EmailListResponseStatus = "pending"
+	EmailListResponseStatusSent     EmailListResponseStatus = "sent"
+	EmailListResponseStatusSoftfail EmailListResponseStatus = "softfail"
+	EmailListResponseStatusHardfail EmailListResponseStatus = "hardfail"
+	EmailListResponseStatusBounced  EmailListResponseStatus = "bounced"
+	EmailListResponseStatusHeld     EmailListResponseStatus = "held"
+)
 
 type EmailGetDeliveriesResponse struct {
 	Data    EmailGetDeliveriesResponseData `json:"data,required"`
