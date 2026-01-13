@@ -15,6 +15,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/internal/apiquery"
 	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
 	"github.com/ArkHQ-io/ark-go/option"
+	"github.com/ArkHQ-io/ark-go/packages/pagination"
 	"github.com/ArkHQ-io/ark-go/packages/param"
 	"github.com/ArkHQ-io/ark-go/packages/respjson"
 )
@@ -61,11 +62,27 @@ func (r *SuppressionService) Get(ctx context.Context, email string, opts ...opti
 
 // Get all email addresses on the suppression list. These addresses will not
 // receive any emails.
-func (r *SuppressionService) List(ctx context.Context, query SuppressionListParams, opts ...option.RequestOption) (res *SuppressionListResponse, err error) {
+func (r *SuppressionService) List(ctx context.Context, query SuppressionListParams, opts ...option.RequestOption) (res *pagination.EmailsPage[SuppressionListResponse], err error) {
+	var raw *http.Response
 	opts = slices.Concat(r.Options, opts)
+	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "suppressions"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
+	if err != nil {
+		return nil, err
+	}
+	err = cfg.Execute()
+	if err != nil {
+		return nil, err
+	}
+	res.SetPageConfig(cfg, raw)
+	return res, nil
+}
+
+// Get all email addresses on the suppression list. These addresses will not
+// receive any emails.
+func (r *SuppressionService) ListAutoPaging(ctx context.Context, query SuppressionListParams, opts ...option.RequestOption) *pagination.EmailsPageAutoPager[SuppressionListResponse] {
+	return pagination.NewEmailsPageAutoPager(r.List(ctx, query, opts...))
 }
 
 // Remove an email address from the suppression list. The address will be able to
