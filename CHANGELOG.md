@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.0 (2026-01-13)
+
+Full Changelog: [v0.2.0...v0.3.0](https://github.com/ArkHQ-io/ark-go/compare/v0.2.0...v0.3.0)
+
+### Features
+
+* **api:** api update ([837dd58](https://github.com/ArkHQ-io/ark-go/commit/837dd58ac46d162da07186e57e94307a1b9f93fd))
+* **api:** api update ([dcb6ba7](https://github.com/ArkHQ-io/ark-go/commit/dcb6ba7bac9e458510858f01b694016a069327dc))
+* **api:** api update ([a832ace](https://github.com/ArkHQ-io/ark-go/commit/a832acec44b591ca59a88593bb2e06cba0e998e8))
+* **api:** api update ([ec78459](https://github.com/ArkHQ-io/ark-go/commit/ec7845961af43ebdacb5ec81f9f76a3b19212343))
+* **api:** manual updates ([875cccb](https://github.com/ArkHQ-io/ark-go/commit/875cccb3ecb1bc3f012886ea5ba68a2b62148715))
+* **api:** manual updates ([9d442ed](https://github.com/ArkHQ-io/ark-go/commit/9d442edafbc15f80506eb937390f726cd6be347d))
+* **api:** manual updates ([83ed8db](https://github.com/ArkHQ-io/ark-go/commit/83ed8db84b58389416cde7d646e33739f7266809))
+* **api:** manual updates ([c929a68](https://github.com/ArkHQ-io/ark-go/commit/c929a684b3d6da8827ba4fe8fca6a53c3d200784))
+* **api:** manual updates ([cd77672](https://github.com/ArkHQ-io/ark-go/commit/cd77672504c9217d8195b62e6eb4df8b671f3071))
+* **api:** manual updates ([14ee31e](https://github.com/ArkHQ-io/ark-go/commit/14ee31eb772e139bd174d5ec850658f2e843e08e))
+* **api:** manual updates ([05a73d4](https://github.com/ArkHQ-io/ark-go/commit/05a73d4ecd56c7a5b4d6742cc6027a0cff4e4d05))
+* **api:** manual updates ([e1ff71e](https://github.com/ArkHQ-io/ark-go/commit/e1ff71ecdd2c0b0436a0b566f2bc2afb27ce4cf2))
+* **api:** manual updates ([fb14f7f](https://github.com/ArkHQ-io/ark-go/commit/fb14f7f876a340d1143a7cba51efaf3e1a0f7be5))
+* **api:** manual updates ([b5426d2](https://github.com/ArkHQ-io/ark-go/commit/b5426d2e0c9e1777ccbc5071d3a2660cfd87dd34))
+* **api:** manual updates ([1d98da0](https://github.com/ArkHQ-io/ark-go/commit/1d98da037a83ce09719bbc0597cb9710ad683765))
+
 ## 0.2.0 (2026-01-12)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/ArkHQ-io/ark-go/compare/v0.1.0...v0.2.0)
