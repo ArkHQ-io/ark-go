@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 (2026-01-13)
+
+Full Changelog: [v0.4.1...v0.5.0](https://github.com/ArkHQ-io/ark-go/compare/v0.4.1...v0.5.0)
+
+### Features
+
+* **api:** manual updates ([ac339f1](https://github.com/ArkHQ-io/ark-go/commit/ac339f192c84a8980d116fe40c15fef395cde975))
+* **api:** manual updates ([9f9e676](https://github.com/ArkHQ-io/ark-go/commit/9f9e676cdbf3cabe0e65cfbd92f53822a04dc08c))
+
 ## 0.4.1 (2026-01-13)
 
 Full Changelog: [v0.4.0...v0.4.1](https://github.com/ArkHQ-io/ark-go/compare/v0.4.0...v0.4.1)

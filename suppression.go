@@ -305,7 +305,7 @@ func (r *SuppressionBulkNewResponseData) UnmarshalJSON(data []byte) error {
 type SuppressionNewParams struct {
 	// Email address to suppress
 	Address string `json:"address,required" format:"email"`
-	// Reason for suppression
+	// Reason for suppression (accepts null)
 	Reason param.Opt[string] `json:"reason,omitzero"`
 	paramObj
 }
@@ -347,8 +347,9 @@ func (r *SuppressionBulkNewParams) UnmarshalJSON(data []byte) error {
 
 // The property Address is required.
 type SuppressionBulkNewParamsSuppression struct {
-	Address string            `json:"address,required" format:"email"`
-	Reason  param.Opt[string] `json:"reason,omitzero"`
+	Address string `json:"address,required" format:"email"`
+	// Reason for suppression (accepts null)
+	Reason param.Opt[string] `json:"reason,omitzero"`
 	paramObj
 }
 

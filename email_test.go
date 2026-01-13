@@ -195,7 +195,7 @@ func TestEmailSendBatchWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestEmailSendRaw(t *testing.T) {
+func TestEmailSendRawWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -211,6 +211,7 @@ func TestEmailSendRaw(t *testing.T) {
 		Data:     "data",
 		MailFrom: "dev@stainless.com",
 		RcptTo:   []string{"dev@stainless.com"},
+		Bounce:   ark.Bool(true),
 	})
 	if err != nil {
 		var apierr *ark.Error
