@@ -14,7 +14,6 @@ import (
 )
 
 func TestEmailGetWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -43,7 +42,6 @@ func TestEmailGetWithOptionalParams(t *testing.T) {
 }
 
 func TestEmailListWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -75,7 +73,6 @@ func TestEmailListWithOptionalParams(t *testing.T) {
 }
 
 func TestEmailGetDeliveries(t *testing.T) {
-	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -98,7 +95,6 @@ func TestEmailGetDeliveries(t *testing.T) {
 }
 
 func TestEmailRetry(t *testing.T) {
-	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -121,7 +117,6 @@ func TestEmailRetry(t *testing.T) {
 }
 
 func TestEmailSendWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -163,7 +158,6 @@ func TestEmailSendWithOptionalParams(t *testing.T) {
 }
 
 func TestEmailSendBatchWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -202,7 +196,6 @@ func TestEmailSendBatchWithOptionalParams(t *testing.T) {
 }
 
 func TestEmailSendRaw(t *testing.T) {
-	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL

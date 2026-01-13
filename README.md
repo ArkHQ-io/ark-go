@@ -6,7 +6,7 @@
 
 <!-- x-release-please-end -->
 
-The Ark Go library provides convenient access to the [Ark REST API](https://arkhq.io/support)
+The Ark Go library provides convenient access to the [Ark REST API](https://arkhq.io/docs)
 from applications written in Go.
 
 It is generated with [Stainless](https://www.stainless.com/).
@@ -28,7 +28,7 @@ Or to pin the version:
 <!-- x-release-please-start-version -->
 
 ```sh
-go get -u 'github.com/ArkHQ-io/ark-go@v0.2.0'
+go get -u 'github.com/ArkHQ-io/ark-go@v0.3.0'
 ```
 
 <!-- x-release-please-end -->
@@ -56,15 +56,16 @@ func main() {
 	client := ark.NewClient(
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("ARK_API_KEY")
 	)
-	sendEmail, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+	response, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	})
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", sendEmail.Data)
+	fmt.Printf("%+v\n", response.Data)
 }
 
 ```
@@ -302,9 +303,10 @@ To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
 _, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-	From:    "Acme <hello@acme.com>",
+	From:    "hello@yourdomain.com",
 	Subject: "Hello World",
 	To:      []string{"user@example.com"},
+	HTML:    ark.String("<h1>Welcome!</h1>"),
 })
 if err != nil {
 	var apierr *ark.Error
@@ -333,9 +335,10 @@ defer cancel()
 client.Emails.Send(
 	ctx,
 	ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
@@ -373,9 +376,10 @@ client := ark.NewClient(
 client.Emails.Send(
 	context.TODO(),
 	ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	},
 	option.WithMaxRetries(5),
 )
@@ -389,19 +393,20 @@ you need to examine response headers, status codes, or other details.
 ```go
 // Create a variable to store the HTTP response
 var response *http.Response
-sendEmail, err := client.Emails.Send(
+response, err := client.Emails.Send(
 	context.TODO(),
 	ark.EmailSendParams{
-		From:    "Acme <hello@acme.com>",
+		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
+		HTML:    ark.String("<h1>Welcome!</h1>"),
 	},
 	option.WithResponseInto(&response),
 )
 if err != nil {
 	// handle error
 }
-fmt.Printf("%+v\n", sendEmail)
+fmt.Printf("%+v\n", response)
 
 fmt.Printf("Status Code: %d\n", response.StatusCode)
 fmt.Printf("Headers: %+#v\n", response.Header)
