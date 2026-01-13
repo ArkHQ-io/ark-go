@@ -163,9 +163,10 @@ const (
 )
 
 type DomainNewResponse struct {
-	Data    DomainNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta        `json:"meta,required"`
-	Success bool                  `json:"success,required"`
+	Data DomainNewResponseData `json:"data,required"`
+	Meta shared.APIMeta        `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -235,9 +236,10 @@ func (r *DomainNewResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
 }
 
 type DomainGetResponse struct {
-	Data    DomainGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta        `json:"meta,required"`
-	Success bool                  `json:"success,required"`
+	Data DomainGetResponseData `json:"data,required"`
+	Meta shared.APIMeta        `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -307,9 +309,10 @@ func (r *DomainGetResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
 }
 
 type DomainListResponse struct {
-	Data    DomainListResponseData `json:"data,required"`
-	Meta    shared.APIMeta         `json:"meta,required"`
-	Success bool                   `json:"success,required"`
+	Data DomainListResponseData `json:"data,required"`
+	Meta shared.APIMeta         `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -366,9 +369,10 @@ func (r *DomainListResponseDataDomain) UnmarshalJSON(data []byte) error {
 }
 
 type DomainDeleteResponse struct {
-	Data    DomainDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta           `json:"meta,required"`
-	Success bool                     `json:"success,required"`
+	Data DomainDeleteResponseData `json:"data,required"`
+	Meta shared.APIMeta           `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -402,9 +406,10 @@ func (r *DomainDeleteResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type DomainVerifyResponse struct {
-	Data    DomainVerifyResponseData `json:"data,required"`
-	Meta    shared.APIMeta           `json:"meta,required"`
-	Success bool                     `json:"success,required"`
+	Data DomainVerifyResponseData `json:"data,required"`
+	Meta shared.APIMeta           `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

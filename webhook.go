@@ -124,9 +124,10 @@ func (r *WebhookService) Test(ctx context.Context, webhookID string, body Webhoo
 }
 
 type WebhookNewResponse struct {
-	Data    WebhookNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta         `json:"meta,required"`
-	Success bool                   `json:"success,required"`
+	Data WebhookNewResponseData `json:"data,required"`
+	Meta shared.APIMeta         `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -183,9 +184,10 @@ func (r *WebhookNewResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type WebhookGetResponse struct {
-	Data    WebhookGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta         `json:"meta,required"`
-	Success bool                   `json:"success,required"`
+	Data WebhookGetResponseData `json:"data,required"`
+	Meta shared.APIMeta         `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -242,9 +244,10 @@ func (r *WebhookGetResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type WebhookUpdateResponse struct {
-	Data    WebhookUpdateResponseData `json:"data,required"`
-	Meta    shared.APIMeta            `json:"meta,required"`
-	Success bool                      `json:"success,required"`
+	Data WebhookUpdateResponseData `json:"data,required"`
+	Meta shared.APIMeta            `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -301,9 +304,10 @@ func (r *WebhookUpdateResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type WebhookListResponse struct {
-	Data    WebhookListResponseData `json:"data,required"`
-	Meta    shared.APIMeta          `json:"meta,required"`
-	Success bool                    `json:"success,required"`
+	Data WebhookListResponseData `json:"data,required"`
+	Meta shared.APIMeta          `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -362,9 +366,10 @@ func (r *WebhookListResponseDataWebhook) UnmarshalJSON(data []byte) error {
 }
 
 type WebhookDeleteResponse struct {
-	Data    WebhookDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta            `json:"meta,required"`
-	Success bool                      `json:"success,required"`
+	Data WebhookDeleteResponseData `json:"data,required"`
+	Meta shared.APIMeta            `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -398,9 +403,10 @@ func (r *WebhookDeleteResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type WebhookTestResponse struct {
-	Data    WebhookTestResponseData `json:"data,required"`
-	Meta    shared.APIMeta          `json:"meta,required"`
-	Success bool                    `json:"success,required"`
+	Data WebhookTestResponseData `json:"data,required"`
+	Meta shared.APIMeta          `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
