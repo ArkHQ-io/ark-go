@@ -28,7 +28,7 @@ Or to pin the version:
 <!-- x-release-please-start-version -->
 
 ```sh
-go get -u 'github.com/ArkHQ-io/ark-go@v0.3.0'
+go get -u 'github.com/ArkHQ-io/ark-go@v0.4.0'
 ```
 
 <!-- x-release-please-end -->
@@ -289,8 +289,39 @@ This library provides some conveniences for working with paginated list endpoint
 
 You can use `.ListAutoPaging()` methods to iterate through items across all pages:
 
+```go
+iter := client.Emails.ListAutoPaging(context.TODO(), ark.EmailListParams{
+	Page:    ark.Int(1),
+	PerPage: ark.Int(10),
+})
+// Automatically fetches more pages as needed.
+for iter.Next() {
+	emailListResponse := iter.Current()
+	fmt.Printf("%+v\n", emailListResponse)
+}
+if err := iter.Err(); err != nil {
+	panic(err.Error())
+}
+```
+
 Or you can use simple `.List()` methods to fetch a single page and receive a standard response object
 with additional helper methods like `.GetNextPage()`, e.g.:
+
+```go
+page, err := client.Emails.List(context.TODO(), ark.EmailListParams{
+	Page:    ark.Int(1),
+	PerPage: ark.Int(10),
+})
+for page != nil {
+	for _, email := range page.Data {
+		fmt.Printf("%+v\n", email)
+	}
+	page, err = page.GetNextPage()
+}
+if err != nil {
+	panic(err.Error())
+}
+```
 
 ### Errors
 
