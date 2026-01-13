@@ -162,9 +162,10 @@ const (
 )
 
 type DomainResponse struct {
-	Data    DomainResponseData `json:"data,required"`
-	Meta    APIMeta            `json:"meta,required"`
-	Success bool               `json:"success,required"`
+	Data DomainResponseData `json:"data,required"`
+	Meta APIMeta            `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -234,9 +235,10 @@ func (r *DomainResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
 }
 
 type SuccessResponse struct {
-	Data    SuccessResponseData `json:"data,required"`
-	Meta    APIMeta             `json:"meta,required"`
-	Success bool                `json:"success,required"`
+	Data SuccessResponseData `json:"data,required"`
+	Meta APIMeta             `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -270,9 +272,10 @@ func (r *SuccessResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type DomainListResponse struct {
-	Data    DomainListResponseData `json:"data,required"`
-	Meta    APIMeta                `json:"meta,required"`
-	Success bool                   `json:"success,required"`
+	Data DomainListResponseData `json:"data,required"`
+	Meta APIMeta                `json:"meta,required"`
+	// Any of true.
+	Success bool `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
