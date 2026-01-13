@@ -227,10 +227,9 @@ const (
 )
 
 type TrackDomainResponse struct {
-	Data TrackDomain `json:"data,required"`
-	Meta APIMeta     `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    TrackDomain `json:"data,required"`
+	Meta    APIMeta     `json:"meta,required"`
+	Success bool        `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -248,10 +247,9 @@ func (r *TrackDomainResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TrackingListResponse struct {
-	Data TrackingListResponseData `json:"data,required"`
-	Meta APIMeta                  `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    TrackingListResponseData `json:"data,required"`
+	Meta    APIMeta                  `json:"meta,required"`
+	Success bool                     `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -285,10 +283,9 @@ func (r *TrackingListResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TrackingVerifyResponse struct {
-	Data TrackingVerifyResponseData `json:"data,required"`
-	Meta APIMeta                    `json:"meta,required"`
-	// Any of true.
-	Success bool `json:"success,required"`
+	Data    TrackingVerifyResponseData `json:"data,required"`
+	Meta    APIMeta                    `json:"meta,required"`
+	Success bool                       `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
