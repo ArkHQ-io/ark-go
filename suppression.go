@@ -198,70 +198,6 @@ func (r *SuppressionGetResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type SuppressionListResponse struct {
-	Data    SuppressionListResponseData `json:"data,required"`
-	Meta    shared.APIMeta              `json:"meta,required"`
-	Success bool                        `json:"success,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Data        respjson.Field
-		Meta        respjson.Field
-		Success     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SuppressionListResponse) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionListResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type SuppressionListResponseData struct {
-	Pagination   SuppressionListResponseDataPagination    `json:"pagination,required"`
-	Suppressions []SuppressionListResponseDataSuppression `json:"suppressions,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Pagination   respjson.Field
-		Suppressions respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SuppressionListResponseData) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionListResponseData) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type SuppressionListResponseDataPagination struct {
-	// Current page number (1-indexed)
-	Page int64 `json:"page,required"`
-	// Items per page
-	PerPage int64 `json:"perPage,required"`
-	// Total number of items
-	Total int64 `json:"total,required"`
-	// Total number of pages
-	TotalPages int64 `json:"totalPages,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Page        respjson.Field
-		PerPage     respjson.Field
-		Total       respjson.Field
-		TotalPages  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SuppressionListResponseDataPagination) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionListResponseDataPagination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type SuppressionListResponseDataSuppression struct {
 	// Suppression ID
 	ID        string    `json:"id,required"`
 	Address   string    `json:"address,required" format:"email"`
@@ -279,8 +215,8 @@ type SuppressionListResponseDataSuppression struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r SuppressionListResponseDataSuppression) RawJSON() string { return r.JSON.raw }
-func (r *SuppressionListResponseDataSuppression) UnmarshalJSON(data []byte) error {
+func (r SuppressionListResponse) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
