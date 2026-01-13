@@ -20,8 +20,8 @@ type paramUnion = param.APIUnion
 type paramObj = param.APIObject
 
 type EmailsPageData[T any] struct {
-	Messages   []T                      `json:"messages"`
-	Pagination EmailsPageDataPagination `json:"pagination"`
+	Messages   []T                      `json:"messages,required"`
+	Pagination EmailsPageDataPagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Messages    respjson.Field
@@ -39,10 +39,14 @@ func (r *EmailsPageData[T]) UnmarshalJSON(data []byte) error {
 
 type EmailsPageDataPagination struct {
 	Page       int64 `json:"page"`
+	PerPage    int64 `json:"perPage"`
+	Total      int64 `json:"total"`
 	TotalPages int64 `json:"totalPages"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Page        respjson.Field
+		PerPage     respjson.Field
+		Total       respjson.Field
 		TotalPages  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -55,11 +59,31 @@ func (r *EmailsPageDataPagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type EmailsPage[T any] struct {
-	Data EmailsPageData[T] `json:"data"`
+type EmailsPageMeta struct {
+	RequestID string `json:"requestId"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		RequestID   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailsPageMeta) RawJSON() string { return r.JSON.raw }
+func (r *EmailsPageMeta) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailsPage[T any] struct {
+	Success bool              `json:"success"`
+	Data    EmailsPageData[T] `json:"data"`
+	Meta    EmailsPageMeta    `json:"meta"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Success     respjson.Field
 		Data        respjson.Field
+		Meta        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -153,8 +177,8 @@ func (r *EmailsPageAutoPager[T]) Index() int {
 }
 
 type SuppressionsPageData[T any] struct {
-	Pagination   SuppressionsPageDataPagination `json:"pagination"`
-	Suppressions []T                            `json:"suppressions"`
+	Pagination   SuppressionsPageDataPagination `json:"pagination,required"`
+	Suppressions []T                            `json:"suppressions,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Pagination   respjson.Field
@@ -172,10 +196,14 @@ func (r *SuppressionsPageData[T]) UnmarshalJSON(data []byte) error {
 
 type SuppressionsPageDataPagination struct {
 	Page       int64 `json:"page"`
+	PerPage    int64 `json:"perPage"`
+	Total      int64 `json:"total"`
 	TotalPages int64 `json:"totalPages"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Page        respjson.Field
+		PerPage     respjson.Field
+		Total       respjson.Field
 		TotalPages  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -188,11 +216,31 @@ func (r *SuppressionsPageDataPagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type SuppressionsPage[T any] struct {
-	Data SuppressionsPageData[T] `json:"data"`
+type SuppressionsPageMeta struct {
+	RequestID string `json:"requestId"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		RequestID   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SuppressionsPageMeta) RawJSON() string { return r.JSON.raw }
+func (r *SuppressionsPageMeta) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type SuppressionsPage[T any] struct {
+	Success bool                    `json:"success"`
+	Data    SuppressionsPageData[T] `json:"data"`
+	Meta    SuppressionsPageMeta    `json:"meta"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Success     respjson.Field
 		Data        respjson.Field
+		Meta        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
