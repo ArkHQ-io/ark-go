@@ -759,6 +759,17 @@ type EmailSendParams struct {
 	Cc []string `json:"cc,omitzero" format:"email"`
 	// Custom email headers (accepts null)
 	Headers map[string]string `json:"headers,omitzero"`
+	// Custom key-value pairs attached to an email for webhook correlation.
+	//
+	// When you send an email with metadata, these key-value pairs are:
+	//
+	// - **Stored** with the message
+	// - **Returned** in all webhook event payloads (MessageSent, MessageBounced, etc.)
+	// - **Never visible** to email recipients
+	//
+	// This is useful for correlating webhook events with your internal systems (e.g.,
+	// user IDs, order IDs, campaign identifiers).
+	Metadata map[string]string `json:"metadata,omitzero"`
 	paramObj
 }
 
@@ -812,6 +823,17 @@ type EmailSendBatchParamsEmail struct {
 	HTML    param.Opt[string] `json:"html,omitzero"`
 	Tag     param.Opt[string] `json:"tag,omitzero"`
 	Text    param.Opt[string] `json:"text,omitzero"`
+	// Custom key-value pairs attached to an email for webhook correlation.
+	//
+	// When you send an email with metadata, these key-value pairs are:
+	//
+	// - **Stored** with the message
+	// - **Returned** in all webhook event payloads (MessageSent, MessageBounced, etc.)
+	// - **Never visible** to email recipients
+	//
+	// This is useful for correlating webhook events with your internal systems (e.g.,
+	// user IDs, order IDs, campaign identifiers).
+	Metadata map[string]string `json:"metadata,omitzero"`
 	paramObj
 }
 
