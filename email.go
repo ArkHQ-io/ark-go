@@ -821,8 +821,9 @@ type EmailSendBatchParamsEmail struct {
 	Subject string            `json:"subject,required"`
 	To      []string          `json:"to,omitzero,required" format:"email"`
 	HTML    param.Opt[string] `json:"html,omitzero"`
-	Tag     param.Opt[string] `json:"tag,omitzero"`
-	Text    param.Opt[string] `json:"text,omitzero"`
+	// Tag for categorization and filtering
+	Tag  param.Opt[string] `json:"tag,omitzero"`
+	Text param.Opt[string] `json:"text,omitzero"`
 	// Custom key-value pairs attached to an email for webhook correlation.
 	//
 	// When you send an email with metadata, these key-value pairs are:
