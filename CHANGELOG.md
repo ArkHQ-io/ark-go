@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 (2026-01-14)
+
+Full Changelog: [v0.5.0...v0.6.0](https://github.com/ArkHQ-io/ark-go/compare/v0.5.0...v0.6.0)
+
+### Features
+
+* **api:** add metadata ([a5c91dc](https://github.com/ArkHQ-io/ark-go/commit/a5c91dcab47761c881ff344df29b14441e3a3168))
+
 ## 0.5.0 (2026-01-13)
 
 Full Changelog: [v0.4.1...v0.5.0](https://github.com/ArkHQ-io/ark-go/compare/v0.4.1...v0.5.0)
