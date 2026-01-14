@@ -29,6 +29,11 @@ func TestUsage(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())

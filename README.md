@@ -70,6 +70,11 @@ func main() {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err != nil {
 		panic(err.Error())
@@ -347,6 +352,11 @@ _, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
 	Subject: "Hello World",
 	To:      []string{"user@example.com"},
 	HTML:    ark.String("<h1>Welcome!</h1>"),
+	Metadata: map[string]string{
+		"user_id":  "usr_123",
+		"campaign": "onboarding",
+	},
+	Tag: ark.String("welcome"),
 })
 if err != nil {
 	var apierr *ark.Error
@@ -379,6 +389,11 @@ client.Emails.Send(
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
@@ -420,6 +435,11 @@ client.Emails.Send(
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	},
 	option.WithMaxRetries(5),
 )
@@ -440,6 +460,11 @@ response, err := client.Emails.Send(
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	},
 	option.WithResponseInto(&response),
 )
