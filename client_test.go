@@ -43,6 +43,11 @@ func TestUserAgentHeader(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if userAgent != fmt.Sprintf("Ark/Go %s", internal.PackageVersion) {
 		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
@@ -72,6 +77,11 @@ func TestRetryAfter(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -112,6 +122,11 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -147,6 +162,11 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -181,6 +201,11 @@ func TestRetryAfterMs(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -209,6 +234,11 @@ func TestContextCancel(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
@@ -234,6 +264,11 @@ func TestContextCancelDelay(t *testing.T) {
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
+		Metadata: map[string]string{
+			"user_id":  "usr_123",
+			"campaign": "onboarding",
+		},
+		Tag: ark.String("welcome"),
 	})
 	if err == nil {
 		t.Error("expected there to be a cancel error")
@@ -265,6 +300,11 @@ func TestContextDeadline(t *testing.T) {
 			Subject: "Hello World",
 			To:      []string{"user@example.com"},
 			HTML:    ark.String("<h1>Welcome!</h1>"),
+			Metadata: map[string]string{
+				"user_id":  "usr_123",
+				"campaign": "onboarding",
+			},
+			Tag: ark.String("welcome"),
 		})
 		if err == nil {
 			t.Error("expected there to be a deadline error")
