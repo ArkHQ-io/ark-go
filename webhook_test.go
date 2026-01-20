@@ -139,6 +139,95 @@ func TestWebhookDelete(t *testing.T) {
 	}
 }
 
+func TestWebhookListDeliveriesWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := ark.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Webhooks.ListDeliveries(
+		context.TODO(),
+		"webhookId",
+		ark.WebhookListDeliveriesParams{
+			After:   ark.Int(0),
+			Before:  ark.Int(0),
+			Event:   ark.WebhookListDeliveriesParamsEventMessageSent,
+			Page:    ark.Int(1),
+			PerPage: ark.Int(1),
+			Success: ark.Bool(true),
+		},
+	)
+	if err != nil {
+		var apierr *ark.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestWebhookReplayDelivery(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := ark.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Webhooks.ReplayDelivery(
+		context.TODO(),
+		"deliveryId",
+		ark.WebhookReplayDeliveryParams{
+			WebhookID: "webhookId",
+		},
+	)
+	if err != nil {
+		var apierr *ark.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestWebhookGetDelivery(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := ark.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Webhooks.GetDelivery(
+		context.TODO(),
+		"deliveryId",
+		ark.WebhookGetDeliveryParams{
+			WebhookID: "webhookId",
+		},
+	)
+	if err != nil {
+		var apierr *ark.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
 func TestWebhookTest(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
