@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.7.0 (2026-01-20)
+
+Full Changelog: [v0.6.0...v0.7.0](https://github.com/ArkHQ-io/ark-go/compare/v0.6.0...v0.7.0)
+
+### Features
+
+* **api:** add webhook deliveries ([06c916b](https://github.com/ArkHQ-io/ark-go/commit/06c916b874acaccca186b1d21582a88c576a6e23))
+* **api:** api update ([c974547](https://github.com/ArkHQ-io/ark-go/commit/c974547d98521ef9a78350d00ba95c1010eba265))
+* **api:** api update ([dad5ae6](https://github.com/ArkHQ-io/ark-go/commit/dad5ae6c61f5cb24dd3f12769904e06b1595b874))
+* **api:** manual updates ([cf57deb](https://github.com/ArkHQ-io/ark-go/commit/cf57deba939ba163ada7d5271eb3d44e80957b0e))
+
+
+### Bug Fixes
+
+* **docs:** add missing pointer prefix to api.md return types ([b0ba78c](https://github.com/ArkHQ-io/ark-go/commit/b0ba78c0ac8ebbb236206f1748918a2f44f68a86))
+
+
+### Chores
+
+* **internal:** update `actions/checkout` version ([d303dd4](https://github.com/ArkHQ-io/ark-go/commit/d303dd4fa3ade4f79c35a28971c4b7fc6e574dce))
+
 ## 0.6.0 (2026-01-14)
 
 Full Changelog: [v0.5.0...v0.6.0](https://github.com/ArkHQ-io/ark-go/compare/v0.5.0...v0.6.0)
