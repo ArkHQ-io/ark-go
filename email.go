@@ -520,12 +520,16 @@ type EmailSendResponseData struct {
 	To []string `json:"to,required" format:"email"`
 	// SMTP Message-ID header value
 	MessageID string `json:"messageId"`
+	// Whether this email was sent in sandbox mode. Only present (and true) for sandbox
+	// emails sent from @arkhq.io addresses.
+	Sandbox bool `json:"sandbox"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		Status      respjson.Field
 		To          respjson.Field
 		MessageID   respjson.Field
+		Sandbox     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -566,12 +570,16 @@ type EmailSendBatchResponseData struct {
 	Messages map[string]EmailSendBatchResponseDataMessage `json:"messages,required"`
 	// Total emails in the batch
 	Total int64 `json:"total,required"`
+	// Whether this batch was sent in sandbox mode. Only present (and true) for sandbox
+	// emails sent from @arkhq.io addresses.
+	Sandbox bool `json:"sandbox"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Accepted    respjson.Field
 		Failed      respjson.Field
 		Messages    respjson.Field
 		Total       respjson.Field
+		Sandbox     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -633,12 +641,16 @@ type EmailSendRawResponseData struct {
 	To []string `json:"to,required" format:"email"`
 	// SMTP Message-ID header value
 	MessageID string `json:"messageId"`
+	// Whether this email was sent in sandbox mode. Only present (and true) for sandbox
+	// emails sent from @arkhq.io addresses.
+	Sandbox bool `json:"sandbox"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		Status      respjson.Field
 		To          respjson.Field
 		MessageID   respjson.Field
+		Sandbox     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -726,7 +738,7 @@ const (
 )
 
 type EmailSendParams struct {
-	// Sender email address. Must be from a verified domain.
+	// Sender email address. Must be from a verified domain OR use sandbox mode.
 	//
 	// **Supported formats:**
 	//
@@ -735,6 +747,10 @@ type EmailSendParams struct {
 	// - With quoted name: `"Acme Support" <support@yourdomain.com>`
 	//
 	// The domain portion must match a verified sending domain in your account.
+	//
+	// **Sandbox mode:** Use `sandbox@arkhq.io` to send test emails without domain
+	// verification. Sandbox emails can only be sent to organization members and are
+	// limited to 10 per day.
 	From string `json:"from,required"`
 	// Email subject line
 	Subject string `json:"subject,required"`
