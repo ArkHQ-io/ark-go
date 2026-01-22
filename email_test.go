@@ -84,7 +84,7 @@ func TestEmailGetDeliveries(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Emails.GetDeliveries(context.TODO(), "msg_12345_aBc123XyZ")
+	_, err := client.Emails.GetDeliveries(context.TODO(), "emailId")
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
