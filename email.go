@@ -95,42 +95,8 @@ func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams
 	return pagination.NewPageNumberPaginationAutoPager(r.List(ctx, query, opts...))
 }
 
-// Get the complete delivery history for an email, including SMTP response codes,
-// timestamps, and current retry state.
-//
-// ## Response Fields
-//
-// ### Status
-//
-// The current status of the email:
-//
-// - `pending` - Awaiting first delivery attempt
-// - `sent` - Successfully delivered to recipient server
-// - `softfail` - Temporary failure, automatic retry scheduled
-// - `hardfail` - Permanent failure, will not retry
-// - `held` - Held for manual review
-// - `bounced` - Bounced by recipient server
-//
-// ### Retry State
-//
-// When the email is in the delivery queue (`pending` or `softfail` status),
-// `retryState` provides information about the retry schedule:
-//
-// - `attempt` - Current attempt number (0 = first attempt)
-// - `maxAttempts` - Maximum attempts before hard-fail (typically 18)
-// - `attemptsRemaining` - Attempts left before hard-fail
-// - `nextRetryAt` - When the next retry is scheduled (Unix timestamp)
-// - `processing` - Whether the email is currently being processed
-// - `manual` - Whether this was triggered by a manual retry
-//
-// When the email has finished processing (`sent`, `hardfail`, `held`, `bounced`),
-// `retryState` is `null`.
-//
-// ### Can Retry Manually
-//
-// Indicates whether you can call `POST /emails/{emailId}/retry` to manually retry
-// the email. This is `true` when the raw message content is still available (not
-// expired due to retention policy).
+// Get the history of delivery attempts for an email, including SMTP response codes
+// and timestamps.
 func (r *EmailService) GetDeliveries(ctx context.Context, emailID string, opts ...option.RequestOption) (res *EmailGetDeliveriesResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if emailID == "" {
@@ -428,41 +394,18 @@ func (r *EmailGetDeliveriesResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailGetDeliveriesResponseData struct {
-	// Whether the message can be manually retried via `POST /emails/{emailId}/retry`.
-	// `true` when the raw message content is still available (not expired). Messages
-	// older than the retention period cannot be retried.
-	CanRetryManually bool `json:"canRetryManually,required"`
-	// Chronological list of delivery attempts for this message. Each attempt includes
-	// SMTP response codes and timestamps.
 	Deliveries []EmailGetDeliveriesResponseDataDelivery `json:"deliveries,required"`
-	// Internal numeric message ID
-	MessageID int64 `json:"messageId,required"`
-	// Unique message token for API references
+	// Internal message ID
+	MessageID string `json:"messageId,required"`
+	// Message token
 	MessageToken string `json:"messageToken,required"`
-	// Information about the current retry state of a message that is queued for
-	// delivery. Only present when the message is in the delivery queue.
-	RetryState EmailGetDeliveriesResponseDataRetryState `json:"retryState,required"`
-	// Current message status (lowercase). Possible values:
-	//
-	// - `pending` - Initial state, awaiting first delivery attempt
-	// - `sent` - Successfully delivered
-	// - `softfail` - Temporary failure, will retry automatically
-	// - `hardfail` - Permanent failure, will not retry
-	// - `held` - Held for manual review (suppression list, etc.)
-	// - `bounced` - Bounced by recipient server
-	//
-	// Any of "pending", "sent", "softfail", "hardfail", "held", "bounced".
-	Status string `json:"status,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		CanRetryManually respjson.Field
-		Deliveries       respjson.Field
-		MessageID        respjson.Field
-		MessageToken     respjson.Field
-		RetryState       respjson.Field
-		Status           respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
+		Deliveries   respjson.Field
+		MessageID    respjson.Field
+		MessageToken respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
 	} `json:"-"`
 }
 
@@ -507,50 +450,6 @@ type EmailGetDeliveriesResponseDataDelivery struct {
 // Returns the unmodified JSON received from the API
 func (r EmailGetDeliveriesResponseDataDelivery) RawJSON() string { return r.JSON.raw }
 func (r *EmailGetDeliveriesResponseDataDelivery) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Information about the current retry state of a message that is queued for
-// delivery. Only present when the message is in the delivery queue.
-type EmailGetDeliveriesResponseDataRetryState struct {
-	// Current attempt number (0-indexed). The first delivery attempt is 0, the first
-	// retry is 1, and so on.
-	Attempt int64 `json:"attempt,required"`
-	// Number of attempts remaining before the message is hard-failed. Calculated as
-	// `maxAttempts - attempt`.
-	AttemptsRemaining int64 `json:"attemptsRemaining,required"`
-	// Whether this queue entry was created by a manual retry request. Manual retries
-	// bypass certain hold conditions like suppression lists.
-	Manual bool `json:"manual,required"`
-	// Maximum number of delivery attempts before the message is hard-failed.
-	// Configured at the server level.
-	MaxAttempts int64 `json:"maxAttempts,required"`
-	// Whether the message is currently being processed by a delivery worker. When
-	// `true`, the message is actively being sent.
-	Processing bool `json:"processing,required"`
-	// Unix timestamp of when the next retry attempt is scheduled. `null` if the
-	// message is ready for immediate processing or currently being processed.
-	NextRetryAt float64 `json:"nextRetryAt,nullable"`
-	// ISO 8601 formatted timestamp of the next retry attempt. `null` if the message is
-	// ready for immediate processing.
-	NextRetryAtISO time.Time `json:"nextRetryAtIso,nullable" format:"date-time"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Attempt           respjson.Field
-		AttemptsRemaining respjson.Field
-		Manual            respjson.Field
-		MaxAttempts       respjson.Field
-		Processing        respjson.Field
-		NextRetryAt       respjson.Field
-		NextRetryAtISO    respjson.Field
-		ExtraFields       map[string]respjson.Field
-		raw               string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r EmailGetDeliveriesResponseDataRetryState) RawJSON() string { return r.JSON.raw }
-func (r *EmailGetDeliveriesResponseDataRetryState) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
