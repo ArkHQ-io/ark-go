@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0 (2026-01-22)
+
+Full Changelog: [v0.8.0...v0.9.0](https://github.com/ArkHQ-io/ark-go/compare/v0.8.0...v0.9.0)
+
+### Features
+
+* **api:** improve GET delivery attempts ([74e92c4](https://github.com/ArkHQ-io/ark-go/commit/74e92c4d8d914bb632c133b5a6bd225abedc1266))
+
 ## 0.8.0 (2026-01-21)
 
 Full Changelog: [v0.7.0...v0.8.0](https://github.com/ArkHQ-io/ark-go/compare/v0.7.0...v0.8.0)
