@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.0 (2026-01-22)
+
+Full Changelog: [v0.9.0...v0.10.0](https://github.com/ArkHQ-io/ark-go/compare/v0.9.0...v0.10.0)
+
+### Features
+
+* **api:** api update ([a85e9b9](https://github.com/ArkHQ-io/ark-go/commit/a85e9b96cf489714533f83a0a6f3f9f64eff0c49))
+* **api:** api update ([570a407](https://github.com/ArkHQ-io/ark-go/commit/570a4079dc4f67a0efce331a6b339329dfde0fce))
+* **api:** fix incorrect webhook payload examples ([fd2e5f0](https://github.com/ArkHQ-io/ark-go/commit/fd2e5f03ee7154540882f29b90f7b0392a31ff60))
+* **api:** manual updates ([7eb1580](https://github.com/ArkHQ-io/ark-go/commit/7eb158021562c76dbd6eb1c10166f52a3b25e7cd))
+
 ## 0.9.0 (2026-01-22)
 
 Full Changelog: [v0.8.0...v0.9.0](https://github.com/ArkHQ-io/ark-go/compare/v0.8.0...v0.9.0)
