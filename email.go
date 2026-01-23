@@ -980,8 +980,16 @@ func (r *EmailSendBatchParamsEmail) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendRawParams struct {
-	// Sender email address
-	From string `json:"from,required" format:"email"`
+	// Sender email address. Must be from a verified domain.
+	//
+	// **Supported formats:**
+	//
+	// - Email only: `hello@yourdomain.com`
+	// - With display name: `Acme <hello@yourdomain.com>`
+	// - With quoted name: `"Acme Support" <support@yourdomain.com>`
+	//
+	// The domain portion must match a verified sending domain in your account.
+	From string `json:"from,required"`
 	// Base64-encoded RFC 2822 MIME message
 	RawMessage string `json:"rawMessage,required"`
 	// Recipient email addresses
