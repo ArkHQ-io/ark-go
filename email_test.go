@@ -222,10 +222,10 @@ func TestEmailSendRawWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Emails.SendRaw(context.TODO(), ark.EmailSendRawParams{
-		Data:     "data",
-		MailFrom: "dev@stainless.com",
-		RcptTo:   []string{"dev@stainless.com"},
-		Bounce:   ark.Bool(true),
+		From:       "dev@stainless.com",
+		RawMessage: "rawMessage",
+		To:         []string{"dev@stainless.com"},
+		Bounce:     ark.Bool(true),
 	})
 	if err != nil {
 		var apierr *ark.Error
