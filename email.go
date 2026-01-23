@@ -201,7 +201,7 @@ func (r *EmailService) SendBatch(ctx context.Context, params EmailSendBatchParam
 // Send a pre-formatted RFC 2822 MIME message. Use this for advanced use cases or
 // when migrating from systems that generate raw email content.
 //
-// The `data` field should contain the base64-encoded raw email.
+// The `rawMessage` field should contain the base64-encoded raw email.
 func (r *EmailService) SendRaw(ctx context.Context, body EmailSendRawParams, opts ...option.RequestOption) (res *EmailSendRawResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "emails/raw"
@@ -980,12 +980,12 @@ func (r *EmailSendBatchParamsEmail) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendRawParams struct {
-	// Base64-encoded RFC 2822 message
-	Data string `json:"data,required"`
-	// Envelope sender address
-	MailFrom string `json:"mailFrom,required" format:"email"`
-	// Envelope recipient addresses
-	RcptTo []string `json:"rcptTo,omitzero,required" format:"email"`
+	// Sender email address
+	From string `json:"from,required" format:"email"`
+	// Base64-encoded RFC 2822 MIME message
+	RawMessage string `json:"rawMessage,required"`
+	// Recipient email addresses
+	To []string `json:"to,omitzero,required" format:"email"`
 	// Whether this is a bounce message (accepts null)
 	Bounce param.Opt[bool] `json:"bounce,omitzero"`
 	paramObj
