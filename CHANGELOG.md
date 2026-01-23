@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.12.0 (2026-01-23)
+
+Full Changelog: [v0.11.0...v0.12.0](https://github.com/ArkHQ-io/ark-go/compare/v0.11.0...v0.12.0)
+
+### Features
+
+* **api:** fix from in Send raw MIME email ([b28cc4e](https://github.com/ArkHQ-io/ark-go/commit/b28cc4e42d9668a9d9e2a4171af47f82fa9b7200))
+* **api:** improve raw MIME error handling ([e081b2d](https://github.com/ArkHQ-io/ark-go/commit/e081b2dbf57e25e592e4ea378601e1fbc6a8e6c6))
+
 ## 0.11.0 (2026-01-23)
 
 Full Changelog: [v0.10.0...v0.11.0](https://github.com/ArkHQ-io/ark-go/compare/v0.10.0...v0.11.0)
