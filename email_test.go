@@ -29,7 +29,7 @@ func TestEmailGetWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"emailId",
 		ark.EmailGetParams{
-			Expand: ark.String("content,deliveries"),
+			Expand: ark.String("full"),
 		},
 	)
 	if err != nil {
