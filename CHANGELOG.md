@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.0 (2026-01-25)
+
+Full Changelog: [v0.12.0...v0.13.0](https://github.com/ArkHQ-io/ark-go/compare/v0.12.0...v0.13.0)
+
+### Features
+
+* **api:** manual updates ([4b20d24](https://github.com/ArkHQ-io/ark-go/commit/4b20d24cd50227ee8227be8a4ce678d573888b53))
+* **api:** update email details to include attachments ([ee24249](https://github.com/ArkHQ-io/ark-go/commit/ee24249404df578645aca958d833f0eeb2a0bc61))
+* **client:** add a convenient param.SetJSON helper ([bb784b4](https://github.com/ArkHQ-io/ark-go/commit/bb784b40fa959977242993f72f71313733145ba2))
+
 ## 0.12.0 (2026-01-23)
 
 Full Changelog: [v0.11.0...v0.12.0](https://github.com/ArkHQ-io/ark-go/compare/v0.11.0...v0.12.0)
