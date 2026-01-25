@@ -263,6 +263,10 @@ type EmailGetResponseData struct {
 	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
 	// Recipient address
 	To string `json:"to,required" format:"email"`
+	// Opens and clicks tracking data (included if expand=activity)
+	Activity EmailGetResponseDataActivity `json:"activity"`
+	// File attachments (included if expand=attachments)
+	Attachments []EmailGetResponseDataAttachment `json:"attachments"`
 	// Delivery attempt history (included if expand=deliveries)
 	Deliveries []EmailGetResponseDataDelivery `json:"deliveries"`
 	// Email headers (included if expand=headers)
@@ -273,6 +277,9 @@ type EmailGetResponseData struct {
 	MessageID string `json:"messageId"`
 	// Plain text body (included if expand=content)
 	PlainBody string `json:"plainBody"`
+	// Complete raw MIME message, base64 encoded (included if expand=raw). Decode this
+	// to get the original RFC 2822 formatted email.
+	RawMessage string `json:"rawMessage"`
 	// Whether the message was flagged as spam
 	Spam bool `json:"spam"`
 	// Spam score (if applicable)
@@ -290,11 +297,14 @@ type EmailGetResponseData struct {
 		Timestamp    respjson.Field
 		TimestampISO respjson.Field
 		To           respjson.Field
+		Activity     respjson.Field
+		Attachments  respjson.Field
 		Deliveries   respjson.Field
 		Headers      respjson.Field
 		HTMLBody     respjson.Field
 		MessageID    respjson.Field
 		PlainBody    respjson.Field
+		RawMessage   respjson.Field
 		Spam         respjson.Field
 		SpamScore    respjson.Field
 		Tag          respjson.Field
@@ -306,6 +316,112 @@ type EmailGetResponseData struct {
 // Returns the unmodified JSON received from the API
 func (r EmailGetResponseData) RawJSON() string { return r.JSON.raw }
 func (r *EmailGetResponseData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Opens and clicks tracking data (included if expand=activity)
+type EmailGetResponseDataActivity struct {
+	// List of link click events
+	Clicks []EmailGetResponseDataActivityClick `json:"clicks"`
+	// List of email open events
+	Opens []EmailGetResponseDataActivityOpen `json:"opens"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Clicks      respjson.Field
+		Opens       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailGetResponseDataActivity) RawJSON() string { return r.JSON.raw }
+func (r *EmailGetResponseDataActivity) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailGetResponseDataActivityClick struct {
+	// IP address of the clicker
+	IPAddress string `json:"ipAddress"`
+	// Unix timestamp of the click event
+	Timestamp float64 `json:"timestamp"`
+	// ISO 8601 timestamp of the click event
+	TimestampISO time.Time `json:"timestampIso" format:"date-time"`
+	// URL that was clicked
+	URL string `json:"url" format:"uri"`
+	// User agent of the email client
+	UserAgent string `json:"userAgent"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		IPAddress    respjson.Field
+		Timestamp    respjson.Field
+		TimestampISO respjson.Field
+		URL          respjson.Field
+		UserAgent    respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailGetResponseDataActivityClick) RawJSON() string { return r.JSON.raw }
+func (r *EmailGetResponseDataActivityClick) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EmailGetResponseDataActivityOpen struct {
+	// IP address of the opener
+	IPAddress string `json:"ipAddress"`
+	// Unix timestamp of the open event
+	Timestamp float64 `json:"timestamp"`
+	// ISO 8601 timestamp of the open event
+	TimestampISO time.Time `json:"timestampIso" format:"date-time"`
+	// User agent of the email client
+	UserAgent string `json:"userAgent"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		IPAddress    respjson.Field
+		Timestamp    respjson.Field
+		TimestampISO respjson.Field
+		UserAgent    respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailGetResponseDataActivityOpen) RawJSON() string { return r.JSON.raw }
+func (r *EmailGetResponseDataActivityOpen) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// An email attachment retrieved from a sent message
+type EmailGetResponseDataAttachment struct {
+	// MIME type of the attachment
+	ContentType string `json:"contentType,required"`
+	// Base64 encoded attachment content. Decode this to get the raw file bytes.
+	Data string `json:"data,required"`
+	// Original filename of the attachment
+	Filename string `json:"filename,required"`
+	// SHA256 hash of the attachment content for verification
+	Hash string `json:"hash,required"`
+	// Size of the attachment in bytes
+	Size int64 `json:"size,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ContentType respjson.Field
+		Data        respjson.Field
+		Filename    respjson.Field
+		Hash        respjson.Field
+		Size        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EmailGetResponseDataAttachment) RawJSON() string { return r.JSON.raw }
+func (r *EmailGetResponseDataAttachment) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -768,10 +884,13 @@ func (r *EmailSendRawResponseData) UnmarshalJSON(data []byte) error {
 type EmailGetParams struct {
 	// Comma-separated list of fields to include:
 	//
+	// - `full` - Include all expanded fields in a single request
 	// - `content` - HTML and plain text body
 	// - `headers` - Email headers
 	// - `deliveries` - Delivery attempt history
-	// - `activity` - Opens and clicks
+	// - `activity` - Opens and clicks tracking data
+	// - `attachments` - File attachments with content (base64 encoded)
+	// - `raw` - Complete raw MIME message (base64 encoded)
 	Expand param.Opt[string] `query:"expand,omitzero" json:"-"`
 	paramObj
 }
