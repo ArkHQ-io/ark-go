@@ -121,7 +121,8 @@ type TrackDomain struct {
 	ID string `json:"id,required"`
 	// When the track domain was created
 	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
-	// Whether DNS is correctly configured
+	// Whether the tracking CNAME record is correctly configured. Must be true to use
+	// tracking features.
 	DNSOk bool `json:"dnsOk,required"`
 	// ID of the parent sending domain
 	DomainID string `json:"domainId,required"`

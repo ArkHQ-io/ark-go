@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.14.0 (2026-01-27)
+
+Full Changelog: [v0.13.0...v0.14.0](https://github.com/ArkHQ-io/ark-go/compare/v0.13.0...v0.14.0)
+
+### Features
+
+* **api:** api update ([1e56852](https://github.com/ArkHQ-io/ark-go/commit/1e56852f528fdb1351cac80c4b2c34a33552b9a4))
+* **api:** domain list improvement ([90bda05](https://github.com/ArkHQ-io/ark-go/commit/90bda0580bf1fc5f573248d5b9a8402603855795))
+
 ## 0.13.0 (2026-01-25)
 
 Full Changelog: [v0.12.0...v0.13.0](https://github.com/ArkHQ-io/ark-go/compare/v0.12.0...v0.13.0)

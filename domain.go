@@ -104,26 +104,50 @@ func (r *DomainService) Verify(ctx context.Context, domainID string, opts ...opt
 	return
 }
 
+// A DNS record that needs to be configured in your domain's DNS settings.
+//
+// The `name` field contains the relative hostname to enter in your DNS provider
+// (which auto-appends the zone). The `fullName` field contains the complete
+// fully-qualified domain name (FQDN) for reference.
+//
+// **Example for subdomain `mail.example.com`:**
+//
+// - `name`: `"mail"` (what you enter in DNS provider)
+// - `fullName`: `"mail.example.com"` (the complete hostname)
+//
+// **Example for root domain `example.com`:**
+//
+// - `name`: `"@"` (DNS shorthand for apex/root)
+// - `fullName`: `"example.com"`
 type DNSRecord struct {
-	// DNS record name (hostname)
+	// The complete fully-qualified domain name (FQDN). Use this as a reference to
+	// verify the record is configured correctly.
+	FullName string `json:"fullName,required"`
+	// The relative hostname to enter in your DNS provider. Most DNS providers
+	// auto-append the zone name, so you only need to enter this relative part.
+	//
+	// - `"@"` means the apex/root of the zone (for root domains)
+	// - `"mail"` for a subdomain like `mail.example.com`
+	// - `"ark-xyz._domainkey.mail"` for DKIM on a subdomain
 	Name string `json:"name,required"`
-	// DNS record type
+	// The DNS record type to create
 	//
 	// Any of "TXT", "CNAME", "MX".
 	Type DNSRecordType `json:"type,required"`
-	// DNS record value
+	// The value to set for the DNS record
 	Value string `json:"value,required"`
-	// DNS verification status:
+	// Current verification status of this DNS record:
 	//
-	// - `OK` - Record is correctly configured
-	// - `Missing` - Record not found in DNS
-	// - `Invalid` - Record exists but has wrong value
-	// - `null` - Not yet checked
+	// - `OK` - Record is correctly configured and verified
+	// - `Missing` - Record was not found in your DNS
+	// - `Invalid` - Record exists but has an incorrect value
+	// - `null` - Record has not been checked yet
 	//
 	// Any of "OK", "Missing", "Invalid".
 	Status DNSRecordStatus `json:"status,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		FullName    respjson.Field
 		Name        respjson.Field
 		Type        respjson.Field
 		Value       respjson.Field
@@ -139,7 +163,7 @@ func (r *DNSRecord) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// DNS record type
+// The DNS record type to create
 type DNSRecordType string
 
 const (
@@ -148,12 +172,12 @@ const (
 	DNSRecordTypeMx    DNSRecordType = "MX"
 )
 
-// DNS verification status:
+// Current verification status of this DNS record:
 //
-// - `OK` - Record is correctly configured
-// - `Missing` - Record not found in DNS
-// - `Invalid` - Record exists but has wrong value
-// - `null` - Not yet checked
+// - `OK` - Record is correctly configured and verified
+// - `Missing` - Record was not found in your DNS
+// - `Invalid` - Record exists but has an incorrect value
+// - `null` - Record has not been checked yet
 type DNSRecordStatus string
 
 const (
@@ -183,16 +207,31 @@ func (r *DomainNewResponse) UnmarshalJSON(data []byte) error {
 }
 
 type DomainNewResponseData struct {
-	// Domain ID
-	ID         string                          `json:"id,required"`
-	CreatedAt  time.Time                       `json:"createdAt,required" format:"date-time"`
+	// Unique domain identifier
+	ID int64 `json:"id,required"`
+	// Timestamp when the domain was added
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	// DNS records that must be added to your domain's DNS settings. Null if records
+	// are not yet generated.
+	//
+	// **Important:** The `name` field contains the relative hostname that you should
+	// enter in your DNS provider. Most DNS providers auto-append the zone name, so you
+	// only need to enter the relative part.
+	//
+	// For subdomains like `mail.example.com`, the zone is `example.com`, so:
+	//
+	// - SPF `name` would be `mail` (not `@`)
+	// - DKIM `name` would be `ark-xyz._domainkey.mail`
+	// - Return Path `name` would be `psrp.mail`
 	DNSRecords DomainNewResponseDataDNSRecords `json:"dnsRecords,required"`
-	// Domain name
+	// The domain name used for sending emails
 	Name string `json:"name,required"`
+	// UUID of the domain
 	Uuid string `json:"uuid,required" format:"uuid"`
-	// Whether DNS is verified
+	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
+	// Domain must be verified before sending emails.
 	Verified bool `json:"verified,required"`
-	// When the domain was verified (null if not verified)
+	// Timestamp when the domain ownership was verified, or null if not yet verified
 	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -214,15 +253,77 @@ func (r *DomainNewResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// DNS records that must be added to your domain's DNS settings. Null if records
+// are not yet generated.
+//
+// **Important:** The `name` field contains the relative hostname that you should
+// enter in your DNS provider. Most DNS providers auto-append the zone name, so you
+// only need to enter the relative part.
+//
+// For subdomains like `mail.example.com`, the zone is `example.com`, so:
+//
+// - SPF `name` would be `mail` (not `@`)
+// - DKIM `name` would be `ark-xyz._domainkey.mail`
+// - Return Path `name` would be `psrp.mail`
 type DomainNewResponseDataDNSRecords struct {
-	Dkim       DNSRecord `json:"dkim,required"`
-	ReturnPath DNSRecord `json:"returnPath,required"`
-	Spf        DNSRecord `json:"spf,required"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	Dkim DNSRecord `json:"dkim,nullable"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	ReturnPath DNSRecord `json:"returnPath,nullable"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	Spf DNSRecord `json:"spf,nullable"`
+	// The DNS zone (registrable domain) where records should be added. This is the
+	// root domain that your DNS provider manages. For `mail.example.com`, the zone is
+	// `example.com`. For `example.co.uk`, the zone is `example.co.uk`.
+	Zone string `json:"zone"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Dkim        respjson.Field
 		ReturnPath  respjson.Field
 		Spf         respjson.Field
+		Zone        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -255,16 +356,31 @@ func (r *DomainGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 type DomainGetResponseData struct {
-	// Domain ID
-	ID         string                          `json:"id,required"`
-	CreatedAt  time.Time                       `json:"createdAt,required" format:"date-time"`
+	// Unique domain identifier
+	ID int64 `json:"id,required"`
+	// Timestamp when the domain was added
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	// DNS records that must be added to your domain's DNS settings. Null if records
+	// are not yet generated.
+	//
+	// **Important:** The `name` field contains the relative hostname that you should
+	// enter in your DNS provider. Most DNS providers auto-append the zone name, so you
+	// only need to enter the relative part.
+	//
+	// For subdomains like `mail.example.com`, the zone is `example.com`, so:
+	//
+	// - SPF `name` would be `mail` (not `@`)
+	// - DKIM `name` would be `ark-xyz._domainkey.mail`
+	// - Return Path `name` would be `psrp.mail`
 	DNSRecords DomainGetResponseDataDNSRecords `json:"dnsRecords,required"`
-	// Domain name
+	// The domain name used for sending emails
 	Name string `json:"name,required"`
+	// UUID of the domain
 	Uuid string `json:"uuid,required" format:"uuid"`
-	// Whether DNS is verified
+	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
+	// Domain must be verified before sending emails.
 	Verified bool `json:"verified,required"`
-	// When the domain was verified (null if not verified)
+	// Timestamp when the domain ownership was verified, or null if not yet verified
 	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -286,15 +402,77 @@ func (r *DomainGetResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// DNS records that must be added to your domain's DNS settings. Null if records
+// are not yet generated.
+//
+// **Important:** The `name` field contains the relative hostname that you should
+// enter in your DNS provider. Most DNS providers auto-append the zone name, so you
+// only need to enter the relative part.
+//
+// For subdomains like `mail.example.com`, the zone is `example.com`, so:
+//
+// - SPF `name` would be `mail` (not `@`)
+// - DKIM `name` would be `ark-xyz._domainkey.mail`
+// - Return Path `name` would be `psrp.mail`
 type DomainGetResponseDataDNSRecords struct {
-	Dkim       DNSRecord `json:"dkim,required"`
-	ReturnPath DNSRecord `json:"returnPath,required"`
-	Spf        DNSRecord `json:"spf,required"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	Dkim DNSRecord `json:"dkim,nullable"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	ReturnPath DNSRecord `json:"returnPath,nullable"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	Spf DNSRecord `json:"spf,nullable"`
+	// The DNS zone (registrable domain) where records should be added. This is the
+	// root domain that your DNS provider manages. For `mail.example.com`, the zone is
+	// `example.com`. For `example.co.uk`, the zone is `example.co.uk`.
+	Zone string `json:"zone"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Dkim        respjson.Field
 		ReturnPath  respjson.Field
 		Spf         respjson.Field
+		Zone        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -343,15 +521,16 @@ func (r *DomainListResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type DomainListResponseDataDomain struct {
-	// Domain ID
-	ID       string `json:"id,required"`
-	DNSOk    bool   `json:"dnsOk,required"`
-	Name     string `json:"name,required"`
-	Verified bool   `json:"verified,required"`
+	// Unique domain identifier
+	ID int64 `json:"id,required"`
+	// The domain name used for sending emails
+	Name string `json:"name,required"`
+	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
+	// Domain must be verified before sending emails.
+	Verified bool `json:"verified,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
-		DNSOk       respjson.Field
 		Name        respjson.Field
 		Verified    respjson.Field
 		ExtraFields map[string]respjson.Field
@@ -422,16 +601,31 @@ func (r *DomainVerifyResponse) UnmarshalJSON(data []byte) error {
 }
 
 type DomainVerifyResponseData struct {
-	// Domain ID
-	ID         string                             `json:"id,required"`
-	CreatedAt  time.Time                          `json:"createdAt,required" format:"date-time"`
+	// Unique domain identifier
+	ID int64 `json:"id,required"`
+	// Timestamp when the domain was added
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	// DNS records that must be added to your domain's DNS settings. Null if records
+	// are not yet generated.
+	//
+	// **Important:** The `name` field contains the relative hostname that you should
+	// enter in your DNS provider. Most DNS providers auto-append the zone name, so you
+	// only need to enter the relative part.
+	//
+	// For subdomains like `mail.example.com`, the zone is `example.com`, so:
+	//
+	// - SPF `name` would be `mail` (not `@`)
+	// - DKIM `name` would be `ark-xyz._domainkey.mail`
+	// - Return Path `name` would be `psrp.mail`
 	DNSRecords DomainVerifyResponseDataDNSRecords `json:"dnsRecords,required"`
-	// Domain name
+	// The domain name used for sending emails
 	Name string `json:"name,required"`
+	// UUID of the domain
 	Uuid string `json:"uuid,required" format:"uuid"`
-	// Whether DNS is verified
+	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
+	// Domain must be verified before sending emails.
 	Verified bool `json:"verified,required"`
-	// When the domain was verified (null if not verified)
+	// Timestamp when the domain ownership was verified, or null if not yet verified
 	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -453,15 +647,77 @@ func (r *DomainVerifyResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// DNS records that must be added to your domain's DNS settings. Null if records
+// are not yet generated.
+//
+// **Important:** The `name` field contains the relative hostname that you should
+// enter in your DNS provider. Most DNS providers auto-append the zone name, so you
+// only need to enter the relative part.
+//
+// For subdomains like `mail.example.com`, the zone is `example.com`, so:
+//
+// - SPF `name` would be `mail` (not `@`)
+// - DKIM `name` would be `ark-xyz._domainkey.mail`
+// - Return Path `name` would be `psrp.mail`
 type DomainVerifyResponseDataDNSRecords struct {
-	Dkim       DNSRecord `json:"dkim,required"`
-	ReturnPath DNSRecord `json:"returnPath,required"`
-	Spf        DNSRecord `json:"spf,required"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	Dkim DNSRecord `json:"dkim,nullable"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	ReturnPath DNSRecord `json:"returnPath,nullable"`
+	// A DNS record that needs to be configured in your domain's DNS settings.
+	//
+	// The `name` field contains the relative hostname to enter in your DNS provider
+	// (which auto-appends the zone). The `fullName` field contains the complete
+	// fully-qualified domain name (FQDN) for reference.
+	//
+	// **Example for subdomain `mail.example.com`:**
+	//
+	// - `name`: `"mail"` (what you enter in DNS provider)
+	// - `fullName`: `"mail.example.com"` (the complete hostname)
+	//
+	// **Example for root domain `example.com`:**
+	//
+	// - `name`: `"@"` (DNS shorthand for apex/root)
+	// - `fullName`: `"example.com"`
+	Spf DNSRecord `json:"spf,nullable"`
+	// The DNS zone (registrable domain) where records should be added. This is the
+	// root domain that your DNS provider manages. For `mail.example.com`, the zone is
+	// `example.com`. For `example.co.uk`, the zone is `example.co.uk`.
+	Zone string `json:"zone"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Dkim        respjson.Field
 		ReturnPath  respjson.Field
 		Spf         respjson.Field
+		Zone        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
