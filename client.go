@@ -23,6 +23,7 @@ type Client struct {
 	Webhooks     WebhookService
 	Tracking     TrackingService
 	Logs         LogService
+	Usage        UsageService
 }
 
 // DefaultClientOptions read from the environment (ARK_API_KEY, ARK_BASE_URL). This
@@ -53,6 +54,7 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Webhooks = NewWebhookService(opts...)
 	r.Tracking = NewTrackingService(opts...)
 	r.Logs = NewLogService(opts...)
+	r.Usage = NewUsageService(opts...)
 
 	return
 }
