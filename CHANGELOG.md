@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.14.0 (2026-01-29)
+
+Full Changelog: [v0.13.0...v0.14.0](https://github.com/ArkHQ-io/ark-go/compare/v0.13.0...v0.14.0)
+
+### Features
+
+* **api:** add usage and SendLimit Headers ([d85c334](https://github.com/ArkHQ-io/ark-go/commit/d85c33491391046d08b00c228fc4c298de6d5b73))
+* **api:** api update ([1e56852](https://github.com/ArkHQ-io/ark-go/commit/1e56852f528fdb1351cac80c4b2c34a33552b9a4))
+* **api:** domain list improvement ([90bda05](https://github.com/ArkHQ-io/ark-go/commit/90bda0580bf1fc5f573248d5b9a8402603855795))
+
+
+### Bug Fixes
+
+* **docs:** fix mcp installation instructions for remote servers ([0806037](https://github.com/ArkHQ-io/ark-go/commit/08060379e4b962ad794f317e1d8cd83a31775a13))
+
 ## 0.13.0 (2026-01-25)
 
 Full Changelog: [v0.12.0...v0.13.0](https://github.com/ArkHQ-io/ark-go/compare/v0.12.0...v0.13.0)
