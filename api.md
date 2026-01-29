@@ -120,3 +120,13 @@ Methods:
 
 - <code title="get /logs/{requestId}">client.Logs.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#LogService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, requestID <a href="https://pkg.go.dev/builtin#string">string</a>) (\*<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go">ark</a>.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#LogGetResponse">LogGetResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /logs">client.Logs.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#LogService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go">ark</a>.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#LogListParams">LogListParams</a>) (\*<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go/packages/pagination">pagination</a>.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go/packages/pagination#PageNumberPagination">PageNumberPagination</a>[<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go">ark</a>.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#LogEntry">LogEntry</a>], <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+# Usage
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go">ark</a>.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#UsageGetResponse">UsageGetResponse</a>
+
+Methods:
+
+- <code title="get /usage">client.Usage.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#UsageService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (\*<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go">ark</a>.<a href="https://pkg.go.dev/github.com/ArkHQ-io/ark-go#UsageGetResponse">UsageGetResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
