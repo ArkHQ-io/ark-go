@@ -27,7 +27,7 @@ func TestEmailGetWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Emails.Get(
 		context.TODO(),
-		"emailId",
+		"aBc123XyZ",
 		ark.EmailGetParams{
 			Expand: ark.String("full"),
 		},
@@ -84,7 +84,7 @@ func TestEmailGetDeliveries(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Emails.GetDeliveries(context.TODO(), "msg_12345_aBc123XyZ")
+	_, err := client.Emails.GetDeliveries(context.TODO(), "aBc123XyZ")
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -106,7 +106,7 @@ func TestEmailRetry(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Emails.Retry(context.TODO(), "emailId")
+	_, err := client.Emails.Retry(context.TODO(), "aBc123XyZ")
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {

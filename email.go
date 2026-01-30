@@ -45,13 +45,13 @@ func NewEmailService(opts ...option.RequestOption) (r EmailService) {
 //
 // Use the `expand` parameter to include additional data like the HTML/text body,
 // headers, or delivery attempts.
-func (r *EmailService) Get(ctx context.Context, emailID string, query EmailGetParams, opts ...option.RequestOption) (res *EmailGetResponse, err error) {
+func (r *EmailService) Get(ctx context.Context, id string, query EmailGetParams, opts ...option.RequestOption) (res *EmailGetResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if emailID == "" {
-		err = errors.New("missing required emailId parameter")
+	if id == "" {
+		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s", emailID)
+	path := fmt.Sprintf("emails/%s", id)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
@@ -128,16 +128,16 @@ func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams
 //
 // ### Can Retry Manually
 //
-// Indicates whether you can call `POST /emails/{emailId}/retry` to manually retry
-// the email. This is `true` when the raw message content is still available (not
+// Indicates whether you can call `POST /emails/{id}/retry` to manually retry the
+// email. This is `true` when the raw message content is still available (not
 // expired due to retention policy).
-func (r *EmailService) GetDeliveries(ctx context.Context, emailID string, opts ...option.RequestOption) (res *EmailGetDeliveriesResponse, err error) {
+func (r *EmailService) GetDeliveries(ctx context.Context, id string, opts ...option.RequestOption) (res *EmailGetDeliveriesResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if emailID == "" {
-		err = errors.New("missing required emailId parameter")
+	if id == "" {
+		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s/deliveries", emailID)
+	path := fmt.Sprintf("emails/%s/deliveries", id)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -146,13 +146,13 @@ func (r *EmailService) GetDeliveries(ctx context.Context, emailID string, opts .
 // attempt.
 //
 // Only works for emails that have failed or are in a retryable state.
-func (r *EmailService) Retry(ctx context.Context, emailID string, opts ...option.RequestOption) (res *EmailRetryResponse, err error) {
+func (r *EmailService) Retry(ctx context.Context, id string, opts ...option.RequestOption) (res *EmailRetryResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if emailID == "" {
-		err = errors.New("missing required emailId parameter")
+	if id == "" {
+		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s/retry", emailID)
+	path := fmt.Sprintf("emails/%s/retry", id)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
 	return
 }
@@ -232,12 +232,8 @@ func (r *EmailGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailGetResponseData struct {
-	// Internal message ID
+	// Unique message identifier (token)
 	ID string `json:"id,required"`
-	// Unique message token used to retrieve this email via API. Combined with id to
-	// form the full message identifier: msg*{id}*{token} Use this token with GET
-	// /emails/{emailId} where emailId = "msg*{id}*{token}"
-	Token string `json:"token,required"`
 	// Sender address
 	From string `json:"from,required"`
 	// Message direction
@@ -289,7 +285,6 @@ type EmailGetResponseData struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
-		Token        respjson.Field
 		From         respjson.Field
 		Scope        respjson.Field
 		Status       respjson.Field
@@ -464,10 +459,9 @@ func (r *EmailGetResponseDataDelivery) UnmarshalJSON(data []byte) error {
 }
 
 type EmailListResponse struct {
-	// Internal message ID
-	ID    string `json:"id,required"`
-	Token string `json:"token,required"`
-	From  string `json:"from,required"`
+	// Unique message identifier (token)
+	ID   string `json:"id,required"`
+	From string `json:"from,required"`
 	// Current delivery status:
 	//
 	// - `pending` - Email accepted, waiting to be processed
@@ -487,7 +481,6 @@ type EmailListResponse struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
-		Token        respjson.Field
 		From         respjson.Field
 		Status       respjson.Field
 		Subject      respjson.Field
@@ -546,17 +539,15 @@ func (r *EmailGetDeliveriesResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailGetDeliveriesResponseData struct {
-	// Whether the message can be manually retried via `POST /emails/{emailId}/retry`.
+	// Message identifier (token)
+	ID string `json:"id,required"`
+	// Whether the message can be manually retried via `POST /emails/{id}/retry`.
 	// `true` when the raw message content is still available (not expired). Messages
 	// older than the retention period cannot be retried.
 	CanRetryManually bool `json:"canRetryManually,required"`
 	// Chronological list of delivery attempts for this message. Each attempt includes
 	// SMTP response codes and timestamps.
 	Deliveries []EmailGetDeliveriesResponseDataDelivery `json:"deliveries,required"`
-	// Internal numeric message ID
-	MessageID int64 `json:"messageId,required"`
-	// Unique message token for API references
-	MessageToken string `json:"messageToken,required"`
 	// Information about the current retry state of a message that is queued for
 	// delivery. Only present when the message is in the delivery queue.
 	RetryState EmailGetDeliveriesResponseDataRetryState `json:"retryState,required"`
@@ -573,10 +564,9 @@ type EmailGetDeliveriesResponseData struct {
 	Status string `json:"status,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ID               respjson.Field
 		CanRetryManually respjson.Field
 		Deliveries       respjson.Field
-		MessageID        respjson.Field
-		MessageToken     respjson.Field
 		RetryState       respjson.Field
 		Status           respjson.Field
 		ExtraFields      map[string]respjson.Field
@@ -693,9 +683,12 @@ func (r *EmailRetryResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailRetryResponseData struct {
+	// Email identifier (token)
+	ID      string `json:"id,required"`
 	Message string `json:"message,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ID          respjson.Field
 		Message     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -729,7 +722,7 @@ func (r *EmailSendResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendResponseData struct {
-	// Unique message ID (format: msg*{id}*{token})
+	// Unique message identifier (token)
 	ID string `json:"id,required"`
 	// Current delivery status
 	//
@@ -811,13 +804,11 @@ func (r *EmailSendBatchResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendBatchResponseDataMessage struct {
-	// Message ID
-	ID    string `json:"id,required"`
-	Token string `json:"token,required"`
+	// Message identifier (token)
+	ID string `json:"id,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
-		Token       respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -850,7 +841,7 @@ func (r *EmailSendRawResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendRawResponseData struct {
-	// Unique message ID (format: msg*{id}*{token})
+	// Unique message identifier (token)
 	ID string `json:"id,required"`
 	// Current delivery status
 	//

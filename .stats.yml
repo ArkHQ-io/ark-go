@@ -1,4 +1,4 @@
 configured_endpoints: 35
-openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/ark%2Fark-1949bcfc8775c97eca880428dc93e9f97aa91144bef82584027ede5089bb2e19.yml
-openapi_spec_hash: 0aa367455a067b701f18ef7892b6c7e9
-config_hash: 373e654f8034a40c42234eee9ebefbb9
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/ark%2Fark-39b91ffd46b6e41924f8465ffaaff6ba3c200a68daa513d4f1eb1e4b29aba78f.yml
+openapi_spec_hash: 542dd50007316698c83e8b0bdd5e40e2
+config_hash: 77a3908ee910a8019f5831d3a3d53c18
