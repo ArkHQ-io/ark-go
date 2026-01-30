@@ -239,8 +239,7 @@ type WebhookNewResponseData struct {
 	// Subscribed events
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Events []string `json:"events,required"`
 	// Webhook name for identification
 	Name string `json:"name,required"`
@@ -299,8 +298,7 @@ type WebhookGetResponseData struct {
 	// Subscribed events
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Events []string `json:"events,required"`
 	// Webhook name for identification
 	Name string `json:"name,required"`
@@ -359,8 +357,7 @@ type WebhookUpdateResponseData struct {
 	// Subscribed events
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Events []string `json:"events,required"`
 	// Webhook name for identification
 	Name string `json:"name,required"`
@@ -525,8 +522,7 @@ type WebhookListDeliveriesResponseData struct {
 	// Event type that triggered this delivery
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Event string `json:"event,required"`
 	// HTTP status code returned by the endpoint (null if connection failed)
 	StatusCode int64 `json:"statusCode,required"`
@@ -646,8 +642,7 @@ type WebhookGetDeliveryResponseData struct {
 	// Event type that triggered this delivery
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Event string `json:"event,required"`
 	// The request that was sent to your endpoint
 	Request WebhookGetDeliveryResponseDataRequest `json:"request,required"`
@@ -807,8 +802,7 @@ type WebhookNewParams struct {
 	// - `DomainDNSError` - DNS configuration issue detected
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Events []string `json:"events,omitzero"`
 	paramObj
 }
@@ -852,8 +846,7 @@ type WebhookListDeliveriesParams struct {
 	// Filter by event type
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Event WebhookListDeliveriesParamsEvent `query:"event,omitzero" json:"-"`
 	paramObj
 }
@@ -879,8 +872,6 @@ const (
 	WebhookListDeliveriesParamsEventMessageLinkClicked    WebhookListDeliveriesParamsEvent = "MessageLinkClicked"
 	WebhookListDeliveriesParamsEventMessageLoaded         WebhookListDeliveriesParamsEvent = "MessageLoaded"
 	WebhookListDeliveriesParamsEventDomainDNSError        WebhookListDeliveriesParamsEvent = "DomainDNSError"
-	WebhookListDeliveriesParamsEventSendLimitApproaching  WebhookListDeliveriesParamsEvent = "SendLimitApproaching"
-	WebhookListDeliveriesParamsEventSendLimitExceeded     WebhookListDeliveriesParamsEvent = "SendLimitExceeded"
 )
 
 type WebhookReplayDeliveryParams struct {
@@ -897,8 +888,7 @@ type WebhookTestParams struct {
 	// Event type to simulate
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
-	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError",
-	// "SendLimitApproaching", "SendLimitExceeded".
+	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
 	Event WebhookTestParamsEvent `json:"event,omitzero,required"`
 	paramObj
 }
@@ -923,6 +913,4 @@ const (
 	WebhookTestParamsEventMessageLinkClicked    WebhookTestParamsEvent = "MessageLinkClicked"
 	WebhookTestParamsEventMessageLoaded         WebhookTestParamsEvent = "MessageLoaded"
 	WebhookTestParamsEventDomainDNSError        WebhookTestParamsEvent = "DomainDNSError"
-	WebhookTestParamsEventSendLimitApproaching  WebhookTestParamsEvent = "SendLimitApproaching"
-	WebhookTestParamsEventSendLimitExceeded     WebhookTestParamsEvent = "SendLimitExceeded"
 )
