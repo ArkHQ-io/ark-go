@@ -232,12 +232,8 @@ func (r *EmailGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailGetResponseData struct {
-	// Internal message ID
+	// Unique message identifier (token)
 	ID string `json:"id,required"`
-	// Unique message token used to retrieve this email via API. Combined with id to
-	// form the full message identifier: msg*{id}*{token} Use this token with GET
-	// /emails/{emailId} where emailId = "msg*{id}*{token}"
-	Token string `json:"token,required"`
 	// Sender address
 	From string `json:"from,required"`
 	// Message direction
@@ -289,7 +285,6 @@ type EmailGetResponseData struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
-		Token        respjson.Field
 		From         respjson.Field
 		Scope        respjson.Field
 		Status       respjson.Field
@@ -546,6 +541,8 @@ func (r *EmailGetDeliveriesResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailGetDeliveriesResponseData struct {
+	// Message identifier (token)
+	ID string `json:"id,required"`
 	// Whether the message can be manually retried via `POST /emails/{emailId}/retry`.
 	// `true` when the raw message content is still available (not expired). Messages
 	// older than the retention period cannot be retried.
@@ -553,10 +550,6 @@ type EmailGetDeliveriesResponseData struct {
 	// Chronological list of delivery attempts for this message. Each attempt includes
 	// SMTP response codes and timestamps.
 	Deliveries []EmailGetDeliveriesResponseDataDelivery `json:"deliveries,required"`
-	// Internal numeric message ID
-	MessageID int64 `json:"messageId,required"`
-	// Unique message token for API references
-	MessageToken string `json:"messageToken,required"`
 	// Information about the current retry state of a message that is queued for
 	// delivery. Only present when the message is in the delivery queue.
 	RetryState EmailGetDeliveriesResponseDataRetryState `json:"retryState,required"`
@@ -573,10 +566,9 @@ type EmailGetDeliveriesResponseData struct {
 	Status string `json:"status,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ID               respjson.Field
 		CanRetryManually respjson.Field
 		Deliveries       respjson.Field
-		MessageID        respjson.Field
-		MessageToken     respjson.Field
 		RetryState       respjson.Field
 		Status           respjson.Field
 		ExtraFields      map[string]respjson.Field
@@ -693,9 +685,12 @@ func (r *EmailRetryResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailRetryResponseData struct {
+	// Email identifier (token)
+	ID      string `json:"id,required"`
 	Message string `json:"message,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ID          respjson.Field
 		Message     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -729,7 +724,7 @@ func (r *EmailSendResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendResponseData struct {
-	// Unique message ID (format: msg*{id}*{token})
+	// Unique message identifier (token)
 	ID string `json:"id,required"`
 	// Current delivery status
 	//
@@ -811,13 +806,11 @@ func (r *EmailSendBatchResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendBatchResponseDataMessage struct {
-	// Message ID
-	ID    string `json:"id,required"`
-	Token string `json:"token,required"`
+	// Message identifier (token)
+	ID string `json:"id,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
-		Token       respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -850,7 +843,7 @@ func (r *EmailSendRawResponse) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendRawResponseData struct {
-	// Unique message ID (format: msg*{id}*{token})
+	// Unique message identifier (token)
 	ID string `json:"id,required"`
 	// Current delivery status
 	//
