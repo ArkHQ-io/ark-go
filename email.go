@@ -45,13 +45,13 @@ func NewEmailService(opts ...option.RequestOption) (r EmailService) {
 //
 // Use the `expand` parameter to include additional data like the HTML/text body,
 // headers, or delivery attempts.
-func (r *EmailService) Get(ctx context.Context, emailID string, query EmailGetParams, opts ...option.RequestOption) (res *EmailGetResponse, err error) {
+func (r *EmailService) Get(ctx context.Context, id string, query EmailGetParams, opts ...option.RequestOption) (res *EmailGetResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if emailID == "" {
-		err = errors.New("missing required emailId parameter")
+	if id == "" {
+		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s", emailID)
+	path := fmt.Sprintf("emails/%s", id)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
@@ -128,16 +128,16 @@ func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams
 //
 // ### Can Retry Manually
 //
-// Indicates whether you can call `POST /emails/{emailId}/retry` to manually retry
-// the email. This is `true` when the raw message content is still available (not
+// Indicates whether you can call `POST /emails/{id}/retry` to manually retry the
+// email. This is `true` when the raw message content is still available (not
 // expired due to retention policy).
-func (r *EmailService) GetDeliveries(ctx context.Context, emailID string, opts ...option.RequestOption) (res *EmailGetDeliveriesResponse, err error) {
+func (r *EmailService) GetDeliveries(ctx context.Context, id string, opts ...option.RequestOption) (res *EmailGetDeliveriesResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if emailID == "" {
-		err = errors.New("missing required emailId parameter")
+	if id == "" {
+		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s/deliveries", emailID)
+	path := fmt.Sprintf("emails/%s/deliveries", id)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -146,13 +146,13 @@ func (r *EmailService) GetDeliveries(ctx context.Context, emailID string, opts .
 // attempt.
 //
 // Only works for emails that have failed or are in a retryable state.
-func (r *EmailService) Retry(ctx context.Context, emailID string, opts ...option.RequestOption) (res *EmailRetryResponse, err error) {
+func (r *EmailService) Retry(ctx context.Context, id string, opts ...option.RequestOption) (res *EmailRetryResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if emailID == "" {
-		err = errors.New("missing required emailId parameter")
+	if id == "" {
+		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s/retry", emailID)
+	path := fmt.Sprintf("emails/%s/retry", id)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
 	return
 }
@@ -459,10 +459,9 @@ func (r *EmailGetResponseDataDelivery) UnmarshalJSON(data []byte) error {
 }
 
 type EmailListResponse struct {
-	// Internal message ID
-	ID    string `json:"id,required"`
-	Token string `json:"token,required"`
-	From  string `json:"from,required"`
+	// Unique message identifier (token)
+	ID   string `json:"id,required"`
+	From string `json:"from,required"`
 	// Current delivery status:
 	//
 	// - `pending` - Email accepted, waiting to be processed
@@ -482,7 +481,6 @@ type EmailListResponse struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
-		Token        respjson.Field
 		From         respjson.Field
 		Status       respjson.Field
 		Subject      respjson.Field
@@ -543,7 +541,7 @@ func (r *EmailGetDeliveriesResponse) UnmarshalJSON(data []byte) error {
 type EmailGetDeliveriesResponseData struct {
 	// Message identifier (token)
 	ID string `json:"id,required"`
-	// Whether the message can be manually retried via `POST /emails/{emailId}/retry`.
+	// Whether the message can be manually retried via `POST /emails/{id}/retry`.
 	// `true` when the raw message content is still available (not expired). Messages
 	// older than the retention period cannot be retried.
 	CanRetryManually bool `json:"canRetryManually,required"`
