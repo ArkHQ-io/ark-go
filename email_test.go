@@ -13,34 +13,6 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 )
 
-func TestEmailGetWithOptionalParams(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := ark.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Emails.Get(
-		context.TODO(),
-		"aBc123XyZ",
-		ark.EmailGetParams{
-			Expand: ark.String("full"),
-		},
-	)
-	if err != nil {
-		var apierr *ark.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
 func TestEmailListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -63,50 +35,6 @@ func TestEmailListWithOptionalParams(t *testing.T) {
 		Tag:     ark.String("tag"),
 		To:      ark.String("dev@stainless.com"),
 	})
-	if err != nil {
-		var apierr *ark.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestEmailGetDeliveries(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := ark.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Emails.GetDeliveries(context.TODO(), "aBc123XyZ")
-	if err != nil {
-		var apierr *ark.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestEmailRetry(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := ark.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Emails.Retry(context.TODO(), "aBc123XyZ")
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {

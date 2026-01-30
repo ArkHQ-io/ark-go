@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.0 (2026-01-30)
+
+Full Changelog: [v0.16.0...v0.17.0](https://github.com/ArkHQ-io/ark-go/compare/v0.16.0...v0.17.0)
+
+### Features
+
+* **api:** api update ([b084289](https://github.com/ArkHQ-io/ark-go/commit/b08428924f86a3999c6642492dc194ce3178d7ea))
+
 ## 0.16.0 (2026-01-30)
 
 Full Changelog: [v0.15.0...v0.16.0](https://github.com/ArkHQ-io/ark-go/compare/v0.15.0...v0.16.0)
