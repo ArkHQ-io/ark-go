@@ -279,7 +279,7 @@ func (r *LogEntryRateLimit) UnmarshalJSON(data []byte) error {
 
 // Email-specific data (for email endpoints)
 type LogEntryEmail struct {
-	// Email message identifier (token)
+	// Email message ID
 	ID string `json:"id"`
 	// Number of recipients
 	RecipientCount int64 `json:"recipientCount,nullable"`
