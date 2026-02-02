@@ -431,9 +431,13 @@ type EmailGetResponseDataDelivery struct {
 	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
 	// SMTP response code
 	Code int64 `json:"code"`
-	// Status details
+	// Human-readable delivery summary. Format varies by status:
+	//
+	//   - **sent**: `Message for {recipient} accepted by {ip}:{port} ({hostname})`
+	//   - **softfail/hardfail**:
+	//     `{code} {classification}: Delivery to {recipient} failed at {ip}:{port} ({hostname})`
 	Details string `json:"details"`
-	// SMTP server response from the receiving mail server
+	// Raw SMTP response from the receiving mail server
 	Output string `json:"output"`
 	// Whether TLS was used
 	SentWithSsl bool `json:"sentWithSsl"`
@@ -591,9 +595,13 @@ type EmailGetDeliveriesResponseDataDelivery struct {
 	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
 	// SMTP response code
 	Code int64 `json:"code"`
-	// Status details
+	// Human-readable delivery summary. Format varies by status:
+	//
+	//   - **sent**: `Message for {recipient} accepted by {ip}:{port} ({hostname})`
+	//   - **softfail/hardfail**:
+	//     `{code} {classification}: Delivery to {recipient} failed at {ip}:{port} ({hostname})`
 	Details string `json:"details"`
-	// SMTP server response from the receiving mail server
+	// Raw SMTP response from the receiving mail server
 	Output string `json:"output"`
 	// Whether TLS was used
 	SentWithSsl bool `json:"sentWithSsl"`
