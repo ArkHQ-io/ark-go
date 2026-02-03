@@ -24,6 +24,7 @@ type Client struct {
 	Tracking     TrackingService
 	Logs         LogService
 	Usage        UsageService
+	Tenants      TenantService
 }
 
 // DefaultClientOptions read from the environment (ARK_API_KEY, ARK_BASE_URL). This
@@ -55,6 +56,7 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Tracking = NewTrackingService(opts...)
 	r.Logs = NewLogService(opts...)
 	r.Usage = NewUsageService(opts...)
+	r.Tenants = NewTenantService(opts...)
 
 	return
 }
