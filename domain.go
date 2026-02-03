@@ -7,10 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"time"
 
 	"github.com/ArkHQ-io/ark-go/internal/apijson"
+	"github.com/ArkHQ-io/ark-go/internal/apiquery"
 	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
 	"github.com/ArkHQ-io/ark-go/option"
 	"github.com/ArkHQ-io/ark-go/packages/param"
@@ -40,6 +42,9 @@ func NewDomainService(opts ...option.RequestOption) (r DomainService) {
 // Add a new domain for sending emails. Returns DNS records that must be configured
 // before the domain can be verified.
 //
+// **Required:** `tenant_id` to specify which tenant the domain belongs to. Each
+// tenant gets their own isolated mail server for domain isolation.
+//
 // **Required DNS records:**
 //
 // - **SPF** - TXT record for sender authentication
@@ -66,11 +71,14 @@ func (r *DomainService) Get(ctx context.Context, domainID string, opts ...option
 	return
 }
 
-// Get all sending domains with their verification status
-func (r *DomainService) List(ctx context.Context, opts ...option.RequestOption) (res *DomainListResponse, err error) {
+// Get all sending domains with their verification status.
+//
+// Optionally filter by `tenant_id` to list domains for a specific tenant. When
+// filtered, response includes `tenant_id` and `tenant_name` for each domain.
+func (r *DomainService) List(ctx context.Context, query DomainListParams, opts ...option.RequestOption) (res *DomainListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "domains"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
 
@@ -231,6 +239,10 @@ type DomainNewResponseData struct {
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
 	Verified bool `json:"verified,required"`
+	// ID of the tenant this domain belongs to
+	TenantID string `json:"tenant_id"`
+	// Name of the tenant this domain belongs to
+	TenantName string `json:"tenant_name"`
 	// Timestamp when the domain ownership was verified, or null if not yet verified
 	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -241,6 +253,8 @@ type DomainNewResponseData struct {
 		Name        respjson.Field
 		Uuid        respjson.Field
 		Verified    respjson.Field
+		TenantID    respjson.Field
+		TenantName  respjson.Field
 		VerifiedAt  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -380,6 +394,10 @@ type DomainGetResponseData struct {
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
 	Verified bool `json:"verified,required"`
+	// ID of the tenant this domain belongs to
+	TenantID string `json:"tenant_id"`
+	// Name of the tenant this domain belongs to
+	TenantName string `json:"tenant_name"`
 	// Timestamp when the domain ownership was verified, or null if not yet verified
 	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -390,6 +408,8 @@ type DomainGetResponseData struct {
 		Name        respjson.Field
 		Uuid        respjson.Field
 		Verified    respjson.Field
+		TenantID    respjson.Field
+		TenantName  respjson.Field
 		VerifiedAt  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -528,11 +548,17 @@ type DomainListResponseDataDomain struct {
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
 	Verified bool `json:"verified,required"`
+	// ID of the tenant this domain belongs to (included when filtering by tenant_id)
+	TenantID string `json:"tenant_id"`
+	// Name of the tenant this domain belongs to (included when filtering by tenant_id)
+	TenantName string `json:"tenant_name"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		Name        respjson.Field
 		Verified    respjson.Field
+		TenantID    respjson.Field
+		TenantName  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -625,6 +651,10 @@ type DomainVerifyResponseData struct {
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
 	Verified bool `json:"verified,required"`
+	// ID of the tenant this domain belongs to
+	TenantID string `json:"tenant_id"`
+	// Name of the tenant this domain belongs to
+	TenantName string `json:"tenant_name"`
 	// Timestamp when the domain ownership was verified, or null if not yet verified
 	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -635,6 +665,8 @@ type DomainVerifyResponseData struct {
 		Name        respjson.Field
 		Uuid        respjson.Field
 		Verified    respjson.Field
+		TenantID    respjson.Field
+		TenantName  respjson.Field
 		VerifiedAt  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -732,6 +764,8 @@ func (r *DomainVerifyResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
 type DomainNewParams struct {
 	// Domain name (e.g., "mail.example.com")
 	Name string `json:"name,required"`
+	// ID of the tenant this domain belongs to
+	TenantID string `json:"tenant_id,required"`
 	paramObj
 }
 
@@ -741,4 +775,18 @@ func (r DomainNewParams) MarshalJSON() (data []byte, err error) {
 }
 func (r *DomainNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+type DomainListParams struct {
+	// Filter domains by tenant ID
+	TenantID param.Opt[string] `query:"tenant_id,omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [DomainListParams]'s query parameters as `url.Values`.
+func (r DomainListParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
 }
