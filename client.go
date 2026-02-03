@@ -23,6 +23,7 @@ type Client struct {
 	Webhooks     WebhookService
 	Tracking     TrackingService
 	Logs         LogService
+	Limits       LimitService
 	Usage        UsageService
 	Tenants      TenantService
 }
@@ -55,6 +56,7 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Webhooks = NewWebhookService(opts...)
 	r.Tracking = NewTrackingService(opts...)
 	r.Logs = NewLogService(opts...)
+	r.Limits = NewLimitService(opts...)
 	r.Usage = NewUsageService(opts...)
 	r.Tenants = NewTenantService(opts...)
 
