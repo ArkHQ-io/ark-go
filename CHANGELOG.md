@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.17.0 (2026-02-03)
+
+Full Changelog: [v0.16.0...v0.17.0](https://github.com/ArkHQ-io/ark-go/compare/v0.16.0...v0.17.0)
+
+### Features
+
+* **api:** Add Tenants ([94427a2](https://github.com/ArkHQ-io/ark-go/commit/94427a2c99d5f052c91ad31859c97a531e5a3486))
+* **api:** api update ([b084289](https://github.com/ArkHQ-io/ark-go/commit/b08428924f86a3999c6642492dc194ce3178d7ea))
+* **api:** manual updates ([be47347](https://github.com/ArkHQ-io/ark-go/commit/be4734765c174f25bcdddb476a51051e3f9eb3df))
+* **api:** manual updates ([6ab5f3a](https://github.com/ArkHQ-io/ark-go/commit/6ab5f3a0a0455339c890b0ff93642576617ef02c))
+* **api:** manual updates ([0e66ae0](https://github.com/ArkHQ-io/ark-go/commit/0e66ae04cdb1ef6d9e81e56619da076d37546e5a))
+
 ## 0.16.0 (2026-01-30)
 
 Full Changelog: [v0.15.0...v0.16.0](https://github.com/ArkHQ-io/ark-go/compare/v0.15.0...v0.16.0)
