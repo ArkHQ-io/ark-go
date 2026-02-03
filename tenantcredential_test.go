@@ -13,7 +13,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 )
 
-func TestDomainNew(t *testing.T) {
+func TestTenantCredentialNew(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -25,10 +25,14 @@ func TestDomainNew(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.New(context.TODO(), ark.DomainNewParams{
-		Name:     "notifications.myapp.com",
-		TenantID: "cm6abc123def456",
-	})
+	_, err := client.Tenants.Credentials.New(
+		context.TODO(),
+		"cm6abc123def456",
+		ark.TenantCredentialNewParams{
+			Name: "production-smtp",
+			Type: ark.TenantCredentialNewParamsTypeSmtp,
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -38,7 +42,7 @@ func TestDomainNew(t *testing.T) {
 	}
 }
 
-func TestDomainGet(t *testing.T) {
+func TestTenantCredentialGetWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -50,7 +54,14 @@ func TestDomainGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.Get(context.TODO(), "domainId")
+	_, err := client.Tenants.Credentials.Get(
+		context.TODO(),
+		123,
+		ark.TenantCredentialGetParams{
+			TenantID: "cm6abc123def456",
+			Reveal:   ark.Bool(true),
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -60,7 +71,7 @@ func TestDomainGet(t *testing.T) {
 	}
 }
 
-func TestDomainListWithOptionalParams(t *testing.T) {
+func TestTenantCredentialUpdateWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -72,9 +83,15 @@ func TestDomainListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.List(context.TODO(), ark.DomainListParams{
-		TenantID: ark.String("tenant_id"),
-	})
+	_, err := client.Tenants.Credentials.Update(
+		context.TODO(),
+		123,
+		ark.TenantCredentialUpdateParams{
+			TenantID: "cm6abc123def456",
+			Hold:     ark.Bool(true),
+			Name:     ark.String("production-smtp-v2"),
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -84,7 +101,7 @@ func TestDomainListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestDomainDelete(t *testing.T) {
+func TestTenantCredentialListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -96,7 +113,15 @@ func TestDomainDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.Delete(context.TODO(), "domainId")
+	_, err := client.Tenants.Credentials.List(
+		context.TODO(),
+		"cm6abc123def456",
+		ark.TenantCredentialListParams{
+			Page:    ark.Int(1),
+			PerPage: ark.Int(1),
+			Type:    ark.TenantCredentialListParamsTypeSmtp,
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -106,7 +131,7 @@ func TestDomainDelete(t *testing.T) {
 	}
 }
 
-func TestDomainVerify(t *testing.T) {
+func TestTenantCredentialDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -118,7 +143,13 @@ func TestDomainVerify(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.Verify(context.TODO(), "domainId")
+	_, err := client.Tenants.Credentials.Delete(
+		context.TODO(),
+		123,
+		ark.TenantCredentialDeleteParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
