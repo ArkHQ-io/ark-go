@@ -429,26 +429,55 @@ type EmailGetResponseDataDelivery struct {
 	Timestamp float64 `json:"timestamp,required"`
 	// ISO 8601 timestamp
 	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	// Bounce classification category (present for failed deliveries). Helps understand
+	// why delivery failed for analytics and automated handling.
+	//
+	// Any of "invalid_recipient", "mailbox_full", "message_too_large", "spam_block",
+	// "policy_violation", "no_mailbox", "not_accepting_mail",
+	// "temporarily_unavailable", "protocol_error", "tls_required", "connection_error",
+	// "dns_error", "unclassified".
+	Classification string `json:"classification,nullable"`
+	// Numeric bounce classification code for programmatic handling. Codes:
+	// 10=invalid_recipient, 11=no_mailbox, 12=not_accepting_mail, 20=mailbox_full,
+	// 21=message_too_large, 30=spam_block, 31=policy_violation, 32=tls_required,
+	// 40=connection_error, 41=dns_error, 42=temporarily_unavailable,
+	// 50=protocol_error, 99=unclassified
+	ClassificationCode int64 `json:"classificationCode,nullable"`
 	// SMTP response code
 	Code int64 `json:"code"`
-	// Status details
+	// Human-readable delivery summary. Format varies by status:
+	//
+	//   - **sent**: `Message for {recipient} accepted by {ip}:{port} ({hostname})`
+	//   - **softfail/hardfail**:
+	//     `{code} {classification}: Delivery to {recipient} failed at {ip}:{port} ({hostname})`
 	Details string `json:"details"`
-	// SMTP server response from the receiving mail server
+	// Raw SMTP response from the receiving mail server
 	Output string `json:"output"`
+	// Hostname of the remote mail server that processed the delivery. Present for all
+	// delivery attempts (successful and failed).
+	RemoteHost string `json:"remoteHost,nullable"`
 	// Whether TLS was used
 	SentWithSsl bool `json:"sentWithSsl"`
+	// RFC 3463 enhanced status code from SMTP response (e.g., "5.1.1", "4.2.2"). First
+	// digit: 2=success, 4=temporary, 5=permanent. Second digit: category (1=address,
+	// 2=mailbox, 7=security, etc.).
+	SmtpEnhancedCode string `json:"smtpEnhancedCode,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID           respjson.Field
-		Status       respjson.Field
-		Timestamp    respjson.Field
-		TimestampISO respjson.Field
-		Code         respjson.Field
-		Details      respjson.Field
-		Output       respjson.Field
-		SentWithSsl  respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		ID                 respjson.Field
+		Status             respjson.Field
+		Timestamp          respjson.Field
+		TimestampISO       respjson.Field
+		Classification     respjson.Field
+		ClassificationCode respjson.Field
+		Code               respjson.Field
+		Details            respjson.Field
+		Output             respjson.Field
+		RemoteHost         respjson.Field
+		SentWithSsl        respjson.Field
+		SmtpEnhancedCode   respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
 	} `json:"-"`
 }
 
@@ -589,26 +618,55 @@ type EmailGetDeliveriesResponseDataDelivery struct {
 	Timestamp float64 `json:"timestamp,required"`
 	// ISO 8601 timestamp
 	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	// Bounce classification category (present for failed deliveries). Helps understand
+	// why delivery failed for analytics and automated handling.
+	//
+	// Any of "invalid_recipient", "mailbox_full", "message_too_large", "spam_block",
+	// "policy_violation", "no_mailbox", "not_accepting_mail",
+	// "temporarily_unavailable", "protocol_error", "tls_required", "connection_error",
+	// "dns_error", "unclassified".
+	Classification string `json:"classification,nullable"`
+	// Numeric bounce classification code for programmatic handling. Codes:
+	// 10=invalid_recipient, 11=no_mailbox, 12=not_accepting_mail, 20=mailbox_full,
+	// 21=message_too_large, 30=spam_block, 31=policy_violation, 32=tls_required,
+	// 40=connection_error, 41=dns_error, 42=temporarily_unavailable,
+	// 50=protocol_error, 99=unclassified
+	ClassificationCode int64 `json:"classificationCode,nullable"`
 	// SMTP response code
 	Code int64 `json:"code"`
-	// Status details
+	// Human-readable delivery summary. Format varies by status:
+	//
+	//   - **sent**: `Message for {recipient} accepted by {ip}:{port} ({hostname})`
+	//   - **softfail/hardfail**:
+	//     `{code} {classification}: Delivery to {recipient} failed at {ip}:{port} ({hostname})`
 	Details string `json:"details"`
-	// SMTP server response from the receiving mail server
+	// Raw SMTP response from the receiving mail server
 	Output string `json:"output"`
+	// Hostname of the remote mail server that processed the delivery. Present for all
+	// delivery attempts (successful and failed).
+	RemoteHost string `json:"remoteHost,nullable"`
 	// Whether TLS was used
 	SentWithSsl bool `json:"sentWithSsl"`
+	// RFC 3463 enhanced status code from SMTP response (e.g., "5.1.1", "4.2.2"). First
+	// digit: 2=success, 4=temporary, 5=permanent. Second digit: category (1=address,
+	// 2=mailbox, 7=security, etc.).
+	SmtpEnhancedCode string `json:"smtpEnhancedCode,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID           respjson.Field
-		Status       respjson.Field
-		Timestamp    respjson.Field
-		TimestampISO respjson.Field
-		Code         respjson.Field
-		Details      respjson.Field
-		Output       respjson.Field
-		SentWithSsl  respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		ID                 respjson.Field
+		Status             respjson.Field
+		Timestamp          respjson.Field
+		TimestampISO       respjson.Field
+		Classification     respjson.Field
+		ClassificationCode respjson.Field
+		Code               respjson.Field
+		Details            respjson.Field
+		Output             respjson.Field
+		RemoteHost         respjson.Field
+		SentWithSsl        respjson.Field
+		SmtpEnhancedCode   respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
 	} `json:"-"`
 }
 
