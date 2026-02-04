@@ -31,7 +31,7 @@ func TestTenantNewWithOptionalParams(t *testing.T) {
 			"plan": {
 				OfString: ark.String("pro"),
 			},
-			"internal_id": {
+			"internalId": {
 				OfString: ark.String("cust_12345"),
 			},
 			"region": {
@@ -90,7 +90,7 @@ func TestTenantUpdateWithOptionalParams(t *testing.T) {
 				"plan": {
 					OfString: ark.String("pro"),
 				},
-				"internal_id": {
+				"internalId": {
 					OfString: ark.String("cust_12345"),
 				},
 				"region": {
