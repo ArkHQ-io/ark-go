@@ -119,7 +119,7 @@ type Tenant struct {
 	// Unique identifier for the tenant
 	ID string `json:"id,required"`
 	// When the tenant was created
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
 	// Custom key-value pairs for storing additional data
 	Metadata map[string]TenantMetadataUnion `json:"metadata,required"`
 	// Display name for the tenant
@@ -133,7 +133,7 @@ type Tenant struct {
 	// Any of "active", "suspended", "archived".
 	Status TenantStatus `json:"status,required"`
 	// When the tenant was last updated
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt,required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
