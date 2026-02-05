@@ -13,7 +13,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 )
 
-func TestSuppressionNewWithOptionalParams(t *testing.T) {
+func TestTenantDomainNew(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -25,10 +25,13 @@ func TestSuppressionNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.New(context.TODO(), ark.SuppressionNewParams{
-		Address: "user@example.com",
-		Reason:  ark.String("user requested removal"),
-	})
+	_, err := client.Tenants.Domains.New(
+		context.TODO(),
+		"cm6abc123def456",
+		ark.TenantDomainNewParams{
+			Name: "notifications.myapp.com",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -38,7 +41,7 @@ func TestSuppressionNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestSuppressionGet(t *testing.T) {
+func TestTenantDomainGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -50,7 +53,13 @@ func TestSuppressionGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.Get(context.TODO(), "dev@stainless.com")
+	_, err := client.Tenants.Domains.Get(
+		context.TODO(),
+		"123",
+		ark.TenantDomainGetParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -60,7 +69,7 @@ func TestSuppressionGet(t *testing.T) {
 	}
 }
 
-func TestSuppressionListWithOptionalParams(t *testing.T) {
+func TestTenantDomainList(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -72,10 +81,7 @@ func TestSuppressionListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.List(context.TODO(), ark.SuppressionListParams{
-		Page:    ark.Int(0),
-		PerPage: ark.Int(100),
-	})
+	_, err := client.Tenants.Domains.List(context.TODO(), "cm6abc123def456")
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -85,7 +91,7 @@ func TestSuppressionListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestSuppressionDelete(t *testing.T) {
+func TestTenantDomainDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -97,7 +103,13 @@ func TestSuppressionDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.Delete(context.TODO(), "dev@stainless.com")
+	_, err := client.Tenants.Domains.Delete(
+		context.TODO(),
+		"123",
+		ark.TenantDomainDeleteParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -107,7 +119,7 @@ func TestSuppressionDelete(t *testing.T) {
 	}
 }
 
-func TestSuppressionBulkNew(t *testing.T) {
+func TestTenantDomainVerify(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -119,12 +131,13 @@ func TestSuppressionBulkNew(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.BulkNew(context.TODO(), ark.SuppressionBulkNewParams{
-		Suppressions: []ark.SuppressionBulkNewParamsSuppression{{
-			Address: "dev@stainless.com",
-			Reason:  ark.String("reason"),
-		}},
-	})
+	_, err := client.Tenants.Domains.Verify(
+		context.TODO(),
+		"123",
+		ark.TenantDomainVerifyParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {

@@ -18,44 +18,52 @@ import (
 	"github.com/ArkHQ-io/ark-go/shared"
 )
 
-// TrackingService contains methods and other services that help with interacting
-// with the ark API.
+// TenantTrackingService contains methods and other services that help with
+// interacting with the ark API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewTrackingService] method instead.
-type TrackingService struct {
+// the [NewTenantTrackingService] method instead.
+type TenantTrackingService struct {
 	Options []option.RequestOption
 }
 
-// NewTrackingService generates a new service that applies the given options to
-// each request. These options are applied after the parent client's options (if
+// NewTenantTrackingService generates a new service that applies the given options
+// to each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewTrackingService(opts ...option.RequestOption) (r TrackingService) {
-	r = TrackingService{}
+func NewTenantTrackingService(opts ...option.RequestOption) (r TenantTrackingService) {
+	r = TenantTrackingService{}
 	r.Options = opts
 	return
 }
 
-// Create a new track domain for open/click tracking.
+// Create a new track domain for open/click tracking for a tenant.
 //
 // After creation, you must configure a CNAME record pointing to the provided DNS
 // value before tracking will work.
-func (r *TrackingService) New(ctx context.Context, body TrackingNewParams, opts ...option.RequestOption) (res *TrackingNewResponse, err error) {
+func (r *TenantTrackingService) New(ctx context.Context, tenantID string, body TenantTrackingNewParams, opts ...option.RequestOption) (res *TenantTrackingNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	path := "tracking"
+	if tenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
+	path := fmt.Sprintf("tenants/%s/tracking", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
-// Get details of a specific track domain including DNS configuration
-func (r *TrackingService) Get(ctx context.Context, trackingID string, opts ...option.RequestOption) (res *TrackingGetResponse, err error) {
+// Get details of a specific track domain including DNS configuration.
+func (r *TenantTrackingService) Get(ctx context.Context, trackingID string, query TenantTrackingGetParams, opts ...option.RequestOption) (res *TenantTrackingGetResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
+	if query.TenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
 		return
 	}
-	path := fmt.Sprintf("tracking/%s", trackingID)
+	path := fmt.Sprintf("tenants/%s/tracking/%s", query.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -68,35 +76,47 @@ func (r *TrackingService) Get(ctx context.Context, trackingID string, opts ...op
 // - Enable/disable open tracking
 // - Enable/disable SSL
 // - Set excluded click domains
-func (r *TrackingService) Update(ctx context.Context, trackingID string, body TrackingUpdateParams, opts ...option.RequestOption) (res *TrackingUpdateResponse, err error) {
+func (r *TenantTrackingService) Update(ctx context.Context, trackingID string, params TenantTrackingUpdateParams, opts ...option.RequestOption) (res *TenantTrackingUpdateResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
+	if params.TenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
 		return
 	}
-	path := fmt.Sprintf("tracking/%s", trackingID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
+	path := fmt.Sprintf("tenants/%s/tracking/%s", params.TenantID, trackingID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
 
-// List all track domains configured for your server. Track domains enable open and
-// click tracking for your emails.
-func (r *TrackingService) List(ctx context.Context, opts ...option.RequestOption) (res *TrackingListResponse, err error) {
+// List all track domains configured for a tenant. Track domains enable open and
+// click tracking for emails.
+func (r *TenantTrackingService) List(ctx context.Context, tenantID string, opts ...option.RequestOption) (res *TenantTrackingListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	path := "tracking"
+	if tenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
+	path := fmt.Sprintf("tenants/%s/tracking", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
 // Delete a track domain. This will disable tracking for any emails using this
 // domain.
-func (r *TrackingService) Delete(ctx context.Context, trackingID string, opts ...option.RequestOption) (res *TrackingDeleteResponse, err error) {
+func (r *TenantTrackingService) Delete(ctx context.Context, trackingID string, body TenantTrackingDeleteParams, opts ...option.RequestOption) (res *TenantTrackingDeleteResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
+	if body.TenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
 		return
 	}
-	path := fmt.Sprintf("tracking/%s", trackingID)
+	path := fmt.Sprintf("tenants/%s/tracking/%s", body.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
 }
@@ -105,13 +125,17 @@ func (r *TrackingService) Delete(ctx context.Context, trackingID string, opts ..
 //
 // The track domain requires a CNAME record to be configured before open and click
 // tracking will work. Use this endpoint to verify the DNS is correctly set up.
-func (r *TrackingService) Verify(ctx context.Context, trackingID string, opts ...option.RequestOption) (res *TrackingVerifyResponse, err error) {
+func (r *TenantTrackingService) Verify(ctx context.Context, trackingID string, body TenantTrackingVerifyParams, opts ...option.RequestOption) (res *TenantTrackingVerifyResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
+	if body.TenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
 		return
 	}
-	path := fmt.Sprintf("tracking/%s/verify", trackingID)
+	path := fmt.Sprintf("tenants/%s/tracking/%s/verify", body.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
 	return
 }
@@ -211,7 +235,7 @@ const (
 	TrackDomainDNSStatusInvalid TrackDomainDNSStatus = "invalid"
 )
 
-type TrackingNewResponse struct {
+type TenantTrackingNewResponse struct {
 	Data    TrackDomain    `json:"data,required"`
 	Meta    shared.APIMeta `json:"meta,required"`
 	Success bool           `json:"success,required"`
@@ -226,12 +250,12 @@ type TrackingNewResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingNewResponse) RawJSON() string { return r.JSON.raw }
-func (r *TrackingNewResponse) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingNewResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingNewResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingGetResponse struct {
+type TenantTrackingGetResponse struct {
 	Data    TrackDomain    `json:"data,required"`
 	Meta    shared.APIMeta `json:"meta,required"`
 	Success bool           `json:"success,required"`
@@ -246,12 +270,12 @@ type TrackingGetResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingGetResponse) RawJSON() string { return r.JSON.raw }
-func (r *TrackingGetResponse) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingGetResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingGetResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingUpdateResponse struct {
+type TenantTrackingUpdateResponse struct {
 	Data    TrackDomain    `json:"data,required"`
 	Meta    shared.APIMeta `json:"meta,required"`
 	Success bool           `json:"success,required"`
@@ -266,15 +290,15 @@ type TrackingUpdateResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingUpdateResponse) RawJSON() string { return r.JSON.raw }
-func (r *TrackingUpdateResponse) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingUpdateResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingUpdateResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingListResponse struct {
-	Data    TrackingListResponseData `json:"data,required"`
-	Meta    shared.APIMeta           `json:"meta,required"`
-	Success bool                     `json:"success,required"`
+type TenantTrackingListResponse struct {
+	Data    TenantTrackingListResponseData `json:"data,required"`
+	Meta    shared.APIMeta                 `json:"meta,required"`
+	Success bool                           `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -286,12 +310,12 @@ type TrackingListResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingListResponse) RawJSON() string { return r.JSON.raw }
-func (r *TrackingListResponse) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingListResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingListResponseData struct {
+type TenantTrackingListResponseData struct {
 	TrackDomains []TrackDomain `json:"trackDomains,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -302,15 +326,15 @@ type TrackingListResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingListResponseData) RawJSON() string { return r.JSON.raw }
-func (r *TrackingListResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingListResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingListResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingDeleteResponse struct {
-	Data    TrackingDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta             `json:"meta,required"`
-	Success bool                       `json:"success,required"`
+type TenantTrackingDeleteResponse struct {
+	Data    TenantTrackingDeleteResponseData `json:"data,required"`
+	Meta    shared.APIMeta                   `json:"meta,required"`
+	Success bool                             `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -322,12 +346,12 @@ type TrackingDeleteResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingDeleteResponse) RawJSON() string { return r.JSON.raw }
-func (r *TrackingDeleteResponse) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingDeleteResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingDeleteResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingDeleteResponseData struct {
+type TenantTrackingDeleteResponseData struct {
 	Message string `json:"message,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -338,15 +362,15 @@ type TrackingDeleteResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingDeleteResponseData) RawJSON() string { return r.JSON.raw }
-func (r *TrackingDeleteResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingDeleteResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingDeleteResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingVerifyResponse struct {
-	Data    TrackingVerifyResponseData `json:"data,required"`
-	Meta    shared.APIMeta             `json:"meta,required"`
-	Success bool                       `json:"success,required"`
+type TenantTrackingVerifyResponse struct {
+	Data    TenantTrackingVerifyResponseData `json:"data,required"`
+	Meta    shared.APIMeta                   `json:"meta,required"`
+	Success bool                             `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -358,12 +382,12 @@ type TrackingVerifyResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingVerifyResponse) RawJSON() string { return r.JSON.raw }
-func (r *TrackingVerifyResponse) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingVerifyResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingVerifyResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingVerifyResponseData struct {
+type TenantTrackingVerifyResponseData struct {
 	// Track domain ID
 	ID string `json:"id,required"`
 	// Whether DNS is correctly configured
@@ -379,7 +403,7 @@ type TrackingVerifyResponseData struct {
 	// DNS error message if verification failed
 	DNSError string `json:"dnsError,nullable"`
 	// Required DNS record configuration
-	DNSRecord TrackingVerifyResponseDataDNSRecord `json:"dnsRecord,nullable"`
+	DNSRecord TenantTrackingVerifyResponseDataDNSRecord `json:"dnsRecord,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
@@ -395,13 +419,13 @@ type TrackingVerifyResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingVerifyResponseData) RawJSON() string { return r.JSON.raw }
-func (r *TrackingVerifyResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingVerifyResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingVerifyResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Required DNS record configuration
-type TrackingVerifyResponseDataDNSRecord struct {
+type TenantTrackingVerifyResponseDataDNSRecord struct {
 	Name  string `json:"name"`
 	Type  string `json:"type"`
 	Value string `json:"value"`
@@ -416,12 +440,12 @@ type TrackingVerifyResponseDataDNSRecord struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r TrackingVerifyResponseDataDNSRecord) RawJSON() string { return r.JSON.raw }
-func (r *TrackingVerifyResponseDataDNSRecord) UnmarshalJSON(data []byte) error {
+func (r TenantTrackingVerifyResponseDataDNSRecord) RawJSON() string { return r.JSON.raw }
+func (r *TenantTrackingVerifyResponseDataDNSRecord) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingNewParams struct {
+type TenantTrackingNewParams struct {
 	// ID of the sending domain to attach this track domain to
 	DomainID int64 `json:"domainId,required"`
 	// Subdomain name (e.g., 'track' for track.yourdomain.com)
@@ -435,15 +459,21 @@ type TrackingNewParams struct {
 	paramObj
 }
 
-func (r TrackingNewParams) MarshalJSON() (data []byte, err error) {
-	type shadow TrackingNewParams
+func (r TenantTrackingNewParams) MarshalJSON() (data []byte, err error) {
+	type shadow TenantTrackingNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *TrackingNewParams) UnmarshalJSON(data []byte) error {
+func (r *TenantTrackingNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type TrackingUpdateParams struct {
+type TenantTrackingGetParams struct {
+	TenantID string `path:"tenantId,required" json:"-"`
+	paramObj
+}
+
+type TenantTrackingUpdateParams struct {
+	TenantID string `path:"tenantId,required" json:"-"`
 	// Comma-separated list of domains to exclude from click tracking (accepts null)
 	ExcludedClickDomains param.Opt[string] `json:"excludedClickDomains,omitzero"`
 	// Enable or disable SSL for tracking URLs (accepts null)
@@ -455,10 +485,20 @@ type TrackingUpdateParams struct {
 	paramObj
 }
 
-func (r TrackingUpdateParams) MarshalJSON() (data []byte, err error) {
-	type shadow TrackingUpdateParams
+func (r TenantTrackingUpdateParams) MarshalJSON() (data []byte, err error) {
+	type shadow TenantTrackingUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *TrackingUpdateParams) UnmarshalJSON(data []byte) error {
+func (r *TenantTrackingUpdateParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+type TenantTrackingDeleteParams struct {
+	TenantID string `path:"tenantId,required" json:"-"`
+	paramObj
+}
+
+type TenantTrackingVerifyParams struct {
+	TenantID string `path:"tenantId,required" json:"-"`
+	paramObj
 }

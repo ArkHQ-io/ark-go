@@ -7,12 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"slices"
 	"time"
 
 	"github.com/ArkHQ-io/ark-go/internal/apijson"
-	"github.com/ArkHQ-io/ark-go/internal/apiquery"
 	"github.com/ArkHQ-io/ark-go/internal/requestconfig"
 	"github.com/ArkHQ-io/ark-go/option"
 	"github.com/ArkHQ-io/ark-go/packages/param"
@@ -20,30 +18,29 @@ import (
 	"github.com/ArkHQ-io/ark-go/shared"
 )
 
-// DomainService contains methods and other services that help with interacting
-// with the ark API.
+// TenantDomainService contains methods and other services that help with
+// interacting with the ark API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewDomainService] method instead.
-type DomainService struct {
+// the [NewTenantDomainService] method instead.
+type TenantDomainService struct {
 	Options []option.RequestOption
 }
 
-// NewDomainService generates a new service that applies the given options to each
-// request. These options are applied after the parent client's options (if there
-// is one), and before any request-specific options.
-func NewDomainService(opts ...option.RequestOption) (r DomainService) {
-	r = DomainService{}
+// NewTenantDomainService generates a new service that applies the given options to
+// each request. These options are applied after the parent client's options (if
+// there is one), and before any request-specific options.
+func NewTenantDomainService(opts ...option.RequestOption) (r TenantDomainService) {
+	r = TenantDomainService{}
 	r.Options = opts
 	return
 }
 
-// Add a new domain for sending emails. Returns DNS records that must be configured
-// before the domain can be verified.
+// Add a new sending domain to a tenant. Returns DNS records that must be
+// configured before the domain can be verified.
 //
-// **Required:** `tenant_id` to specify which tenant the domain belongs to. Each
-// tenant gets their own isolated mail server for domain isolation.
+// Each tenant gets their own isolated mail server for domain isolation.
 //
 // **Required DNS records:**
 //
@@ -51,48 +48,62 @@ func NewDomainService(opts ...option.RequestOption) (r DomainService) {
 // - **DKIM** - TXT record for email signing
 // - **Return Path** - CNAME for bounce handling
 //
-// After adding DNS records, call `POST /domains/{id}/verify` to verify.
-func (r *DomainService) New(ctx context.Context, body DomainNewParams, opts ...option.RequestOption) (res *DomainNewResponse, err error) {
+// After adding DNS records, call
+// `POST /tenants/{tenantId}/domains/{domainId}/verify` to verify.
+func (r *TenantDomainService) New(ctx context.Context, tenantID string, body TenantDomainNewParams, opts ...option.RequestOption) (res *TenantDomainNewResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	path := "domains"
+	if tenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
+	path := fmt.Sprintf("tenants/%s/domains", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
-// Get detailed information about a domain including DNS record status
-func (r *DomainService) Get(ctx context.Context, domainID string, opts ...option.RequestOption) (res *DomainGetResponse, err error) {
+// Get detailed information about a domain including DNS record status.
+func (r *TenantDomainService) Get(ctx context.Context, domainID string, query TenantDomainGetParams, opts ...option.RequestOption) (res *TenantDomainGetResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
+	if query.TenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
 		return
 	}
-	path := fmt.Sprintf("domains/%s", domainID)
+	path := fmt.Sprintf("tenants/%s/domains/%s", query.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
-// Get all sending domains with their verification status.
-//
-// Optionally filter by `tenant_id` to list domains for a specific tenant. When
-// filtered, response includes `tenant_id` and `tenant_name` for each domain.
-func (r *DomainService) List(ctx context.Context, query DomainListParams, opts ...option.RequestOption) (res *DomainListResponse, err error) {
+// Get all sending domains for a specific tenant with their verification status.
+func (r *TenantDomainService) List(ctx context.Context, tenantID string, opts ...option.RequestOption) (res *TenantDomainListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	path := "domains"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	if tenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
+	path := fmt.Sprintf("tenants/%s/domains", tenantID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
-// Remove a sending domain. You will no longer be able to send emails from this
-// domain.
+// Remove a sending domain from a tenant. You will no longer be able to send emails
+// from this domain.
 //
 // **Warning:** This action cannot be undone.
-func (r *DomainService) Delete(ctx context.Context, domainID string, opts ...option.RequestOption) (res *DomainDeleteResponse, err error) {
+func (r *TenantDomainService) Delete(ctx context.Context, domainID string, body TenantDomainDeleteParams, opts ...option.RequestOption) (res *TenantDomainDeleteResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
+	if body.TenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
 		return
 	}
-	path := fmt.Sprintf("domains/%s", domainID)
+	path := fmt.Sprintf("tenants/%s/domains/%s", body.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
 }
@@ -101,13 +112,17 @@ func (r *DomainService) Delete(ctx context.Context, domainID string, opts ...opt
 // current status of each required DNS record.
 //
 // Call this after you've added the DNS records shown when creating the domain.
-func (r *DomainService) Verify(ctx context.Context, domainID string, opts ...option.RequestOption) (res *DomainVerifyResponse, err error) {
+func (r *TenantDomainService) Verify(ctx context.Context, domainID string, body TenantDomainVerifyParams, opts ...option.RequestOption) (res *TenantDomainVerifyResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
+	if body.TenantID == "" {
+		err = errors.New("missing required tenantId parameter")
+		return
+	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
 		return
 	}
-	path := fmt.Sprintf("domains/%s/verify", domainID)
+	path := fmt.Sprintf("tenants/%s/domains/%s/verify", body.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
 	return
 }
@@ -194,10 +209,10 @@ const (
 	DNSRecordStatusInvalid DNSRecordStatus = "Invalid"
 )
 
-type DomainNewResponse struct {
-	Data    DomainNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta        `json:"meta,required"`
-	Success bool                  `json:"success,required"`
+type TenantDomainNewResponse struct {
+	Data    TenantDomainNewResponseData `json:"data,required"`
+	Meta    shared.APIMeta              `json:"meta,required"`
+	Success bool                        `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -209,12 +224,12 @@ type DomainNewResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainNewResponse) RawJSON() string { return r.JSON.raw }
-func (r *DomainNewResponse) UnmarshalJSON(data []byte) error {
+func (r TenantDomainNewResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainNewResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainNewResponseData struct {
+type TenantDomainNewResponseData struct {
 	// Unique domain identifier
 	ID int64 `json:"id,required"`
 	// Timestamp when the domain was added
@@ -231,7 +246,7 @@ type DomainNewResponseData struct {
 	// - SPF `name` would be `mail` (not `@`)
 	// - DKIM `name` would be `ark-xyz._domainkey.mail`
 	// - Return Path `name` would be `psrp.mail`
-	DNSRecords DomainNewResponseDataDNSRecords `json:"dnsRecords,required"`
+	DNSRecords TenantDomainNewResponseDataDNSRecords `json:"dnsRecords,required"`
 	// The domain name used for sending emails
 	Name string `json:"name,required"`
 	// UUID of the domain
@@ -262,8 +277,8 @@ type DomainNewResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainNewResponseData) RawJSON() string { return r.JSON.raw }
-func (r *DomainNewResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantDomainNewResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainNewResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -279,7 +294,7 @@ func (r *DomainNewResponseData) UnmarshalJSON(data []byte) error {
 // - SPF `name` would be `mail` (not `@`)
 // - DKIM `name` would be `ark-xyz._domainkey.mail`
 // - Return Path `name` would be `psrp.mail`
-type DomainNewResponseDataDNSRecords struct {
+type TenantDomainNewResponseDataDNSRecords struct {
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -344,15 +359,15 @@ type DomainNewResponseDataDNSRecords struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainNewResponseDataDNSRecords) RawJSON() string { return r.JSON.raw }
-func (r *DomainNewResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
+func (r TenantDomainNewResponseDataDNSRecords) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainNewResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainGetResponse struct {
-	Data    DomainGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta        `json:"meta,required"`
-	Success bool                  `json:"success,required"`
+type TenantDomainGetResponse struct {
+	Data    TenantDomainGetResponseData `json:"data,required"`
+	Meta    shared.APIMeta              `json:"meta,required"`
+	Success bool                        `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -364,12 +379,12 @@ type DomainGetResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainGetResponse) RawJSON() string { return r.JSON.raw }
-func (r *DomainGetResponse) UnmarshalJSON(data []byte) error {
+func (r TenantDomainGetResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainGetResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainGetResponseData struct {
+type TenantDomainGetResponseData struct {
 	// Unique domain identifier
 	ID int64 `json:"id,required"`
 	// Timestamp when the domain was added
@@ -386,7 +401,7 @@ type DomainGetResponseData struct {
 	// - SPF `name` would be `mail` (not `@`)
 	// - DKIM `name` would be `ark-xyz._domainkey.mail`
 	// - Return Path `name` would be `psrp.mail`
-	DNSRecords DomainGetResponseDataDNSRecords `json:"dnsRecords,required"`
+	DNSRecords TenantDomainGetResponseDataDNSRecords `json:"dnsRecords,required"`
 	// The domain name used for sending emails
 	Name string `json:"name,required"`
 	// UUID of the domain
@@ -417,8 +432,8 @@ type DomainGetResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainGetResponseData) RawJSON() string { return r.JSON.raw }
-func (r *DomainGetResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantDomainGetResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainGetResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -434,7 +449,7 @@ func (r *DomainGetResponseData) UnmarshalJSON(data []byte) error {
 // - SPF `name` would be `mail` (not `@`)
 // - DKIM `name` would be `ark-xyz._domainkey.mail`
 // - Return Path `name` would be `psrp.mail`
-type DomainGetResponseDataDNSRecords struct {
+type TenantDomainGetResponseDataDNSRecords struct {
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -499,15 +514,15 @@ type DomainGetResponseDataDNSRecords struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainGetResponseDataDNSRecords) RawJSON() string { return r.JSON.raw }
-func (r *DomainGetResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
+func (r TenantDomainGetResponseDataDNSRecords) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainGetResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainListResponse struct {
-	Data    DomainListResponseData `json:"data,required"`
-	Meta    shared.APIMeta         `json:"meta,required"`
-	Success bool                   `json:"success,required"`
+type TenantDomainListResponse struct {
+	Data    TenantDomainListResponseData `json:"data,required"`
+	Meta    shared.APIMeta               `json:"meta,required"`
+	Success bool                         `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -519,13 +534,13 @@ type DomainListResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainListResponse) RawJSON() string { return r.JSON.raw }
-func (r *DomainListResponse) UnmarshalJSON(data []byte) error {
+func (r TenantDomainListResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainListResponseData struct {
-	Domains []DomainListResponseDataDomain `json:"domains,required"`
+type TenantDomainListResponseData struct {
+	Domains []TenantDomainListResponseDataDomain `json:"domains,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Domains     respjson.Field
@@ -535,12 +550,12 @@ type DomainListResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainListResponseData) RawJSON() string { return r.JSON.raw }
-func (r *DomainListResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantDomainListResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainListResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainListResponseDataDomain struct {
+type TenantDomainListResponseDataDomain struct {
 	// Unique domain identifier
 	ID int64 `json:"id,required"`
 	// The domain name used for sending emails
@@ -565,15 +580,15 @@ type DomainListResponseDataDomain struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainListResponseDataDomain) RawJSON() string { return r.JSON.raw }
-func (r *DomainListResponseDataDomain) UnmarshalJSON(data []byte) error {
+func (r TenantDomainListResponseDataDomain) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainListResponseDataDomain) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainDeleteResponse struct {
-	Data    DomainDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta           `json:"meta,required"`
-	Success bool                     `json:"success,required"`
+type TenantDomainDeleteResponse struct {
+	Data    TenantDomainDeleteResponseData `json:"data,required"`
+	Meta    shared.APIMeta                 `json:"meta,required"`
+	Success bool                           `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -585,12 +600,12 @@ type DomainDeleteResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainDeleteResponse) RawJSON() string { return r.JSON.raw }
-func (r *DomainDeleteResponse) UnmarshalJSON(data []byte) error {
+func (r TenantDomainDeleteResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainDeleteResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainDeleteResponseData struct {
+type TenantDomainDeleteResponseData struct {
 	Message string `json:"message,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -601,15 +616,15 @@ type DomainDeleteResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainDeleteResponseData) RawJSON() string { return r.JSON.raw }
-func (r *DomainDeleteResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantDomainDeleteResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainDeleteResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainVerifyResponse struct {
-	Data    DomainVerifyResponseData `json:"data,required"`
-	Meta    shared.APIMeta           `json:"meta,required"`
-	Success bool                     `json:"success,required"`
+type TenantDomainVerifyResponse struct {
+	Data    TenantDomainVerifyResponseData `json:"data,required"`
+	Meta    shared.APIMeta                 `json:"meta,required"`
+	Success bool                           `json:"success,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -621,12 +636,12 @@ type DomainVerifyResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainVerifyResponse) RawJSON() string { return r.JSON.raw }
-func (r *DomainVerifyResponse) UnmarshalJSON(data []byte) error {
+func (r TenantDomainVerifyResponse) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainVerifyResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainVerifyResponseData struct {
+type TenantDomainVerifyResponseData struct {
 	// Unique domain identifier
 	ID int64 `json:"id,required"`
 	// Timestamp when the domain was added
@@ -643,7 +658,7 @@ type DomainVerifyResponseData struct {
 	// - SPF `name` would be `mail` (not `@`)
 	// - DKIM `name` would be `ark-xyz._domainkey.mail`
 	// - Return Path `name` would be `psrp.mail`
-	DNSRecords DomainVerifyResponseDataDNSRecords `json:"dnsRecords,required"`
+	DNSRecords TenantDomainVerifyResponseDataDNSRecords `json:"dnsRecords,required"`
 	// The domain name used for sending emails
 	Name string `json:"name,required"`
 	// UUID of the domain
@@ -674,8 +689,8 @@ type DomainVerifyResponseData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainVerifyResponseData) RawJSON() string { return r.JSON.raw }
-func (r *DomainVerifyResponseData) UnmarshalJSON(data []byte) error {
+func (r TenantDomainVerifyResponseData) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainVerifyResponseData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -691,7 +706,7 @@ func (r *DomainVerifyResponseData) UnmarshalJSON(data []byte) error {
 // - SPF `name` would be `mail` (not `@`)
 // - DKIM `name` would be `ark-xyz._domainkey.mail`
 // - Return Path `name` would be `psrp.mail`
-type DomainVerifyResponseDataDNSRecords struct {
+type TenantDomainVerifyResponseDataDNSRecords struct {
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -756,37 +771,36 @@ type DomainVerifyResponseDataDNSRecords struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r DomainVerifyResponseDataDNSRecords) RawJSON() string { return r.JSON.raw }
-func (r *DomainVerifyResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
+func (r TenantDomainVerifyResponseDataDNSRecords) RawJSON() string { return r.JSON.raw }
+func (r *TenantDomainVerifyResponseDataDNSRecords) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainNewParams struct {
+type TenantDomainNewParams struct {
 	// Domain name (e.g., "mail.example.com")
 	Name string `json:"name,required"`
-	// ID of the tenant this domain belongs to
-	TenantID string `json:"tenant_id,required"`
 	paramObj
 }
 
-func (r DomainNewParams) MarshalJSON() (data []byte, err error) {
-	type shadow DomainNewParams
+func (r TenantDomainNewParams) MarshalJSON() (data []byte, err error) {
+	type shadow TenantDomainNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *DomainNewParams) UnmarshalJSON(data []byte) error {
+func (r *TenantDomainNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type DomainListParams struct {
-	// Filter domains by tenant ID
-	TenantID param.Opt[string] `query:"tenant_id,omitzero" json:"-"`
+type TenantDomainGetParams struct {
+	TenantID string `path:"tenantId,required" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [DomainListParams]'s query parameters as `url.Values`.
-func (r DomainListParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
+type TenantDomainDeleteParams struct {
+	TenantID string `path:"tenantId,required" json:"-"`
+	paramObj
+}
+
+type TenantDomainVerifyParams struct {
+	TenantID string `path:"tenantId,required" json:"-"`
+	paramObj
 }
