@@ -16,12 +16,13 @@ import (
 // interacting with the ark API. You should not instantiate this client directly,
 // and instead use the [NewClient] method instead.
 type Client struct {
-	Options []option.RequestOption
-	Emails  EmailService
-	Logs    LogService
-	Usage   UsageService
-	Limits  LimitService
-	Tenants TenantService
+	Options  []option.RequestOption
+	Emails   EmailService
+	Logs     LogService
+	Usage    UsageService
+	Limits   LimitService
+	Tenants  TenantService
+	Platform PlatformService
 }
 
 // DefaultClientOptions read from the environment (ARK_API_KEY, ARK_BASE_URL). This
@@ -51,6 +52,7 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Usage = NewUsageService(opts...)
 	r.Limits = NewLimitService(opts...)
 	r.Tenants = NewTenantService(opts...)
+	r.Platform = NewPlatformService(opts...)
 
 	return
 }
