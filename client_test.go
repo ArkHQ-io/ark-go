@@ -44,7 +44,7 @@ func TestUserAgentHeader(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -78,7 +78,7 @@ func TestRetryAfter(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -123,7 +123,7 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -163,7 +163,7 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -202,7 +202,7 @@ func TestRetryAfterMs(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -235,7 +235,7 @@ func TestContextCancel(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -265,7 +265,7 @@ func TestContextCancelDelay(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -301,7 +301,7 @@ func TestContextDeadline(t *testing.T) {
 			To:      []string{"user@example.com"},
 			HTML:    ark.String("<h1>Welcome!</h1>"),
 			Metadata: map[string]string{
-				"user_id":  "usr_123",
+				"user_id":  "usr_123456",
 				"campaign": "onboarding",
 			},
 			Tag: ark.String("welcome"),

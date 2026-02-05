@@ -29,8 +29,13 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewTenantService] method instead.
 type TenantService struct {
-	Options     []option.RequestOption
-	Credentials TenantCredentialService
+	Options      []option.RequestOption
+	Credentials  TenantCredentialService
+	Domains      TenantDomainService
+	Suppressions TenantSuppressionService
+	Webhooks     TenantWebhookService
+	Tracking     TenantTrackingService
+	Usage        TenantUsageService
 }
 
 // NewTenantService generates a new service that applies the given options to each
@@ -40,6 +45,11 @@ func NewTenantService(opts ...option.RequestOption) (r TenantService) {
 	r = TenantService{}
 	r.Options = opts
 	r.Credentials = NewTenantCredentialService(opts...)
+	r.Domains = NewTenantDomainService(opts...)
+	r.Suppressions = NewTenantSuppressionService(opts...)
+	r.Webhooks = NewTenantWebhookService(opts...)
+	r.Tracking = NewTenantTrackingService(opts...)
+	r.Usage = NewTenantUsageService(opts...)
 	return
 }
 

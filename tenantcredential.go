@@ -41,7 +41,7 @@ func NewTenantCredentialService(opts ...option.RequestOption) (r TenantCredentia
 }
 
 // Create a new SMTP or API credential for a tenant. The credential can be used to
-// send emails through Postal on behalf of the tenant.
+// send emails via Ark on behalf of the tenant.
 //
 // **Important:** The credential key is only returned once at creation time. Store
 // it securely - you cannot retrieve it again.
@@ -97,7 +97,7 @@ func (r *TenantCredentialService) Update(ctx context.Context, credentialID int64
 }
 
 // List all SMTP and API credentials for a tenant. Credentials are used to send
-// emails through Postal on behalf of the tenant.
+// emails via Ark on behalf of the tenant.
 //
 // **Security:** Credential keys are not returned in the list response. Use the
 // retrieve endpoint with `reveal=true` to get the key.
@@ -123,7 +123,7 @@ func (r *TenantCredentialService) List(ctx context.Context, tenantID string, que
 }
 
 // List all SMTP and API credentials for a tenant. Credentials are used to send
-// emails through Postal on behalf of the tenant.
+// emails via Ark on behalf of the tenant.
 //
 // **Security:** Credential keys are not returned in the list response. Use the
 // retrieve endpoint with `reveal=true` to get the key.

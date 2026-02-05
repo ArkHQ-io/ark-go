@@ -30,7 +30,7 @@ func TestUsage(t *testing.T) {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),

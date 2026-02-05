@@ -13,7 +13,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 )
 
-func TestTrackingNewWithOptionalParams(t *testing.T) {
+func TestTenantTrackingNewWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -25,60 +25,71 @@ func TestTrackingNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Tracking.New(context.TODO(), ark.TrackingNewParams{
-		DomainID:    123,
-		Name:        "track",
-		SslEnabled:  ark.Bool(true),
-		TrackClicks: ark.Bool(true),
-		TrackOpens:  ark.Bool(true),
-	})
-	if err != nil {
-		var apierr *ark.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestTrackingGet(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := ark.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Tracking.Get(context.TODO(), "trackingId")
-	if err != nil {
-		var apierr *ark.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestTrackingUpdateWithOptionalParams(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := ark.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Tracking.Update(
+	_, err := client.Tenants.Tracking.New(
 		context.TODO(),
-		"trackingId",
-		ark.TrackingUpdateParams{
+		"cm6abc123def456",
+		ark.TenantTrackingNewParams{
+			DomainID:    123,
+			Name:        "track",
+			SslEnabled:  ark.Bool(true),
+			TrackClicks: ark.Bool(true),
+			TrackOpens:  ark.Bool(true),
+		},
+	)
+	if err != nil {
+		var apierr *ark.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestTenantTrackingGet(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := ark.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Tenants.Tracking.Get(
+		context.TODO(),
+		"123",
+		ark.TenantTrackingGetParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
+	if err != nil {
+		var apierr *ark.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestTenantTrackingUpdateWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := ark.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Tenants.Tracking.Update(
+		context.TODO(),
+		"123",
+		ark.TenantTrackingUpdateParams{
+			TenantID:             "cm6abc123def456",
 			ExcludedClickDomains: ark.String("example.com,mysite.org"),
 			SslEnabled:           ark.Bool(true),
 			TrackClicks:          ark.Bool(true),
@@ -94,7 +105,7 @@ func TestTrackingUpdateWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestTrackingList(t *testing.T) {
+func TestTenantTrackingList(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -106,7 +117,7 @@ func TestTrackingList(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Tracking.List(context.TODO())
+	_, err := client.Tenants.Tracking.List(context.TODO(), "cm6abc123def456")
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -116,7 +127,7 @@ func TestTrackingList(t *testing.T) {
 	}
 }
 
-func TestTrackingDelete(t *testing.T) {
+func TestTenantTrackingDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -128,7 +139,13 @@ func TestTrackingDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Tracking.Delete(context.TODO(), "trackingId")
+	_, err := client.Tenants.Tracking.Delete(
+		context.TODO(),
+		"123",
+		ark.TenantTrackingDeleteParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -138,7 +155,7 @@ func TestTrackingDelete(t *testing.T) {
 	}
 }
 
-func TestTrackingVerify(t *testing.T) {
+func TestTenantTrackingVerify(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -150,7 +167,13 @@ func TestTrackingVerify(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Tracking.Verify(context.TODO(), "trackingId")
+	_, err := client.Tenants.Tracking.Verify(
+		context.TODO(),
+		"123",
+		ark.TenantTrackingVerifyParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
