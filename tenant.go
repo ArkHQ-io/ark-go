@@ -29,7 +29,13 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewTenantService] method instead.
 type TenantService struct {
-	Options []option.RequestOption
+	Options      []option.RequestOption
+	Credentials  TenantCredentialService
+	Domains      TenantDomainService
+	Suppressions TenantSuppressionService
+	Webhooks     TenantWebhookService
+	Tracking     TenantTrackingService
+	Usage        TenantUsageService
 }
 
 // NewTenantService generates a new service that applies the given options to each
@@ -38,6 +44,12 @@ type TenantService struct {
 func NewTenantService(opts ...option.RequestOption) (r TenantService) {
 	r = TenantService{}
 	r.Options = opts
+	r.Credentials = NewTenantCredentialService(opts...)
+	r.Domains = NewTenantDomainService(opts...)
+	r.Suppressions = NewTenantSuppressionService(opts...)
+	r.Webhooks = NewTenantWebhookService(opts...)
+	r.Tracking = NewTenantTrackingService(opts...)
+	r.Usage = NewTenantUsageService(opts...)
 	return
 }
 
@@ -117,7 +129,7 @@ type Tenant struct {
 	// Unique identifier for the tenant
 	ID string `json:"id,required"`
 	// When the tenant was created
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
 	// Custom key-value pairs for storing additional data
 	Metadata map[string]TenantMetadataUnion `json:"metadata,required"`
 	// Display name for the tenant
@@ -131,7 +143,7 @@ type Tenant struct {
 	// Any of "active", "suspended", "archived".
 	Status TenantStatus `json:"status,required"`
 	// When the tenant was last updated
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt,required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field

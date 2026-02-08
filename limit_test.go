@@ -4,6 +4,7 @@ package ark_test
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 
@@ -12,7 +13,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 )
 
-func TestUsage(t *testing.T) {
+func TestLimitGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -24,19 +25,12 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	response, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
-		From:    "hello@yourdomain.com",
-		Subject: "Hello World",
-		To:      []string{"user@example.com"},
-		HTML:    ark.String("<h1>Welcome!</h1>"),
-		Metadata: map[string]string{
-			"user_id":  "usr_123456",
-			"campaign": "onboarding",
-		},
-		Tag: ark.String("welcome"),
-	})
+	_, err := client.Limits.Get(context.TODO())
 	if err != nil {
+		var apierr *ark.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
-	t.Logf("%+v\n", response.Data)
 }

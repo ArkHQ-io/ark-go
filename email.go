@@ -45,13 +45,13 @@ func NewEmailService(opts ...option.RequestOption) (r EmailService) {
 //
 // Use the `expand` parameter to include additional data like the HTML/text body,
 // headers, or delivery attempts.
-func (r *EmailService) Get(ctx context.Context, id string, query EmailGetParams, opts ...option.RequestOption) (res *EmailGetResponse, err error) {
+func (r *EmailService) Get(ctx context.Context, emailID string, query EmailGetParams, opts ...option.RequestOption) (res *EmailGetResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if id == "" {
-		err = errors.New("missing required id parameter")
+	if emailID == "" {
+		err = errors.New("missing required emailId parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s", id)
+	path := fmt.Sprintf("emails/%s", emailID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
@@ -63,7 +63,7 @@ func (r *EmailService) Get(ctx context.Context, id string, query EmailGetParams,
 //
 // **Related endpoints:**
 //
-// - `GET /emails/{id}` - Get full details of a specific email
+// - `GET /emails/{emailId}` - Get full details of a specific email
 // - `POST /emails` - Send a new email
 func (r *EmailService) List(ctx context.Context, query EmailListParams, opts ...option.RequestOption) (res *pagination.PageNumberPagination[EmailListResponse], err error) {
 	var raw *http.Response
@@ -89,7 +89,7 @@ func (r *EmailService) List(ctx context.Context, query EmailListParams, opts ...
 //
 // **Related endpoints:**
 //
-// - `GET /emails/{id}` - Get full details of a specific email
+// - `GET /emails/{emailId}` - Get full details of a specific email
 // - `POST /emails` - Send a new email
 func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams, opts ...option.RequestOption) *pagination.PageNumberPaginationAutoPager[EmailListResponse] {
 	return pagination.NewPageNumberPaginationAutoPager(r.List(ctx, query, opts...))
@@ -128,16 +128,16 @@ func (r *EmailService) ListAutoPaging(ctx context.Context, query EmailListParams
 //
 // ### Can Retry Manually
 //
-// Indicates whether you can call `POST /emails/{id}/retry` to manually retry the
-// email. This is `true` when the raw message content is still available (not
+// Indicates whether you can call `POST /emails/{emailId}/retry` to manually retry
+// the email. This is `true` when the raw message content is still available (not
 // expired due to retention policy).
-func (r *EmailService) GetDeliveries(ctx context.Context, id string, opts ...option.RequestOption) (res *EmailGetDeliveriesResponse, err error) {
+func (r *EmailService) GetDeliveries(ctx context.Context, emailID string, opts ...option.RequestOption) (res *EmailGetDeliveriesResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if id == "" {
-		err = errors.New("missing required id parameter")
+	if emailID == "" {
+		err = errors.New("missing required emailId parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s/deliveries", id)
+	path := fmt.Sprintf("emails/%s/deliveries", emailID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -146,13 +146,13 @@ func (r *EmailService) GetDeliveries(ctx context.Context, id string, opts ...opt
 // attempt.
 //
 // Only works for emails that have failed or are in a retryable state.
-func (r *EmailService) Retry(ctx context.Context, id string, opts ...option.RequestOption) (res *EmailRetryResponse, err error) {
+func (r *EmailService) Retry(ctx context.Context, emailID string, opts ...option.RequestOption) (res *EmailRetryResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if id == "" {
-		err = errors.New("missing required id parameter")
+	if emailID == "" {
+		err = errors.New("missing required emailId parameter")
 		return
 	}
-	path := fmt.Sprintf("emails/%s/retry", id)
+	path := fmt.Sprintf("emails/%s/retry", emailID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
 	return
 }
@@ -168,9 +168,9 @@ func (r *EmailService) Retry(ctx context.Context, id string, opts ...option.Requ
 //
 // **Related endpoints:**
 //
-// - `GET /emails/{id}` - Track delivery status
-// - `GET /emails/{id}/deliveries` - View delivery attempts
-// - `POST /emails/{id}/retry` - Retry failed delivery
+// - `GET /emails/{emailId}` - Track delivery status
+// - `GET /emails/{emailId}/deliveries` - View delivery attempts
+// - `POST /emails/{emailId}/retry` - Retry failed delivery
 func (r *EmailService) Send(ctx context.Context, params EmailSendParams, opts ...option.RequestOption) (res *EmailSendResponse, err error) {
 	if !param.IsOmitted(params.IdempotencyKey) {
 		opts = append(opts, option.WithHeader("Idempotency-Key", fmt.Sprintf("%s", params.IdempotencyKey.Value)))
@@ -570,7 +570,7 @@ func (r *EmailGetDeliveriesResponse) UnmarshalJSON(data []byte) error {
 type EmailGetDeliveriesResponseData struct {
 	// Message identifier (token)
 	ID string `json:"id,required"`
-	// Whether the message can be manually retried via `POST /emails/{id}/retry`.
+	// Whether the message can be manually retried via `POST /emails/{emailId}/retry`.
 	// `true` when the raw message content is still available (not expired). Messages
 	// older than the retention period cannot be retried.
 	CanRetryManually bool `json:"canRetryManually,required"`

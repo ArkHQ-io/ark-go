@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.18.0 (2026-02-05)
+
+Full Changelog: [v0.17.0...v0.18.0](https://github.com/ArkHQ-io/ark-go/compare/v0.17.0...v0.18.0)
+
+### Features
+
+* **api:** add Credentials endpoint ([9b7c497](https://github.com/ArkHQ-io/ark-go/commit/9b7c4970eb682a91a72656e168871d71120d95ba))
+* **api:** add Platform webhooks ([f387b78](https://github.com/ArkHQ-io/ark-go/commit/f387b78f3b3dceedcf7bdf4bdf1107bd7204dc6a))
+* **api:** endpoint updates ([2dee4ee](https://github.com/ArkHQ-io/ark-go/commit/2dee4ee2e1b6e7cd3c136119a47a720990237a66))
+* **api:** standardization improvements ([ce7ca41](https://github.com/ArkHQ-io/ark-go/commit/ce7ca41fd695efd9b090ee74523d13826d014239))
+* **api:** tenant usage ([3bfc6fc](https://github.com/ArkHQ-io/ark-go/commit/3bfc6fccbebb3661765d3aed8b7cc353b50506f5))
+
 ## 0.17.0 (2026-02-03)
 
 Full Changelog: [v0.16.0...v0.17.0](https://github.com/ArkHQ-io/ark-go/compare/v0.16.0...v0.17.0)

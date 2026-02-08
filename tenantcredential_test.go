@@ -13,7 +13,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 )
 
-func TestSuppressionNewWithOptionalParams(t *testing.T) {
+func TestTenantCredentialNew(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -25,10 +25,14 @@ func TestSuppressionNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.New(context.TODO(), ark.SuppressionNewParams{
-		Address: "user@example.com",
-		Reason:  ark.String("user requested removal"),
-	})
+	_, err := client.Tenants.Credentials.New(
+		context.TODO(),
+		"cm6abc123def456",
+		ark.TenantCredentialNewParams{
+			Name: "production-smtp",
+			Type: ark.TenantCredentialNewParamsTypeSmtp,
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -38,7 +42,7 @@ func TestSuppressionNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestSuppressionGet(t *testing.T) {
+func TestTenantCredentialGetWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -50,7 +54,14 @@ func TestSuppressionGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.Get(context.TODO(), "dev@stainless.com")
+	_, err := client.Tenants.Credentials.Get(
+		context.TODO(),
+		123,
+		ark.TenantCredentialGetParams{
+			TenantID: "cm6abc123def456",
+			Reveal:   ark.Bool(true),
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -60,7 +71,7 @@ func TestSuppressionGet(t *testing.T) {
 	}
 }
 
-func TestSuppressionListWithOptionalParams(t *testing.T) {
+func TestTenantCredentialUpdateWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -72,10 +83,15 @@ func TestSuppressionListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.List(context.TODO(), ark.SuppressionListParams{
-		Page:    ark.Int(0),
-		PerPage: ark.Int(100),
-	})
+	_, err := client.Tenants.Credentials.Update(
+		context.TODO(),
+		123,
+		ark.TenantCredentialUpdateParams{
+			TenantID: "cm6abc123def456",
+			Hold:     ark.Bool(true),
+			Name:     ark.String("production-smtp-v2"),
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -85,7 +101,7 @@ func TestSuppressionListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestSuppressionDelete(t *testing.T) {
+func TestTenantCredentialListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -97,7 +113,15 @@ func TestSuppressionDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.Delete(context.TODO(), "dev@stainless.com")
+	_, err := client.Tenants.Credentials.List(
+		context.TODO(),
+		"cm6abc123def456",
+		ark.TenantCredentialListParams{
+			Page:    ark.Int(1),
+			PerPage: ark.Int(1),
+			Type:    ark.TenantCredentialListParamsTypeSmtp,
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -107,7 +131,7 @@ func TestSuppressionDelete(t *testing.T) {
 	}
 }
 
-func TestSuppressionBulkNew(t *testing.T) {
+func TestTenantCredentialDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -119,12 +143,13 @@ func TestSuppressionBulkNew(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Suppressions.BulkNew(context.TODO(), ark.SuppressionBulkNewParams{
-		Suppressions: []ark.SuppressionBulkNewParamsSuppression{{
-			Address: "dev@stainless.com",
-			Reason:  ark.String("reason"),
-		}},
-	})
+	_, err := client.Tenants.Credentials.Delete(
+		context.TODO(),
+		123,
+		ark.TenantCredentialDeleteParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {

@@ -13,7 +13,7 @@ import (
 	"github.com/ArkHQ-io/ark-go/option"
 )
 
-func TestDomainNew(t *testing.T) {
+func TestTenantDomainNew(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -25,9 +25,13 @@ func TestDomainNew(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.New(context.TODO(), ark.DomainNewParams{
-		Name: "notifications.myapp.com",
-	})
+	_, err := client.Tenants.Domains.New(
+		context.TODO(),
+		"cm6abc123def456",
+		ark.TenantDomainNewParams{
+			Name: "notifications.myapp.com",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -37,7 +41,7 @@ func TestDomainNew(t *testing.T) {
 	}
 }
 
-func TestDomainGet(t *testing.T) {
+func TestTenantDomainGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -49,7 +53,13 @@ func TestDomainGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.Get(context.TODO(), "domainId")
+	_, err := client.Tenants.Domains.Get(
+		context.TODO(),
+		"123",
+		ark.TenantDomainGetParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -59,7 +69,7 @@ func TestDomainGet(t *testing.T) {
 	}
 }
 
-func TestDomainList(t *testing.T) {
+func TestTenantDomainList(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -71,7 +81,7 @@ func TestDomainList(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.List(context.TODO())
+	_, err := client.Tenants.Domains.List(context.TODO(), "cm6abc123def456")
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -81,7 +91,7 @@ func TestDomainList(t *testing.T) {
 	}
 }
 
-func TestDomainDelete(t *testing.T) {
+func TestTenantDomainDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -93,7 +103,13 @@ func TestDomainDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.Delete(context.TODO(), "domainId")
+	_, err := client.Tenants.Domains.Delete(
+		context.TODO(),
+		"123",
+		ark.TenantDomainDeleteParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {
@@ -103,7 +119,7 @@ func TestDomainDelete(t *testing.T) {
 	}
 }
 
-func TestDomainVerify(t *testing.T) {
+func TestTenantDomainVerify(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -115,7 +131,13 @@ func TestDomainVerify(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Domains.Verify(context.TODO(), "domainId")
+	_, err := client.Tenants.Domains.Verify(
+		context.TODO(),
+		"123",
+		ark.TenantDomainVerifyParams{
+			TenantID: "cm6abc123def456",
+		},
+	)
 	if err != nil {
 		var apierr *ark.Error
 		if errors.As(err, &apierr) {

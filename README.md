@@ -37,7 +37,7 @@ Or to pin the version:
 <!-- x-release-please-start-version -->
 
 ```sh
-go get -u 'github.com/ArkHQ-io/ark-go@v0.17.0'
+go get -u 'github.com/ArkHQ-io/ark-go@v0.18.0'
 ```
 
 <!-- x-release-please-end -->
@@ -71,7 +71,7 @@ func main() {
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -353,7 +353,7 @@ _, err := client.Emails.Send(context.TODO(), ark.EmailSendParams{
 	To:      []string{"user@example.com"},
 	HTML:    ark.String("<h1>Welcome!</h1>"),
 	Metadata: map[string]string{
-		"user_id":  "usr_123",
+		"user_id":  "usr_123456",
 		"campaign": "onboarding",
 	},
 	Tag: ark.String("welcome"),
@@ -390,7 +390,7 @@ client.Emails.Send(
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -436,7 +436,7 @@ client.Emails.Send(
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
@@ -461,7 +461,7 @@ response, err := client.Emails.Send(
 		To:      []string{"user@example.com"},
 		HTML:    ark.String("<h1>Welcome!</h1>"),
 		Metadata: map[string]string{
-			"user_id":  "usr_123",
+			"user_id":  "usr_123456",
 			"campaign": "onboarding",
 		},
 		Tag: ark.String("welcome"),
