@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.1 (2026-02-18)
+
+Full Changelog: [v0.18.0...v0.18.1](https://github.com/ArkHQ-io/ark-go/compare/v0.18.0...v0.18.1)
+
+### Bug Fixes
+
+* **encoder:** correctly serialize NullStruct ([4280a68](https://github.com/ArkHQ-io/ark-go/commit/4280a68e9c08b8b46486f2c9c2719e84619f5f5b))
+
 ## 0.18.0 (2026-02-05)
 
 Full Changelog: [v0.17.0...v0.18.0](https://github.com/ArkHQ-io/ark-go/compare/v0.17.0...v0.18.0)
