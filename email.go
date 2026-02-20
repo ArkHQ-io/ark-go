@@ -253,6 +253,8 @@ type EmailGetResponseData struct {
 	Status string `json:"status,required"`
 	// Email subject line
 	Subject string `json:"subject,required"`
+	// The tenant ID this email belongs to
+	TenantID string `json:"tenantId,required"`
 	// Unix timestamp when the email was sent
 	Timestamp float64 `json:"timestamp,required"`
 	// ISO 8601 formatted timestamp
@@ -289,6 +291,7 @@ type EmailGetResponseData struct {
 		Scope        respjson.Field
 		Status       respjson.Field
 		Subject      respjson.Field
+		TenantID     respjson.Field
 		Timestamp    respjson.Field
 		TimestampISO respjson.Field
 		To           respjson.Field
@@ -501,18 +504,21 @@ type EmailListResponse struct {
 	// - `held` - Held for manual review
 	//
 	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
-	Status       EmailListResponseStatus `json:"status,required"`
-	Subject      string                  `json:"subject,required"`
-	Timestamp    float64                 `json:"timestamp,required"`
-	TimestampISO time.Time               `json:"timestampIso,required" format:"date-time"`
-	To           string                  `json:"to,required" format:"email"`
-	Tag          string                  `json:"tag"`
+	Status  EmailListResponseStatus `json:"status,required"`
+	Subject string                  `json:"subject,required"`
+	// The tenant ID this email belongs to
+	TenantID     string    `json:"tenantId,required"`
+	Timestamp    float64   `json:"timestamp,required"`
+	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	To           string    `json:"to,required" format:"email"`
+	Tag          string    `json:"tag"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
 		From         respjson.Field
 		Status       respjson.Field
 		Subject      respjson.Field
+		TenantID     respjson.Field
 		Timestamp    respjson.Field
 		TimestampISO respjson.Field
 		To           respjson.Field
@@ -591,6 +597,8 @@ type EmailGetDeliveriesResponseData struct {
 	//
 	// Any of "pending", "sent", "softfail", "hardfail", "held", "bounced".
 	Status string `json:"status,required"`
+	// The tenant ID this email belongs to
+	TenantID string `json:"tenantId,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID               respjson.Field
@@ -598,6 +606,7 @@ type EmailGetDeliveriesResponseData struct {
 		Deliveries       respjson.Field
 		RetryState       respjson.Field
 		Status           respjson.Field
+		TenantID         respjson.Field
 		ExtraFields      map[string]respjson.Field
 		raw              string
 	} `json:"-"`
@@ -744,10 +753,13 @@ type EmailRetryResponseData struct {
 	// Email identifier (token)
 	ID      string `json:"id,required"`
 	Message string `json:"message,required"`
+	// The tenant ID this email belongs to
+	TenantID string `json:"tenantId,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		Message     respjson.Field
+		TenantID    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -786,6 +798,8 @@ type EmailSendResponseData struct {
 	//
 	// Any of "pending", "sent".
 	Status string `json:"status,required"`
+	// The tenant ID this email was sent from
+	TenantID string `json:"tenantId,required"`
 	// List of recipient addresses
 	To []string `json:"to,required" format:"email"`
 	// SMTP Message-ID header value
@@ -797,6 +811,7 @@ type EmailSendResponseData struct {
 	JSON struct {
 		ID          respjson.Field
 		Status      respjson.Field
+		TenantID    respjson.Field
 		To          respjson.Field
 		MessageID   respjson.Field
 		Sandbox     respjson.Field
@@ -838,6 +853,8 @@ type EmailSendBatchResponseData struct {
 	Failed int64 `json:"failed,required"`
 	// Map of recipient email to message info
 	Messages map[string]EmailSendBatchResponseDataMessage `json:"messages,required"`
+	// The tenant ID this batch was sent from
+	TenantID string `json:"tenantId,required"`
 	// Total emails in the batch
 	Total int64 `json:"total,required"`
 	// Whether this batch was sent in sandbox mode. Only present (and true) for sandbox
@@ -848,6 +865,7 @@ type EmailSendBatchResponseData struct {
 		Accepted    respjson.Field
 		Failed      respjson.Field
 		Messages    respjson.Field
+		TenantID    respjson.Field
 		Total       respjson.Field
 		Sandbox     respjson.Field
 		ExtraFields map[string]respjson.Field
@@ -905,6 +923,8 @@ type EmailSendRawResponseData struct {
 	//
 	// Any of "pending", "sent".
 	Status string `json:"status,required"`
+	// The tenant ID this email was sent from
+	TenantID string `json:"tenantId,required"`
 	// List of recipient addresses
 	To []string `json:"to,required" format:"email"`
 	// SMTP Message-ID header value
@@ -916,6 +936,7 @@ type EmailSendRawResponseData struct {
 	JSON struct {
 		ID          respjson.Field
 		Status      respjson.Field
+		TenantID    respjson.Field
 		To          respjson.Field
 		MessageID   respjson.Field
 		Sandbox     respjson.Field
@@ -1034,6 +1055,14 @@ type EmailSendParams struct {
 	ReplyTo param.Opt[string] `json:"replyTo,omitzero" format:"email"`
 	// Tag for categorization and filtering (accepts null)
 	Tag param.Opt[string] `json:"tag,omitzero"`
+	// The tenant ID to send this email from. Determines which tenant's configuration
+	// (domains, webhooks, tracking) is used.
+	//
+	//   - If your API key is scoped to a specific tenant, this must match that tenant or
+	//     be omitted.
+	//   - If your API key is org-level, specify the tenant to send from.
+	//   - If omitted, the organization's default tenant is used.
+	TenantID param.Opt[string] `json:"tenantId,omitzero"`
 	// Plain text body (accepts null, auto-generated from HTML if not provided).
 	// Maximum 5MB (5,242,880 characters).
 	Text           param.Opt[string] `json:"text,omitzero"`
@@ -1098,7 +1127,15 @@ func (r *EmailSendParamsAttachment) UnmarshalJSON(data []byte) error {
 type EmailSendBatchParams struct {
 	Emails []EmailSendBatchParamsEmail `json:"emails,omitzero,required"`
 	// Sender email for all messages
-	From           string            `json:"from,required"`
+	From string `json:"from,required"`
+	// The tenant ID to send this batch from. Determines which tenant's configuration
+	// (domains, webhooks, tracking) is used.
+	//
+	//   - If your API key is scoped to a specific tenant, this must match that tenant or
+	//     be omitted.
+	//   - If your API key is org-level, specify the tenant to send from.
+	//   - If omitted, the organization's default tenant is used.
+	TenantID       param.Opt[string] `json:"tenantId,omitzero"`
 	IdempotencyKey param.Opt[string] `header:"Idempotency-Key,omitzero" json:"-"`
 	paramObj
 }
@@ -1170,6 +1207,14 @@ type EmailSendRawParams struct {
 	To []string `json:"to,omitzero,required" format:"email"`
 	// Whether this is a bounce message (accepts null)
 	Bounce param.Opt[bool] `json:"bounce,omitzero"`
+	// The tenant ID to send this email from. Determines which tenant's configuration
+	// (domains, webhooks, tracking) is used.
+	//
+	//   - If your API key is scoped to a specific tenant, this must match that tenant or
+	//     be omitted.
+	//   - If your API key is org-level, specify the tenant to send from.
+	//   - If omitted, the organization's default tenant is used.
+	TenantID param.Opt[string] `json:"tenantId,omitzero"`
 	paramObj
 }
 
