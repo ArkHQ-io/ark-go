@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.19.0 (2026-02-25)
+
+Full Changelog: [v0.18.1...v0.19.0](https://github.com/ArkHQ-io/ark-go/compare/v0.18.1...v0.19.0)
+
+### Features
+
+* **api:** add tenantId to send ([87f7e60](https://github.com/ArkHQ-io/ark-go/commit/87f7e60b3bea70683ee3379f77db939c71969fc5))
+
+
+### Bug Fixes
+
+* allow canceling a request while it is waiting to retry ([f8b7f54](https://github.com/ArkHQ-io/ark-go/commit/f8b7f5401325ff2bf1781754293c1e581a0eb94d))
+* **client:** use correct format specifier for header serialization ([83f0257](https://github.com/ArkHQ-io/ark-go/commit/83f02579e712ffdb40afbc63f562ed4a3937790c))
+
+
+### Chores
+
+* **internal:** move custom custom `json` tags to `api` ([23837f9](https://github.com/ArkHQ-io/ark-go/commit/23837f92b51813054acf0f3357ab61f584d32dab))
+* update mock server docs ([412d3e7](https://github.com/ArkHQ-io/ark-go/commit/412d3e7b706e679820b83eb68a4a04f57be39559))
+
 ## 0.18.1 (2026-02-18)
 
 Full Changelog: [v0.18.0...v0.18.1](https://github.com/ArkHQ-io/ark-go/compare/v0.18.0...v0.18.1)
