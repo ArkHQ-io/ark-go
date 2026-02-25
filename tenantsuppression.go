@@ -116,9 +116,9 @@ func (r *TenantSuppressionService) Delete(ctx context.Context, email string, bod
 }
 
 type TenantSuppressionNewResponse struct {
-	Data    TenantSuppressionNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta                   `json:"meta,required"`
-	Success bool                             `json:"success,required"`
+	Data    TenantSuppressionNewResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                   `json:"meta" api:"required"`
+	Success bool                             `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -137,9 +137,9 @@ func (r *TenantSuppressionNewResponse) UnmarshalJSON(data []byte) error {
 
 type TenantSuppressionNewResponseData struct {
 	// Suppression ID
-	ID        string    `json:"id,required"`
-	Address   string    `json:"address,required" format:"email"`
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	ID        string    `json:"id" api:"required"`
+	Address   string    `json:"address" api:"required" format:"email"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Reason for suppression
 	Reason string `json:"reason"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -160,9 +160,9 @@ func (r *TenantSuppressionNewResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantSuppressionGetResponse struct {
-	Data    TenantSuppressionGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta                   `json:"meta,required"`
-	Success bool                             `json:"success,required"`
+	Data    TenantSuppressionGetResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                   `json:"meta" api:"required"`
+	Success bool                             `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -181,13 +181,13 @@ func (r *TenantSuppressionGetResponse) UnmarshalJSON(data []byte) error {
 
 type TenantSuppressionGetResponseData struct {
 	// The email address that was checked
-	Address string `json:"address,required" format:"email"`
+	Address string `json:"address" api:"required" format:"email"`
 	// Whether the address is currently suppressed
-	Suppressed bool `json:"suppressed,required"`
+	Suppressed bool `json:"suppressed" api:"required"`
 	// When the suppression was created (if suppressed)
-	CreatedAt time.Time `json:"createdAt,nullable" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"nullable" format:"date-time"`
 	// Reason for suppression (if suppressed)
-	Reason string `json:"reason,nullable"`
+	Reason string `json:"reason" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Address     respjson.Field
@@ -207,9 +207,9 @@ func (r *TenantSuppressionGetResponseData) UnmarshalJSON(data []byte) error {
 
 type TenantSuppressionListResponse struct {
 	// Suppression ID
-	ID        string    `json:"id,required"`
-	Address   string    `json:"address,required" format:"email"`
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	ID        string    `json:"id" api:"required"`
+	Address   string    `json:"address" api:"required" format:"email"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	Reason    string    `json:"reason"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -229,9 +229,9 @@ func (r *TenantSuppressionListResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantSuppressionDeleteResponse struct {
-	Data    TenantSuppressionDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta                      `json:"meta,required"`
-	Success bool                                `json:"success,required"`
+	Data    TenantSuppressionDeleteResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                      `json:"meta" api:"required"`
+	Success bool                                `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -249,7 +249,7 @@ func (r *TenantSuppressionDeleteResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantSuppressionDeleteResponseData struct {
-	Message string `json:"message,required"`
+	Message string `json:"message" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Message     respjson.Field
@@ -266,7 +266,7 @@ func (r *TenantSuppressionDeleteResponseData) UnmarshalJSON(data []byte) error {
 
 type TenantSuppressionNewParams struct {
 	// Email address to suppress
-	Address string `json:"address,required" format:"email"`
+	Address string `json:"address" api:"required" format:"email"`
 	// Reason for suppression (accepts null)
 	Reason param.Opt[string] `json:"reason,omitzero"`
 	paramObj
@@ -281,7 +281,7 @@ func (r *TenantSuppressionNewParams) UnmarshalJSON(data []byte) error {
 }
 
 type TenantSuppressionGetParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }
 
@@ -301,6 +301,6 @@ func (r TenantSuppressionListParams) URLQuery() (v url.Values, err error) {
 }
 
 type TenantSuppressionDeleteParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }

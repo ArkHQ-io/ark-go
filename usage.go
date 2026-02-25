@@ -166,17 +166,17 @@ func (r *UsageService) ListTenantsAutoPaging(ctx context.Context, query UsageLis
 // Email delivery counts
 type EmailCounts struct {
 	// Emails that bounced
-	Bounced int64 `json:"bounced,required"`
+	Bounced int64 `json:"bounced" api:"required"`
 	// Emails successfully delivered
-	Delivered int64 `json:"delivered,required"`
+	Delivered int64 `json:"delivered" api:"required"`
 	// Emails that hard-failed (permanent failures)
-	HardFailed int64 `json:"hard_failed,required"`
+	HardFailed int64 `json:"hard_failed" api:"required"`
 	// Emails currently held for review
-	Held int64 `json:"held,required"`
+	Held int64 `json:"held" api:"required"`
 	// Total emails sent
-	Sent int64 `json:"sent,required"`
+	Sent int64 `json:"sent" api:"required"`
 	// Emails that soft-failed (temporary failures, may be retried)
-	SoftFailed int64 `json:"soft_failed,required"`
+	SoftFailed int64 `json:"soft_failed" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Bounced     respjson.Field
@@ -199,9 +199,9 @@ func (r *EmailCounts) UnmarshalJSON(data []byte) error {
 // Email delivery rates (as decimals, e.g., 0.95 = 95%)
 type EmailRates struct {
 	// Percentage of sent emails that bounced (0-1)
-	BounceRate float64 `json:"bounce_rate,required"`
+	BounceRate float64 `json:"bounce_rate" api:"required"`
 	// Percentage of sent emails that were delivered (0-1)
-	DeliveryRate float64 `json:"delivery_rate,required"`
+	DeliveryRate float64 `json:"delivery_rate" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		BounceRate   respjson.Field
@@ -219,9 +219,9 @@ func (r *EmailRates) UnmarshalJSON(data []byte) error {
 
 // Org-wide usage summary response
 type OrgUsageSummary struct {
-	Data    OrgUsageSummaryData `json:"data,required"`
-	Meta    shared.APIMeta      `json:"meta,required"`
-	Success bool                `json:"success,required"`
+	Data    OrgUsageSummaryData `json:"data" api:"required"`
+	Meta    shared.APIMeta      `json:"meta" api:"required"`
+	Success bool                `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -240,12 +240,12 @@ func (r *OrgUsageSummary) UnmarshalJSON(data []byte) error {
 
 type OrgUsageSummaryData struct {
 	// Email delivery counts
-	Emails EmailCounts `json:"emails,required"`
+	Emails EmailCounts `json:"emails" api:"required"`
 	// Time period for usage data
-	Period UsagePeriod `json:"period,required"`
+	Period UsagePeriod `json:"period" api:"required"`
 	// Email delivery rates (as decimals, e.g., 0.95 = 95%)
-	Rates   EmailRates                 `json:"rates,required"`
-	Tenants OrgUsageSummaryDataTenants `json:"tenants,required"`
+	Rates   EmailRates                 `json:"rates" api:"required"`
+	Tenants OrgUsageSummaryDataTenants `json:"tenants" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Emails      respjson.Field
@@ -265,11 +265,11 @@ func (r *OrgUsageSummaryData) UnmarshalJSON(data []byte) error {
 
 type OrgUsageSummaryDataTenants struct {
 	// Number of active tenants
-	Active int64 `json:"active,required"`
+	Active int64 `json:"active" api:"required"`
 	// Total number of tenants
-	Total int64 `json:"total,required"`
+	Total int64 `json:"total" api:"required"`
 	// Number of tenants with sending activity
-	WithActivity int64 `json:"withActivity,required"`
+	WithActivity int64 `json:"withActivity" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Active       respjson.Field
@@ -289,19 +289,19 @@ func (r *OrgUsageSummaryDataTenants) UnmarshalJSON(data []byte) error {
 // Usage record for a single tenant (camelCase for SDK)
 type TenantUsageItem struct {
 	// Email delivery counts
-	Emails EmailCounts `json:"emails,required"`
+	Emails EmailCounts `json:"emails" api:"required"`
 	// Email delivery rates (as decimals, e.g., 0.95 = 95%)
-	Rates EmailRates `json:"rates,required"`
+	Rates EmailRates `json:"rates" api:"required"`
 	// Current tenant status
 	//
 	// Any of "active", "suspended", "archived".
-	Status TenantUsageItemStatus `json:"status,required"`
+	Status TenantUsageItemStatus `json:"status" api:"required"`
 	// Unique tenant identifier
-	TenantID string `json:"tenantId,required"`
+	TenantID string `json:"tenantId" api:"required"`
 	// Tenant display name
-	TenantName string `json:"tenantName,required"`
+	TenantName string `json:"tenantName" api:"required"`
 	// Your external ID for this tenant
-	ExternalID string `json:"externalId,nullable"`
+	ExternalID string `json:"externalId" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Emails      respjson.Field
@@ -333,9 +333,9 @@ const (
 // Time period for usage data
 type UsagePeriod struct {
 	// Period end (inclusive)
-	End time.Time `json:"end,required" format:"date-time"`
+	End time.Time `json:"end" api:"required" format:"date-time"`
 	// Period start (inclusive)
-	Start time.Time `json:"start,required" format:"date-time"`
+	Start time.Time `json:"start" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		End         respjson.Field
@@ -354,31 +354,31 @@ func (r *UsagePeriod) UnmarshalJSON(data []byte) error {
 // Single row in usage export (JSON format)
 type UsageExportResponse struct {
 	// Bounce rate (0-1)
-	BounceRate float64 `json:"bounce_rate,required"`
+	BounceRate float64 `json:"bounce_rate" api:"required"`
 	// Emails that bounced
-	Bounced int64 `json:"bounced,required"`
+	Bounced int64 `json:"bounced" api:"required"`
 	// Emails successfully delivered
-	Delivered int64 `json:"delivered,required"`
+	Delivered int64 `json:"delivered" api:"required"`
 	// Delivery rate (0-1)
-	DeliveryRate float64 `json:"delivery_rate,required"`
+	DeliveryRate float64 `json:"delivery_rate" api:"required"`
 	// Emails that hard-failed
-	HardFailed int64 `json:"hard_failed,required"`
+	HardFailed int64 `json:"hard_failed" api:"required"`
 	// Emails currently held
-	Held int64 `json:"held,required"`
+	Held int64 `json:"held" api:"required"`
 	// Total emails sent
-	Sent int64 `json:"sent,required"`
+	Sent int64 `json:"sent" api:"required"`
 	// Emails that soft-failed
-	SoftFailed int64 `json:"soft_failed,required"`
+	SoftFailed int64 `json:"soft_failed" api:"required"`
 	// Current tenant status
 	//
 	// Any of "active", "suspended", "archived".
-	Status UsageExportResponseStatus `json:"status,required"`
+	Status UsageExportResponseStatus `json:"status" api:"required"`
 	// Unique tenant identifier
-	TenantID string `json:"tenant_id,required"`
+	TenantID string `json:"tenant_id" api:"required"`
 	// Tenant display name
-	TenantName string `json:"tenant_name,required"`
+	TenantName string `json:"tenant_name" api:"required"`
 	// Your external ID for this tenant
-	ExternalID string `json:"external_id,nullable"`
+	ExternalID string `json:"external_id" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		BounceRate   respjson.Field
