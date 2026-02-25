@@ -100,17 +100,17 @@ func (r *TenantUsageService) GetTimeseries(ctx context.Context, tenantID string,
 // Tenant usage statistics
 type TenantUsage struct {
 	// Email delivery counts
-	Emails EmailCounts `json:"emails,required"`
+	Emails EmailCounts `json:"emails" api:"required"`
 	// Time period for usage data
-	Period UsagePeriod `json:"period,required"`
+	Period UsagePeriod `json:"period" api:"required"`
 	// Email delivery rates (as decimals, e.g., 0.95 = 95%)
-	Rates EmailRates `json:"rates,required"`
+	Rates EmailRates `json:"rates" api:"required"`
 	// Unique tenant identifier
-	TenantID string `json:"tenant_id,required"`
+	TenantID string `json:"tenant_id" api:"required"`
 	// Tenant display name
-	TenantName string `json:"tenant_name,required"`
+	TenantName string `json:"tenant_name" api:"required"`
 	// Your external ID for this tenant (from metadata)
-	ExternalID string `json:"external_id,nullable"`
+	ExternalID string `json:"external_id" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Emails      respjson.Field
@@ -133,17 +133,17 @@ func (r *TenantUsage) UnmarshalJSON(data []byte) error {
 // Timeseries usage statistics
 type TenantUsageTimeseries struct {
 	// Array of time-bucketed data points
-	Data []TenantUsageTimeseriesData `json:"data,required"`
+	Data []TenantUsageTimeseriesData `json:"data" api:"required"`
 	// Time bucket granularity
 	//
 	// Any of "hour", "day", "week", "month".
-	Granularity TenantUsageTimeseriesGranularity `json:"granularity,required"`
+	Granularity TenantUsageTimeseriesGranularity `json:"granularity" api:"required"`
 	// Time period for usage data
-	Period UsagePeriod `json:"period,required"`
+	Period UsagePeriod `json:"period" api:"required"`
 	// Unique tenant identifier
-	TenantID string `json:"tenant_id,required"`
+	TenantID string `json:"tenant_id" api:"required"`
 	// Tenant display name
-	TenantName string `json:"tenant_name,required"`
+	TenantName string `json:"tenant_name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -165,19 +165,19 @@ func (r *TenantUsageTimeseries) UnmarshalJSON(data []byte) error {
 // Single timeseries data point
 type TenantUsageTimeseriesData struct {
 	// Bounces in this bucket
-	Bounced int64 `json:"bounced,required"`
+	Bounced int64 `json:"bounced" api:"required"`
 	// Emails delivered in this bucket
-	Delivered int64 `json:"delivered,required"`
+	Delivered int64 `json:"delivered" api:"required"`
 	// Hard failures in this bucket
-	HardFailed int64 `json:"hard_failed,required"`
+	HardFailed int64 `json:"hard_failed" api:"required"`
 	// Emails held in this bucket
-	Held int64 `json:"held,required"`
+	Held int64 `json:"held" api:"required"`
 	// Emails sent in this bucket
-	Sent int64 `json:"sent,required"`
+	Sent int64 `json:"sent" api:"required"`
 	// Soft failures in this bucket
-	SoftFailed int64 `json:"soft_failed,required"`
+	SoftFailed int64 `json:"soft_failed" api:"required"`
 	// Start of time bucket
-	Timestamp time.Time `json:"timestamp,required" format:"date-time"`
+	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Bounced     respjson.Field
@@ -211,9 +211,9 @@ const (
 // Usage statistics for a single tenant
 type TenantUsageGetResponse struct {
 	// Tenant usage statistics
-	Data    TenantUsage    `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    TenantUsage    `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -233,9 +233,9 @@ func (r *TenantUsageGetResponse) UnmarshalJSON(data []byte) error {
 // Timeseries usage data for a tenant
 type TenantUsageGetTimeseriesResponse struct {
 	// Timeseries usage statistics
-	Data    TenantUsageTimeseries `json:"data,required"`
-	Meta    shared.APIMeta        `json:"meta,required"`
-	Success bool                  `json:"success,required"`
+	Data    TenantUsageTimeseries `json:"data" api:"required"`
+	Meta    shared.APIMeta        `json:"meta" api:"required"`
+	Success bool                  `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

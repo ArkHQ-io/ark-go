@@ -61,11 +61,11 @@ func (r *LimitService) Get(ctx context.Context, opts ...option.RequestOption) (r
 // Current usage and limit information
 type LimitsData struct {
 	// Billing and credit information
-	Billing LimitsDataBilling `json:"billing,required"`
+	Billing LimitsDataBilling `json:"billing" api:"required"`
 	// API rate limit status
-	RateLimit LimitsDataRateLimit `json:"rateLimit,required"`
+	RateLimit LimitsDataRateLimit `json:"rateLimit" api:"required"`
 	// Email send limit status (hourly cap)
-	SendLimit LimitsDataSendLimit `json:"sendLimit,required"`
+	SendLimit LimitsDataSendLimit `json:"sendLimit" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Billing     respjson.Field
@@ -85,13 +85,13 @@ func (r *LimitsData) UnmarshalJSON(data []byte) error {
 // Billing and credit information
 type LimitsDataBilling struct {
 	// Auto-recharge configuration
-	AutoRecharge LimitsDataBillingAutoRecharge `json:"autoRecharge,required"`
+	AutoRecharge LimitsDataBillingAutoRecharge `json:"autoRecharge" api:"required"`
 	// Current credit balance as formatted string (e.g., "25.50")
-	CreditBalance string `json:"creditBalance,required"`
+	CreditBalance string `json:"creditBalance" api:"required"`
 	// Current credit balance in cents for precise calculations
-	CreditBalanceCents int64 `json:"creditBalanceCents,required"`
+	CreditBalanceCents int64 `json:"creditBalanceCents" api:"required"`
 	// Whether a payment method is configured
-	HasPaymentMethod bool `json:"hasPaymentMethod,required"`
+	HasPaymentMethod bool `json:"hasPaymentMethod" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AutoRecharge       respjson.Field
@@ -112,11 +112,11 @@ func (r *LimitsDataBilling) UnmarshalJSON(data []byte) error {
 // Auto-recharge configuration
 type LimitsDataBillingAutoRecharge struct {
 	// Amount to recharge when triggered
-	Amount string `json:"amount,required"`
+	Amount string `json:"amount" api:"required"`
 	// Whether auto-recharge is enabled
-	Enabled bool `json:"enabled,required"`
+	Enabled bool `json:"enabled" api:"required"`
 	// Balance threshold that triggers recharge
-	Threshold string `json:"threshold,required"`
+	Threshold string `json:"threshold" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Amount      respjson.Field
@@ -136,15 +136,15 @@ func (r *LimitsDataBillingAutoRecharge) UnmarshalJSON(data []byte) error {
 // API rate limit status
 type LimitsDataRateLimit struct {
 	// Maximum requests allowed per period
-	Limit int64 `json:"limit,required"`
+	Limit int64 `json:"limit" api:"required"`
 	// Time period for the limit
 	//
 	// Any of "second".
-	Period string `json:"period,required"`
+	Period string `json:"period" api:"required"`
 	// Requests remaining in current window
-	Remaining int64 `json:"remaining,required"`
+	Remaining int64 `json:"remaining" api:"required"`
 	// Unix timestamp when the limit resets
-	Reset int64 `json:"reset,required"`
+	Reset int64 `json:"reset" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Limit       respjson.Field
@@ -165,23 +165,23 @@ func (r *LimitsDataRateLimit) UnmarshalJSON(data []byte) error {
 // Email send limit status (hourly cap)
 type LimitsDataSendLimit struct {
 	// Whether approaching the limit (>90%)
-	Approaching bool `json:"approaching,required"`
+	Approaching bool `json:"approaching" api:"required"`
 	// Whether the limit has been exceeded
-	Exceeded bool `json:"exceeded,required"`
+	Exceeded bool `json:"exceeded" api:"required"`
 	// Maximum emails allowed per hour (null = unlimited)
-	Limit int64 `json:"limit,required"`
+	Limit int64 `json:"limit" api:"required"`
 	// Time period for the limit
 	//
 	// Any of "hour".
-	Period string `json:"period,required"`
+	Period string `json:"period" api:"required"`
 	// Emails remaining in current period (null if unlimited)
-	Remaining int64 `json:"remaining,required"`
+	Remaining int64 `json:"remaining" api:"required"`
 	// ISO timestamp when the limit window resets (top of next hour)
-	ResetsAt time.Time `json:"resetsAt,required" format:"date-time"`
+	ResetsAt time.Time `json:"resetsAt" api:"required" format:"date-time"`
 	// Usage as a percentage (null if unlimited)
-	UsagePercent float64 `json:"usagePercent,required"`
+	UsagePercent float64 `json:"usagePercent" api:"required"`
 	// Emails sent in current period
-	Used int64 `json:"used,required"`
+	Used int64 `json:"used" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Approaching  respjson.Field
@@ -206,9 +206,9 @@ func (r *LimitsDataSendLimit) UnmarshalJSON(data []byte) error {
 // Account rate limits and send limits response
 type LimitGetResponse struct {
 	// Current usage and limit information
-	Data    LimitsData     `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    LimitsData     `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

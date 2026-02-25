@@ -148,9 +148,9 @@ func (r *TenantCredentialService) Delete(ctx context.Context, credentialID int64
 }
 
 type TenantCredentialNewResponse struct {
-	Data    TenantCredentialNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta                  `json:"meta,required"`
-	Success bool                            `json:"success,required"`
+	Data    TenantCredentialNewResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                  `json:"meta" api:"required"`
+	Success bool                            `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -169,28 +169,28 @@ func (r *TenantCredentialNewResponse) UnmarshalJSON(data []byte) error {
 
 type TenantCredentialNewResponseData struct {
 	// Unique identifier for the credential
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// When the credential was created
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the credential is on hold (disabled). When `true`, the credential cannot
 	// be used to send emails.
-	Hold bool `json:"hold,required"`
+	Hold bool `json:"hold" api:"required"`
 	// The credential key (secret). **Store this securely** - it will not be shown
 	// again unless you use the reveal parameter.
-	Key string `json:"key,required"`
+	Key string `json:"key" api:"required"`
 	// When the credential was last used to send an email
-	LastUsedAt time.Time `json:"lastUsedAt,required" format:"date-time"`
+	LastUsedAt time.Time `json:"lastUsedAt" api:"required" format:"date-time"`
 	// Name of the credential
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Type of credential:
 	//
 	// - `smtp` - For SMTP-based email sending
 	// - `api` - For API-based email sending
 	//
 	// Any of "smtp", "api".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// When the credential was last updated
-	UpdatedAt time.Time `json:"updatedAt,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt" api:"required" format:"date-time"`
 	// SMTP username for authentication. Only included for SMTP credentials. Format:
 	// `{tenantId}/{key}`
 	SmtpUsername string `json:"smtpUsername"`
@@ -217,9 +217,9 @@ func (r *TenantCredentialNewResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantCredentialGetResponse struct {
-	Data    TenantCredentialGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta                  `json:"meta,required"`
-	Success bool                            `json:"success,required"`
+	Data    TenantCredentialGetResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                  `json:"meta" api:"required"`
+	Success bool                            `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -238,25 +238,25 @@ func (r *TenantCredentialGetResponse) UnmarshalJSON(data []byte) error {
 
 type TenantCredentialGetResponseData struct {
 	// Unique identifier for the credential
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// When the credential was created
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the credential is on hold (disabled). When `true`, the credential cannot
 	// be used to send emails.
-	Hold bool `json:"hold,required"`
+	Hold bool `json:"hold" api:"required"`
 	// When the credential was last used to send an email
-	LastUsedAt time.Time `json:"lastUsedAt,required" format:"date-time"`
+	LastUsedAt time.Time `json:"lastUsedAt" api:"required" format:"date-time"`
 	// Name of the credential
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Type of credential:
 	//
 	// - `smtp` - For SMTP-based email sending
 	// - `api` - For API-based email sending
 	//
 	// Any of "smtp", "api".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// When the credential was last updated
-	UpdatedAt time.Time `json:"updatedAt,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt" api:"required" format:"date-time"`
 	// The credential key (secret). Only included when:
 	//
 	// - Creating a new credential (always returned)
@@ -288,9 +288,9 @@ func (r *TenantCredentialGetResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantCredentialUpdateResponse struct {
-	Data    TenantCredentialUpdateResponseData `json:"data,required"`
-	Meta    shared.APIMeta                     `json:"meta,required"`
-	Success bool                               `json:"success,required"`
+	Data    TenantCredentialUpdateResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                     `json:"meta" api:"required"`
+	Success bool                               `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -309,25 +309,25 @@ func (r *TenantCredentialUpdateResponse) UnmarshalJSON(data []byte) error {
 
 type TenantCredentialUpdateResponseData struct {
 	// Unique identifier for the credential
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// When the credential was created
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the credential is on hold (disabled). When `true`, the credential cannot
 	// be used to send emails.
-	Hold bool `json:"hold,required"`
+	Hold bool `json:"hold" api:"required"`
 	// When the credential was last used to send an email
-	LastUsedAt time.Time `json:"lastUsedAt,required" format:"date-time"`
+	LastUsedAt time.Time `json:"lastUsedAt" api:"required" format:"date-time"`
 	// Name of the credential
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Type of credential:
 	//
 	// - `smtp` - For SMTP-based email sending
 	// - `api` - For API-based email sending
 	//
 	// Any of "smtp", "api".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// When the credential was last updated
-	UpdatedAt time.Time `json:"updatedAt,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt" api:"required" format:"date-time"`
 	// The credential key (secret). Only included when:
 	//
 	// - Creating a new credential (always returned)
@@ -360,25 +360,25 @@ func (r *TenantCredentialUpdateResponseData) UnmarshalJSON(data []byte) error {
 
 type TenantCredentialListResponse struct {
 	// Unique identifier for the credential
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// When the credential was created
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the credential is on hold (disabled). When `true`, the credential cannot
 	// be used to send emails.
-	Hold bool `json:"hold,required"`
+	Hold bool `json:"hold" api:"required"`
 	// When the credential was last used to send an email
-	LastUsedAt time.Time `json:"lastUsedAt,required" format:"date-time"`
+	LastUsedAt time.Time `json:"lastUsedAt" api:"required" format:"date-time"`
 	// Name of the credential
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Type of credential:
 	//
 	// - `smtp` - For SMTP-based email sending
 	// - `api` - For API-based email sending
 	//
 	// Any of "smtp", "api".
-	Type TenantCredentialListResponseType `json:"type,required"`
+	Type TenantCredentialListResponseType `json:"type" api:"required"`
 	// When the credential was last updated
-	UpdatedAt time.Time `json:"updatedAt,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -411,9 +411,9 @@ const (
 )
 
 type TenantCredentialDeleteResponse struct {
-	Data    TenantCredentialDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta                     `json:"meta,required"`
-	Success bool                               `json:"success,required"`
+	Data    TenantCredentialDeleteResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                     `json:"meta" api:"required"`
+	Success bool                               `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -431,7 +431,7 @@ func (r *TenantCredentialDeleteResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantCredentialDeleteResponseData struct {
-	Deleted bool `json:"deleted,required"`
+	Deleted bool `json:"deleted" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Deleted     respjson.Field
@@ -449,14 +449,14 @@ func (r *TenantCredentialDeleteResponseData) UnmarshalJSON(data []byte) error {
 type TenantCredentialNewParams struct {
 	// Name for the credential. Can only contain letters, numbers, hyphens, and
 	// underscores. Max 50 characters.
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Type of credential:
 	//
 	// - `smtp` - For SMTP-based email sending
 	// - `api` - For API-based email sending
 	//
 	// Any of "smtp", "api".
-	Type TenantCredentialNewParamsType `json:"type,omitzero,required"`
+	Type TenantCredentialNewParamsType `json:"type,omitzero" api:"required"`
 	paramObj
 }
 
@@ -480,7 +480,7 @@ const (
 )
 
 type TenantCredentialGetParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	// Set to `true` to include the credential key in the response
 	Reveal param.Opt[bool] `query:"reveal,omitzero" json:"-"`
 	paramObj
@@ -496,7 +496,7 @@ func (r TenantCredentialGetParams) URLQuery() (v url.Values, err error) {
 }
 
 type TenantCredentialUpdateParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	// Set to `true` to disable the credential (put on hold). Set to `false` to enable
 	// the credential (release from hold).
 	Hold param.Opt[bool] `json:"hold,omitzero"`
@@ -543,6 +543,6 @@ const (
 )
 
 type TenantCredentialDeleteParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }

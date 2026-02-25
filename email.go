@@ -173,7 +173,7 @@ func (r *EmailService) Retry(ctx context.Context, emailID string, opts ...option
 // - `POST /emails/{emailId}/retry` - Retry failed delivery
 func (r *EmailService) Send(ctx context.Context, params EmailSendParams, opts ...option.RequestOption) (res *EmailSendResponse, err error) {
 	if !param.IsOmitted(params.IdempotencyKey) {
-		opts = append(opts, option.WithHeader("Idempotency-Key", fmt.Sprintf("%s", params.IdempotencyKey.Value)))
+		opts = append(opts, option.WithHeader("Idempotency-Key", fmt.Sprintf("%v", params.IdempotencyKey.Value)))
 	}
 	opts = slices.Concat(r.Options, opts)
 	path := "emails"
@@ -190,7 +190,7 @@ func (r *EmailService) Send(ctx context.Context, params EmailSendParams, opts ..
 // **Idempotency:** Supports `Idempotency-Key` header for safe retries.
 func (r *EmailService) SendBatch(ctx context.Context, params EmailSendBatchParams, opts ...option.RequestOption) (res *EmailSendBatchResponse, err error) {
 	if !param.IsOmitted(params.IdempotencyKey) {
-		opts = append(opts, option.WithHeader("Idempotency-Key", fmt.Sprintf("%s", params.IdempotencyKey.Value)))
+		opts = append(opts, option.WithHeader("Idempotency-Key", fmt.Sprintf("%v", params.IdempotencyKey.Value)))
 	}
 	opts = slices.Concat(r.Options, opts)
 	path := "emails/batch"
@@ -212,9 +212,9 @@ func (r *EmailService) SendRaw(ctx context.Context, body EmailSendRawParams, opt
 }
 
 type EmailGetResponse struct {
-	Data    EmailGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta       `json:"meta,required"`
-	Success bool                 `json:"success,required"`
+	Data    EmailGetResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta       `json:"meta" api:"required"`
+	Success bool                 `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -233,13 +233,13 @@ func (r *EmailGetResponse) UnmarshalJSON(data []byte) error {
 
 type EmailGetResponseData struct {
 	// Unique message identifier (token)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Sender address
-	From string `json:"from,required"`
+	From string `json:"from" api:"required"`
 	// Message direction
 	//
 	// Any of "outgoing", "incoming".
-	Scope string `json:"scope,required"`
+	Scope string `json:"scope" api:"required"`
 	// Current delivery status:
 	//
 	// - `pending` - Email accepted, waiting to be processed
@@ -250,15 +250,17 @@ type EmailGetResponseData struct {
 	// - `held` - Held for manual review
 	//
 	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
-	Status string `json:"status,required"`
+	Status string `json:"status" api:"required"`
 	// Email subject line
-	Subject string `json:"subject,required"`
+	Subject string `json:"subject" api:"required"`
+	// The tenant ID this email belongs to
+	TenantID string `json:"tenantId" api:"required"`
 	// Unix timestamp when the email was sent
-	Timestamp float64 `json:"timestamp,required"`
+	Timestamp float64 `json:"timestamp" api:"required"`
 	// ISO 8601 formatted timestamp
-	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	TimestampISO time.Time `json:"timestampIso" api:"required" format:"date-time"`
 	// Recipient address
-	To string `json:"to,required" format:"email"`
+	To string `json:"to" api:"required" format:"email"`
 	// Opens and clicks tracking data (included if expand=activity)
 	Activity EmailGetResponseDataActivity `json:"activity"`
 	// File attachments (included if expand=attachments)
@@ -289,6 +291,7 @@ type EmailGetResponseData struct {
 		Scope        respjson.Field
 		Status       respjson.Field
 		Subject      respjson.Field
+		TenantID     respjson.Field
 		Timestamp    respjson.Field
 		TimestampISO respjson.Field
 		To           respjson.Field
@@ -393,15 +396,15 @@ func (r *EmailGetResponseDataActivityOpen) UnmarshalJSON(data []byte) error {
 // An email attachment retrieved from a sent message
 type EmailGetResponseDataAttachment struct {
 	// MIME type of the attachment
-	ContentType string `json:"contentType,required"`
+	ContentType string `json:"contentType" api:"required"`
 	// Base64 encoded attachment content. Decode this to get the raw file bytes.
-	Data string `json:"data,required"`
+	Data string `json:"data" api:"required"`
 	// Original filename of the attachment
-	Filename string `json:"filename,required"`
+	Filename string `json:"filename" api:"required"`
 	// SHA256 hash of the attachment content for verification
-	Hash string `json:"hash,required"`
+	Hash string `json:"hash" api:"required"`
 	// Size of the attachment in bytes
-	Size int64 `json:"size,required"`
+	Size int64 `json:"size" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ContentType respjson.Field
@@ -422,13 +425,13 @@ func (r *EmailGetResponseDataAttachment) UnmarshalJSON(data []byte) error {
 
 type EmailGetResponseDataDelivery struct {
 	// Delivery attempt ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Delivery status (lowercase)
-	Status string `json:"status,required"`
+	Status string `json:"status" api:"required"`
 	// Unix timestamp
-	Timestamp float64 `json:"timestamp,required"`
+	Timestamp float64 `json:"timestamp" api:"required"`
 	// ISO 8601 timestamp
-	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	TimestampISO time.Time `json:"timestampIso" api:"required" format:"date-time"`
 	// Bounce classification category (present for failed deliveries). Helps understand
 	// why delivery failed for analytics and automated handling.
 	//
@@ -436,13 +439,13 @@ type EmailGetResponseDataDelivery struct {
 	// "policy_violation", "no_mailbox", "not_accepting_mail",
 	// "temporarily_unavailable", "protocol_error", "tls_required", "connection_error",
 	// "dns_error", "unclassified".
-	Classification string `json:"classification,nullable"`
+	Classification string `json:"classification" api:"nullable"`
 	// Numeric bounce classification code for programmatic handling. Codes:
 	// 10=invalid_recipient, 11=no_mailbox, 12=not_accepting_mail, 20=mailbox_full,
 	// 21=message_too_large, 30=spam_block, 31=policy_violation, 32=tls_required,
 	// 40=connection_error, 41=dns_error, 42=temporarily_unavailable,
 	// 50=protocol_error, 99=unclassified
-	ClassificationCode int64 `json:"classificationCode,nullable"`
+	ClassificationCode int64 `json:"classificationCode" api:"nullable"`
 	// SMTP response code
 	Code int64 `json:"code"`
 	// Human-readable delivery summary. Format varies by status:
@@ -455,13 +458,13 @@ type EmailGetResponseDataDelivery struct {
 	Output string `json:"output"`
 	// Hostname of the remote mail server that processed the delivery. Present for all
 	// delivery attempts (successful and failed).
-	RemoteHost string `json:"remoteHost,nullable"`
+	RemoteHost string `json:"remoteHost" api:"nullable"`
 	// Whether TLS was used
 	SentWithSsl bool `json:"sentWithSsl"`
 	// RFC 3463 enhanced status code from SMTP response (e.g., "5.1.1", "4.2.2"). First
 	// digit: 2=success, 4=temporary, 5=permanent. Second digit: category (1=address,
 	// 2=mailbox, 7=security, etc.).
-	SmtpEnhancedCode string `json:"smtpEnhancedCode,nullable"`
+	SmtpEnhancedCode string `json:"smtpEnhancedCode" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                 respjson.Field
@@ -489,8 +492,8 @@ func (r *EmailGetResponseDataDelivery) UnmarshalJSON(data []byte) error {
 
 type EmailListResponse struct {
 	// Unique message identifier (token)
-	ID   string `json:"id,required"`
-	From string `json:"from,required"`
+	ID   string `json:"id" api:"required"`
+	From string `json:"from" api:"required"`
 	// Current delivery status:
 	//
 	// - `pending` - Email accepted, waiting to be processed
@@ -501,18 +504,21 @@ type EmailListResponse struct {
 	// - `held` - Held for manual review
 	//
 	// Any of "pending", "sent", "softfail", "hardfail", "bounced", "held".
-	Status       EmailListResponseStatus `json:"status,required"`
-	Subject      string                  `json:"subject,required"`
-	Timestamp    float64                 `json:"timestamp,required"`
-	TimestampISO time.Time               `json:"timestampIso,required" format:"date-time"`
-	To           string                  `json:"to,required" format:"email"`
-	Tag          string                  `json:"tag"`
+	Status  EmailListResponseStatus `json:"status" api:"required"`
+	Subject string                  `json:"subject" api:"required"`
+	// The tenant ID this email belongs to
+	TenantID     string    `json:"tenantId" api:"required"`
+	Timestamp    float64   `json:"timestamp" api:"required"`
+	TimestampISO time.Time `json:"timestampIso" api:"required" format:"date-time"`
+	To           string    `json:"to" api:"required" format:"email"`
+	Tag          string    `json:"tag"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
 		From         respjson.Field
 		Status       respjson.Field
 		Subject      respjson.Field
+		TenantID     respjson.Field
 		Timestamp    respjson.Field
 		TimestampISO respjson.Field
 		To           respjson.Field
@@ -548,9 +554,9 @@ const (
 )
 
 type EmailGetDeliveriesResponse struct {
-	Data    EmailGetDeliveriesResponseData `json:"data,required"`
-	Meta    shared.APIMeta                 `json:"meta,required"`
-	Success bool                           `json:"success,required"`
+	Data    EmailGetDeliveriesResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                 `json:"meta" api:"required"`
+	Success bool                           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -569,17 +575,17 @@ func (r *EmailGetDeliveriesResponse) UnmarshalJSON(data []byte) error {
 
 type EmailGetDeliveriesResponseData struct {
 	// Message identifier (token)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Whether the message can be manually retried via `POST /emails/{emailId}/retry`.
 	// `true` when the raw message content is still available (not expired). Messages
 	// older than the retention period cannot be retried.
-	CanRetryManually bool `json:"canRetryManually,required"`
+	CanRetryManually bool `json:"canRetryManually" api:"required"`
 	// Chronological list of delivery attempts for this message. Each attempt includes
 	// SMTP response codes and timestamps.
-	Deliveries []EmailGetDeliveriesResponseDataDelivery `json:"deliveries,required"`
+	Deliveries []EmailGetDeliveriesResponseDataDelivery `json:"deliveries" api:"required"`
 	// Information about the current retry state of a message that is queued for
 	// delivery. Only present when the message is in the delivery queue.
-	RetryState EmailGetDeliveriesResponseDataRetryState `json:"retryState,required"`
+	RetryState EmailGetDeliveriesResponseDataRetryState `json:"retryState" api:"required"`
 	// Current message status (lowercase). Possible values:
 	//
 	// - `pending` - Initial state, awaiting first delivery attempt
@@ -590,7 +596,9 @@ type EmailGetDeliveriesResponseData struct {
 	// - `bounced` - Bounced by recipient server
 	//
 	// Any of "pending", "sent", "softfail", "hardfail", "held", "bounced".
-	Status string `json:"status,required"`
+	Status string `json:"status" api:"required"`
+	// The tenant ID this email belongs to
+	TenantID string `json:"tenantId" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID               respjson.Field
@@ -598,6 +606,7 @@ type EmailGetDeliveriesResponseData struct {
 		Deliveries       respjson.Field
 		RetryState       respjson.Field
 		Status           respjson.Field
+		TenantID         respjson.Field
 		ExtraFields      map[string]respjson.Field
 		raw              string
 	} `json:"-"`
@@ -611,13 +620,13 @@ func (r *EmailGetDeliveriesResponseData) UnmarshalJSON(data []byte) error {
 
 type EmailGetDeliveriesResponseDataDelivery struct {
 	// Delivery attempt ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Delivery status (lowercase)
-	Status string `json:"status,required"`
+	Status string `json:"status" api:"required"`
 	// Unix timestamp
-	Timestamp float64 `json:"timestamp,required"`
+	Timestamp float64 `json:"timestamp" api:"required"`
 	// ISO 8601 timestamp
-	TimestampISO time.Time `json:"timestampIso,required" format:"date-time"`
+	TimestampISO time.Time `json:"timestampIso" api:"required" format:"date-time"`
 	// Bounce classification category (present for failed deliveries). Helps understand
 	// why delivery failed for analytics and automated handling.
 	//
@@ -625,13 +634,13 @@ type EmailGetDeliveriesResponseDataDelivery struct {
 	// "policy_violation", "no_mailbox", "not_accepting_mail",
 	// "temporarily_unavailable", "protocol_error", "tls_required", "connection_error",
 	// "dns_error", "unclassified".
-	Classification string `json:"classification,nullable"`
+	Classification string `json:"classification" api:"nullable"`
 	// Numeric bounce classification code for programmatic handling. Codes:
 	// 10=invalid_recipient, 11=no_mailbox, 12=not_accepting_mail, 20=mailbox_full,
 	// 21=message_too_large, 30=spam_block, 31=policy_violation, 32=tls_required,
 	// 40=connection_error, 41=dns_error, 42=temporarily_unavailable,
 	// 50=protocol_error, 99=unclassified
-	ClassificationCode int64 `json:"classificationCode,nullable"`
+	ClassificationCode int64 `json:"classificationCode" api:"nullable"`
 	// SMTP response code
 	Code int64 `json:"code"`
 	// Human-readable delivery summary. Format varies by status:
@@ -644,13 +653,13 @@ type EmailGetDeliveriesResponseDataDelivery struct {
 	Output string `json:"output"`
 	// Hostname of the remote mail server that processed the delivery. Present for all
 	// delivery attempts (successful and failed).
-	RemoteHost string `json:"remoteHost,nullable"`
+	RemoteHost string `json:"remoteHost" api:"nullable"`
 	// Whether TLS was used
 	SentWithSsl bool `json:"sentWithSsl"`
 	// RFC 3463 enhanced status code from SMTP response (e.g., "5.1.1", "4.2.2"). First
 	// digit: 2=success, 4=temporary, 5=permanent. Second digit: category (1=address,
 	// 2=mailbox, 7=security, etc.).
-	SmtpEnhancedCode string `json:"smtpEnhancedCode,nullable"`
+	SmtpEnhancedCode string `json:"smtpEnhancedCode" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                 respjson.Field
@@ -681,25 +690,25 @@ func (r *EmailGetDeliveriesResponseDataDelivery) UnmarshalJSON(data []byte) erro
 type EmailGetDeliveriesResponseDataRetryState struct {
 	// Current attempt number (0-indexed). The first delivery attempt is 0, the first
 	// retry is 1, and so on.
-	Attempt int64 `json:"attempt,required"`
+	Attempt int64 `json:"attempt" api:"required"`
 	// Number of attempts remaining before the message is hard-failed. Calculated as
 	// `maxAttempts - attempt`.
-	AttemptsRemaining int64 `json:"attemptsRemaining,required"`
+	AttemptsRemaining int64 `json:"attemptsRemaining" api:"required"`
 	// Whether this queue entry was created by a manual retry request. Manual retries
 	// bypass certain hold conditions like suppression lists.
-	Manual bool `json:"manual,required"`
+	Manual bool `json:"manual" api:"required"`
 	// Maximum number of delivery attempts before the message is hard-failed.
 	// Configured at the server level.
-	MaxAttempts int64 `json:"maxAttempts,required"`
+	MaxAttempts int64 `json:"maxAttempts" api:"required"`
 	// Whether the message is currently being processed by a delivery worker. When
 	// `true`, the message is actively being sent.
-	Processing bool `json:"processing,required"`
+	Processing bool `json:"processing" api:"required"`
 	// Unix timestamp of when the next retry attempt is scheduled. `null` if the
 	// message is ready for immediate processing or currently being processed.
-	NextRetryAt float64 `json:"nextRetryAt,nullable"`
+	NextRetryAt float64 `json:"nextRetryAt" api:"nullable"`
 	// ISO 8601 formatted timestamp of the next retry attempt. `null` if the message is
 	// ready for immediate processing.
-	NextRetryAtISO time.Time `json:"nextRetryAtIso,nullable" format:"date-time"`
+	NextRetryAtISO time.Time `json:"nextRetryAtIso" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Attempt           respjson.Field
@@ -721,9 +730,9 @@ func (r *EmailGetDeliveriesResponseDataRetryState) UnmarshalJSON(data []byte) er
 }
 
 type EmailRetryResponse struct {
-	Data    EmailRetryResponseData `json:"data,required"`
-	Meta    shared.APIMeta         `json:"meta,required"`
-	Success bool                   `json:"success,required"`
+	Data    EmailRetryResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta         `json:"meta" api:"required"`
+	Success bool                   `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -742,12 +751,15 @@ func (r *EmailRetryResponse) UnmarshalJSON(data []byte) error {
 
 type EmailRetryResponseData struct {
 	// Email identifier (token)
-	ID      string `json:"id,required"`
-	Message string `json:"message,required"`
+	ID      string `json:"id" api:"required"`
+	Message string `json:"message" api:"required"`
+	// The tenant ID this email belongs to
+	TenantID string `json:"tenantId" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		Message     respjson.Field
+		TenantID    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -760,9 +772,9 @@ func (r *EmailRetryResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendResponse struct {
-	Data    EmailSendResponseData `json:"data,required"`
-	Meta    shared.APIMeta        `json:"meta,required"`
-	Success bool                  `json:"success,required"`
+	Data    EmailSendResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta        `json:"meta" api:"required"`
+	Success bool                  `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -781,13 +793,15 @@ func (r *EmailSendResponse) UnmarshalJSON(data []byte) error {
 
 type EmailSendResponseData struct {
 	// Unique message identifier (token)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Current delivery status
 	//
 	// Any of "pending", "sent".
-	Status string `json:"status,required"`
+	Status string `json:"status" api:"required"`
+	// The tenant ID this email was sent from
+	TenantID string `json:"tenantId" api:"required"`
 	// List of recipient addresses
-	To []string `json:"to,required" format:"email"`
+	To []string `json:"to" api:"required" format:"email"`
 	// SMTP Message-ID header value
 	MessageID string `json:"messageId"`
 	// Whether this email was sent in sandbox mode. Only present (and true) for sandbox
@@ -797,6 +811,7 @@ type EmailSendResponseData struct {
 	JSON struct {
 		ID          respjson.Field
 		Status      respjson.Field
+		TenantID    respjson.Field
 		To          respjson.Field
 		MessageID   respjson.Field
 		Sandbox     respjson.Field
@@ -812,9 +827,9 @@ func (r *EmailSendResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendBatchResponse struct {
-	Data    EmailSendBatchResponseData `json:"data,required"`
-	Meta    shared.APIMeta             `json:"meta,required"`
-	Success bool                       `json:"success,required"`
+	Data    EmailSendBatchResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta             `json:"meta" api:"required"`
+	Success bool                       `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -833,13 +848,15 @@ func (r *EmailSendBatchResponse) UnmarshalJSON(data []byte) error {
 
 type EmailSendBatchResponseData struct {
 	// Successfully accepted emails
-	Accepted int64 `json:"accepted,required"`
+	Accepted int64 `json:"accepted" api:"required"`
 	// Failed emails
-	Failed int64 `json:"failed,required"`
+	Failed int64 `json:"failed" api:"required"`
 	// Map of recipient email to message info
-	Messages map[string]EmailSendBatchResponseDataMessage `json:"messages,required"`
+	Messages map[string]EmailSendBatchResponseDataMessage `json:"messages" api:"required"`
+	// The tenant ID this batch was sent from
+	TenantID string `json:"tenantId" api:"required"`
 	// Total emails in the batch
-	Total int64 `json:"total,required"`
+	Total int64 `json:"total" api:"required"`
 	// Whether this batch was sent in sandbox mode. Only present (and true) for sandbox
 	// emails sent from @arkhq.io addresses.
 	Sandbox bool `json:"sandbox"`
@@ -848,6 +865,7 @@ type EmailSendBatchResponseData struct {
 		Accepted    respjson.Field
 		Failed      respjson.Field
 		Messages    respjson.Field
+		TenantID    respjson.Field
 		Total       respjson.Field
 		Sandbox     respjson.Field
 		ExtraFields map[string]respjson.Field
@@ -863,7 +881,7 @@ func (r *EmailSendBatchResponseData) UnmarshalJSON(data []byte) error {
 
 type EmailSendBatchResponseDataMessage struct {
 	// Message identifier (token)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -879,9 +897,9 @@ func (r *EmailSendBatchResponseDataMessage) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendRawResponse struct {
-	Data    EmailSendRawResponseData `json:"data,required"`
-	Meta    shared.APIMeta           `json:"meta,required"`
-	Success bool                     `json:"success,required"`
+	Data    EmailSendRawResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta           `json:"meta" api:"required"`
+	Success bool                     `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -900,13 +918,15 @@ func (r *EmailSendRawResponse) UnmarshalJSON(data []byte) error {
 
 type EmailSendRawResponseData struct {
 	// Unique message identifier (token)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Current delivery status
 	//
 	// Any of "pending", "sent".
-	Status string `json:"status,required"`
+	Status string `json:"status" api:"required"`
+	// The tenant ID this email was sent from
+	TenantID string `json:"tenantId" api:"required"`
 	// List of recipient addresses
-	To []string `json:"to,required" format:"email"`
+	To []string `json:"to" api:"required" format:"email"`
 	// SMTP Message-ID header value
 	MessageID string `json:"messageId"`
 	// Whether this email was sent in sandbox mode. Only present (and true) for sandbox
@@ -916,6 +936,7 @@ type EmailSendRawResponseData struct {
 	JSON struct {
 		ID          respjson.Field
 		Status      respjson.Field
+		TenantID    respjson.Field
 		To          respjson.Field
 		MessageID   respjson.Field
 		Sandbox     respjson.Field
@@ -1022,11 +1043,11 @@ type EmailSendParams struct {
 	// **Sandbox mode:** Use `sandbox@arkhq.io` to send test emails without domain
 	// verification. Sandbox emails can only be sent to organization members and are
 	// limited to 10 per day.
-	From string `json:"from,required"`
+	From string `json:"from" api:"required"`
 	// Email subject line
-	Subject string `json:"subject,required"`
+	Subject string `json:"subject" api:"required"`
 	// Recipient email addresses (max 50)
-	To []string `json:"to,omitzero,required" format:"email"`
+	To []string `json:"to,omitzero" api:"required" format:"email"`
 	// HTML body content (accepts null). Maximum 5MB (5,242,880 characters). Combined
 	// with attachments, the total message must not exceed 14MB.
 	HTML param.Opt[string] `json:"html,omitzero"`
@@ -1034,6 +1055,14 @@ type EmailSendParams struct {
 	ReplyTo param.Opt[string] `json:"replyTo,omitzero" format:"email"`
 	// Tag for categorization and filtering (accepts null)
 	Tag param.Opt[string] `json:"tag,omitzero"`
+	// The tenant ID to send this email from. Determines which tenant's configuration
+	// (domains, webhooks, tracking) is used.
+	//
+	//   - If your API key is scoped to a specific tenant, this must match that tenant or
+	//     be omitted.
+	//   - If your API key is org-level, specify the tenant to send from.
+	//   - If omitted, the organization's default tenant is used.
+	TenantID param.Opt[string] `json:"tenantId,omitzero"`
 	// Plain text body (accepts null, auto-generated from HTML if not provided).
 	// Maximum 5MB (5,242,880 characters).
 	Text           param.Opt[string] `json:"text,omitzero"`
@@ -1079,11 +1108,11 @@ func (r *EmailSendParams) UnmarshalJSON(data []byte) error {
 // The properties Content, ContentType, Filename are required.
 type EmailSendParamsAttachment struct {
 	// Base64-encoded file content
-	Content string `json:"content,required"`
+	Content string `json:"content" api:"required"`
 	// MIME type
-	ContentType string `json:"contentType,required"`
+	ContentType string `json:"contentType" api:"required"`
 	// Attachment filename
-	Filename string `json:"filename,required"`
+	Filename string `json:"filename" api:"required"`
 	paramObj
 }
 
@@ -1096,9 +1125,17 @@ func (r *EmailSendParamsAttachment) UnmarshalJSON(data []byte) error {
 }
 
 type EmailSendBatchParams struct {
-	Emails []EmailSendBatchParamsEmail `json:"emails,omitzero,required"`
+	Emails []EmailSendBatchParamsEmail `json:"emails,omitzero" api:"required"`
 	// Sender email for all messages
-	From           string            `json:"from,required"`
+	From string `json:"from" api:"required"`
+	// The tenant ID to send this batch from. Determines which tenant's configuration
+	// (domains, webhooks, tracking) is used.
+	//
+	//   - If your API key is scoped to a specific tenant, this must match that tenant or
+	//     be omitted.
+	//   - If your API key is org-level, specify the tenant to send from.
+	//   - If omitted, the organization's default tenant is used.
+	TenantID       param.Opt[string] `json:"tenantId,omitzero"`
 	IdempotencyKey param.Opt[string] `header:"Idempotency-Key,omitzero" json:"-"`
 	paramObj
 }
@@ -1113,8 +1150,8 @@ func (r *EmailSendBatchParams) UnmarshalJSON(data []byte) error {
 
 // The properties Subject, To are required.
 type EmailSendBatchParamsEmail struct {
-	Subject string            `json:"subject,required"`
-	To      []string          `json:"to,omitzero,required" format:"email"`
+	Subject string            `json:"subject" api:"required"`
+	To      []string          `json:"to,omitzero" api:"required" format:"email"`
 	HTML    param.Opt[string] `json:"html,omitzero"`
 	// Tag for categorization and filtering
 	Tag  param.Opt[string] `json:"tag,omitzero"`
@@ -1159,17 +1196,25 @@ type EmailSendRawParams struct {
 	// - With quoted name: `"Acme Support" <support@yourdomain.com>`
 	//
 	// The domain portion must match a verified sending domain in your account.
-	From string `json:"from,required"`
+	From string `json:"from" api:"required"`
 	// Base64-encoded RFC 2822 MIME message.
 	//
 	// **You must base64-encode your raw email before sending.** The raw email should
 	// include headers (From, To, Subject, Content-Type, etc.) followed by a blank line
 	// and the message body.
-	RawMessage string `json:"rawMessage,required"`
+	RawMessage string `json:"rawMessage" api:"required"`
 	// Recipient email addresses
-	To []string `json:"to,omitzero,required" format:"email"`
+	To []string `json:"to,omitzero" api:"required" format:"email"`
 	// Whether this is a bounce message (accepts null)
 	Bounce param.Opt[bool] `json:"bounce,omitzero"`
+	// The tenant ID to send this email from. Determines which tenant's configuration
+	// (domains, webhooks, tracking) is used.
+	//
+	//   - If your API key is scoped to a specific tenant, this must match that tenant or
+	//     be omitted.
+	//   - If your API key is org-level, specify the tenant to send from.
+	//   - If omitted, the organization's default tenant is used.
+	TenantID param.Opt[string] `json:"tenantId,omitzero"`
 	paramObj
 }
 
