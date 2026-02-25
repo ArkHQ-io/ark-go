@@ -245,9 +245,9 @@ func (r *TenantWebhookService) Test(ctx context.Context, webhookID string, param
 }
 
 type TenantWebhookNewResponse struct {
-	Data    TenantWebhookNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta               `json:"meta,required"`
-	Success bool                         `json:"success,required"`
+	Data    TenantWebhookNewResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta               `json:"meta" api:"required"`
+	Success bool                         `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -266,22 +266,22 @@ func (r *TenantWebhookNewResponse) UnmarshalJSON(data []byte) error {
 
 type TenantWebhookNewResponseData struct {
 	// Webhook ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Whether subscribed to all events
-	AllEvents bool      `json:"allEvents,required"`
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	AllEvents bool      `json:"allEvents" api:"required"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the webhook is active
-	Enabled bool `json:"enabled,required"`
+	Enabled bool `json:"enabled" api:"required"`
 	// Subscribed events
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
 	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
-	Events []string `json:"events,required"`
+	Events []string `json:"events" api:"required"`
 	// Webhook name for identification
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Webhook endpoint URL
-	URL  string `json:"url,required" format:"uri"`
-	Uuid string `json:"uuid,required" format:"uuid"`
+	URL  string `json:"url" api:"required" format:"uri"`
+	Uuid string `json:"uuid" api:"required" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -304,9 +304,9 @@ func (r *TenantWebhookNewResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantWebhookGetResponse struct {
-	Data    TenantWebhookGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta               `json:"meta,required"`
-	Success bool                         `json:"success,required"`
+	Data    TenantWebhookGetResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta               `json:"meta" api:"required"`
+	Success bool                         `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -325,22 +325,22 @@ func (r *TenantWebhookGetResponse) UnmarshalJSON(data []byte) error {
 
 type TenantWebhookGetResponseData struct {
 	// Webhook ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Whether subscribed to all events
-	AllEvents bool      `json:"allEvents,required"`
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	AllEvents bool      `json:"allEvents" api:"required"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the webhook is active
-	Enabled bool `json:"enabled,required"`
+	Enabled bool `json:"enabled" api:"required"`
 	// Subscribed events
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
 	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
-	Events []string `json:"events,required"`
+	Events []string `json:"events" api:"required"`
 	// Webhook name for identification
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Webhook endpoint URL
-	URL  string `json:"url,required" format:"uri"`
-	Uuid string `json:"uuid,required" format:"uuid"`
+	URL  string `json:"url" api:"required" format:"uri"`
+	Uuid string `json:"uuid" api:"required" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -363,9 +363,9 @@ func (r *TenantWebhookGetResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantWebhookUpdateResponse struct {
-	Data    TenantWebhookUpdateResponseData `json:"data,required"`
-	Meta    shared.APIMeta                  `json:"meta,required"`
-	Success bool                            `json:"success,required"`
+	Data    TenantWebhookUpdateResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                  `json:"meta" api:"required"`
+	Success bool                            `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -384,22 +384,22 @@ func (r *TenantWebhookUpdateResponse) UnmarshalJSON(data []byte) error {
 
 type TenantWebhookUpdateResponseData struct {
 	// Webhook ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Whether subscribed to all events
-	AllEvents bool      `json:"allEvents,required"`
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	AllEvents bool      `json:"allEvents" api:"required"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the webhook is active
-	Enabled bool `json:"enabled,required"`
+	Enabled bool `json:"enabled" api:"required"`
 	// Subscribed events
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
 	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
-	Events []string `json:"events,required"`
+	Events []string `json:"events" api:"required"`
 	// Webhook name for identification
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Webhook endpoint URL
-	URL  string `json:"url,required" format:"uri"`
-	Uuid string `json:"uuid,required" format:"uuid"`
+	URL  string `json:"url" api:"required" format:"uri"`
+	Uuid string `json:"uuid" api:"required" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -422,9 +422,9 @@ func (r *TenantWebhookUpdateResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantWebhookListResponse struct {
-	Data    TenantWebhookListResponseData `json:"data,required"`
-	Meta    shared.APIMeta                `json:"meta,required"`
-	Success bool                          `json:"success,required"`
+	Data    TenantWebhookListResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                `json:"meta" api:"required"`
+	Success bool                          `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -442,7 +442,7 @@ func (r *TenantWebhookListResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantWebhookListResponseData struct {
-	Webhooks []TenantWebhookListResponseDataWebhook `json:"webhooks,required"`
+	Webhooks []TenantWebhookListResponseDataWebhook `json:"webhooks" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Webhooks    respjson.Field
@@ -459,11 +459,11 @@ func (r *TenantWebhookListResponseData) UnmarshalJSON(data []byte) error {
 
 type TenantWebhookListResponseDataWebhook struct {
 	// Webhook ID
-	ID      string   `json:"id,required"`
-	Enabled bool     `json:"enabled,required"`
-	Events  []string `json:"events,required"`
-	Name    string   `json:"name,required"`
-	URL     string   `json:"url,required" format:"uri"`
+	ID      string   `json:"id" api:"required"`
+	Enabled bool     `json:"enabled" api:"required"`
+	Events  []string `json:"events" api:"required"`
+	Name    string   `json:"name" api:"required"`
+	URL     string   `json:"url" api:"required" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -483,9 +483,9 @@ func (r *TenantWebhookListResponseDataWebhook) UnmarshalJSON(data []byte) error 
 }
 
 type TenantWebhookDeleteResponse struct {
-	Data    TenantWebhookDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta                  `json:"meta,required"`
-	Success bool                            `json:"success,required"`
+	Data    TenantWebhookDeleteResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                  `json:"meta" api:"required"`
+	Success bool                            `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -503,7 +503,7 @@ func (r *TenantWebhookDeleteResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantWebhookDeleteResponseData struct {
-	Message string `json:"message,required"`
+	Message string `json:"message" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Message     respjson.Field
@@ -520,16 +520,16 @@ func (r *TenantWebhookDeleteResponseData) UnmarshalJSON(data []byte) error {
 
 // Paginated list of webhook delivery attempts
 type TenantWebhookListDeliveriesResponse struct {
-	Data []TenantWebhookListDeliveriesResponseData `json:"data,required"`
-	Meta shared.APIMeta                            `json:"meta,required"`
+	Data []TenantWebhookListDeliveriesResponseData `json:"data" api:"required"`
+	Meta shared.APIMeta                            `json:"meta" api:"required"`
 	// Current page number
-	Page int64 `json:"page,required"`
+	Page int64 `json:"page" api:"required"`
 	// Items per page
-	PerPage int64 `json:"perPage,required"`
+	PerPage int64 `json:"perPage" api:"required"`
 	// Total number of deliveries matching the filter
-	Total int64 `json:"total,required"`
+	Total int64 `json:"total" api:"required"`
 	// Total number of pages
-	TotalPages int64 `json:"totalPages,required"`
+	TotalPages int64 `json:"totalPages" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -552,26 +552,26 @@ func (r *TenantWebhookListDeliveriesResponse) UnmarshalJSON(data []byte) error {
 // Summary of a webhook delivery attempt
 type TenantWebhookListDeliveriesResponseData struct {
 	// Unique delivery ID (UUID)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Attempt number (1 for first attempt, increments with retries)
-	Attempt int64 `json:"attempt,required"`
+	Attempt int64 `json:"attempt" api:"required"`
 	// Event type that triggered this delivery
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
 	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
-	Event string `json:"event,required"`
+	Event string `json:"event" api:"required"`
 	// HTTP status code returned by the endpoint (null if connection failed)
-	StatusCode int64 `json:"statusCode,required"`
+	StatusCode int64 `json:"statusCode" api:"required"`
 	// Whether the delivery was successful (2xx response)
-	Success bool `json:"success,required"`
+	Success bool `json:"success" api:"required"`
 	// When this delivery attempt occurred
-	Timestamp time.Time `json:"timestamp,required" format:"date-time"`
+	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
 	// URL the webhook was delivered to
-	URL string `json:"url,required" format:"uri"`
+	URL string `json:"url" api:"required" format:"uri"`
 	// ID of the webhook this delivery belongs to
-	WebhookID string `json:"webhookId,required"`
+	WebhookID string `json:"webhookId" api:"required"`
 	// Whether this delivery will be retried (true if failed and retries remaining)
-	WillRetry bool `json:"willRetry,required"`
+	WillRetry bool `json:"willRetry" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -596,9 +596,9 @@ func (r *TenantWebhookListDeliveriesResponseData) UnmarshalJSON(data []byte) err
 
 // Result of replaying a webhook delivery
 type TenantWebhookReplayDeliveryResponse struct {
-	Data    TenantWebhookReplayDeliveryResponseData `json:"data,required"`
-	Meta    shared.APIMeta                          `json:"meta,required"`
-	Success bool                                    `json:"success,required"`
+	Data    TenantWebhookReplayDeliveryResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                          `json:"meta" api:"required"`
+	Success bool                                    `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -617,17 +617,17 @@ func (r *TenantWebhookReplayDeliveryResponse) UnmarshalJSON(data []byte) error {
 
 type TenantWebhookReplayDeliveryResponseData struct {
 	// Request duration in milliseconds
-	Duration int64 `json:"duration,required"`
+	Duration int64 `json:"duration" api:"required"`
 	// ID of the new delivery created by the replay
-	NewDeliveryID string `json:"newDeliveryId,required"`
+	NewDeliveryID string `json:"newDeliveryId" api:"required"`
 	// ID of the original delivery that was replayed
-	OriginalDeliveryID string `json:"originalDeliveryId,required"`
+	OriginalDeliveryID string `json:"originalDeliveryId" api:"required"`
 	// HTTP status code from your endpoint
-	StatusCode int64 `json:"statusCode,required"`
+	StatusCode int64 `json:"statusCode" api:"required"`
 	// Whether the replay was successful (2xx response from endpoint)
-	Success bool `json:"success,required"`
+	Success bool `json:"success" api:"required"`
 	// When the replay was executed
-	Timestamp time.Time `json:"timestamp,required" format:"date-time"`
+	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Duration           respjson.Field
@@ -650,9 +650,9 @@ func (r *TenantWebhookReplayDeliveryResponseData) UnmarshalJSON(data []byte) err
 // Detailed information about a webhook delivery attempt
 type TenantWebhookGetDeliveryResponse struct {
 	// Full details of a webhook delivery including request and response
-	Data    TenantWebhookGetDeliveryResponseData `json:"data,required"`
-	Meta    shared.APIMeta                       `json:"meta,required"`
-	Success bool                                 `json:"success,required"`
+	Data    TenantWebhookGetDeliveryResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                       `json:"meta" api:"required"`
+	Success bool                                 `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -672,32 +672,32 @@ func (r *TenantWebhookGetDeliveryResponse) UnmarshalJSON(data []byte) error {
 // Full details of a webhook delivery including request and response
 type TenantWebhookGetDeliveryResponseData struct {
 	// Unique delivery ID (UUID)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Attempt number for this delivery
-	Attempt int64 `json:"attempt,required"`
+	Attempt int64 `json:"attempt" api:"required"`
 	// Event type that triggered this delivery
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
 	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
-	Event string `json:"event,required"`
+	Event string `json:"event" api:"required"`
 	// The request that was sent to your endpoint
-	Request TenantWebhookGetDeliveryResponseDataRequest `json:"request,required"`
+	Request TenantWebhookGetDeliveryResponseDataRequest `json:"request" api:"required"`
 	// The response received from your endpoint
-	Response TenantWebhookGetDeliveryResponseDataResponse `json:"response,required"`
+	Response TenantWebhookGetDeliveryResponseDataResponse `json:"response" api:"required"`
 	// HTTP status code returned by the endpoint
-	StatusCode int64 `json:"statusCode,required"`
+	StatusCode int64 `json:"statusCode" api:"required"`
 	// Whether the delivery was successful (2xx response)
-	Success bool `json:"success,required"`
+	Success bool `json:"success" api:"required"`
 	// When this delivery attempt occurred
-	Timestamp time.Time `json:"timestamp,required" format:"date-time"`
+	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
 	// URL the webhook was delivered to
-	URL string `json:"url,required" format:"uri"`
+	URL string `json:"url" api:"required" format:"uri"`
 	// ID of the webhook this delivery belongs to
-	WebhookID string `json:"webhookId,required"`
+	WebhookID string `json:"webhookId" api:"required"`
 	// Name of the webhook for easy identification
-	WebhookName string `json:"webhookName,required"`
+	WebhookName string `json:"webhookName" api:"required"`
 	// Whether this delivery will be retried
-	WillRetry bool `json:"willRetry,required"`
+	WillRetry bool `json:"willRetry" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -726,9 +726,9 @@ func (r *TenantWebhookGetDeliveryResponseData) UnmarshalJSON(data []byte) error 
 // The request that was sent to your endpoint
 type TenantWebhookGetDeliveryResponseDataRequest struct {
 	// HTTP headers that were sent with the request
-	Headers map[string]string `json:"headers,required"`
+	Headers map[string]string `json:"headers" api:"required"`
 	// The complete webhook payload that was sent
-	Payload map[string]any `json:"payload,required"`
+	Payload map[string]any `json:"payload" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Headers     respjson.Field
@@ -747,9 +747,9 @@ func (r *TenantWebhookGetDeliveryResponseDataRequest) UnmarshalJSON(data []byte)
 // The response received from your endpoint
 type TenantWebhookGetDeliveryResponseDataResponse struct {
 	// HTTP status code from your endpoint
-	StatusCode int64 `json:"statusCode,required"`
+	StatusCode int64 `json:"statusCode" api:"required"`
 	// Response body from your endpoint (may be truncated)
-	Body string `json:"body,nullable"`
+	Body string `json:"body" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		StatusCode  respjson.Field
@@ -766,9 +766,9 @@ func (r *TenantWebhookGetDeliveryResponseDataResponse) UnmarshalJSON(data []byte
 }
 
 type TenantWebhookTestResponse struct {
-	Data    TenantWebhookTestResponseData `json:"data,required"`
-	Meta    shared.APIMeta                `json:"meta,required"`
-	Success bool                          `json:"success,required"`
+	Data    TenantWebhookTestResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                `json:"meta" api:"required"`
+	Success bool                          `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -787,17 +787,17 @@ func (r *TenantWebhookTestResponse) UnmarshalJSON(data []byte) error {
 
 type TenantWebhookTestResponseData struct {
 	// Request duration in milliseconds
-	Duration int64 `json:"duration,required"`
+	Duration int64 `json:"duration" api:"required"`
 	// Event type that was tested
-	Event string `json:"event,required"`
+	Event string `json:"event" api:"required"`
 	// HTTP status code from the webhook endpoint
-	StatusCode int64 `json:"statusCode,required"`
+	StatusCode int64 `json:"statusCode" api:"required"`
 	// Whether the webhook endpoint responded with a 2xx status
-	Success bool `json:"success,required"`
+	Success bool `json:"success" api:"required"`
 	// Response body from the webhook endpoint (truncated if too long)
-	Body string `json:"body,nullable"`
+	Body string `json:"body" api:"nullable"`
 	// Error message if the request failed
-	Error string `json:"error,nullable"`
+	Error string `json:"error" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Duration    respjson.Field
@@ -819,9 +819,9 @@ func (r *TenantWebhookTestResponseData) UnmarshalJSON(data []byte) error {
 
 type TenantWebhookNewParams struct {
 	// Webhook name for identification
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// HTTPS endpoint URL
-	URL string `json:"url,required" format:"uri"`
+	URL string `json:"url" api:"required" format:"uri"`
 	// Subscribe to all events (ignores events array, accepts null)
 	AllEvents param.Opt[bool] `json:"allEvents,omitzero"`
 	// Whether the webhook is enabled (accepts null)
@@ -852,12 +852,12 @@ func (r *TenantWebhookNewParams) UnmarshalJSON(data []byte) error {
 }
 
 type TenantWebhookGetParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantWebhookUpdateParams struct {
-	TenantID  string            `path:"tenantId,required" json:"-"`
+	TenantID  string            `path:"tenantId" api:"required" json:"-"`
 	AllEvents param.Opt[bool]   `json:"allEvents,omitzero"`
 	Enabled   param.Opt[bool]   `json:"enabled,omitzero"`
 	Name      param.Opt[string] `json:"name,omitzero"`
@@ -875,12 +875,12 @@ func (r *TenantWebhookUpdateParams) UnmarshalJSON(data []byte) error {
 }
 
 type TenantWebhookDeleteParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantWebhookListDeliveriesParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	// Only deliveries after this Unix timestamp
 	After param.Opt[int64] `query:"after,omitzero" json:"-"`
 	// Only deliveries before this Unix timestamp
@@ -923,24 +923,24 @@ const (
 )
 
 type TenantWebhookReplayDeliveryParams struct {
-	TenantID  string `path:"tenantId,required" json:"-"`
-	WebhookID string `path:"webhookId,required" json:"-"`
+	TenantID  string `path:"tenantId" api:"required" json:"-"`
+	WebhookID string `path:"webhookId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantWebhookGetDeliveryParams struct {
-	TenantID  string `path:"tenantId,required" json:"-"`
-	WebhookID string `path:"webhookId,required" json:"-"`
+	TenantID  string `path:"tenantId" api:"required" json:"-"`
+	WebhookID string `path:"webhookId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantWebhookTestParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	// Event type to simulate
 	//
 	// Any of "MessageSent", "MessageDelayed", "MessageDeliveryFailed", "MessageHeld",
 	// "MessageBounced", "MessageLinkClicked", "MessageLoaded", "DomainDNSError".
-	Event TenantWebhookTestParamsEvent `json:"event,omitzero,required"`
+	Event TenantWebhookTestParamsEvent `json:"event,omitzero" api:"required"`
 	paramObj
 }
 

@@ -127,13 +127,13 @@ func (r *TenantService) Delete(ctx context.Context, tenantID string, opts ...opt
 
 type Tenant struct {
 	// Unique identifier for the tenant
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// When the tenant was created
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Custom key-value pairs for storing additional data
-	Metadata map[string]TenantMetadataUnion `json:"metadata,required"`
+	Metadata map[string]TenantMetadataUnion `json:"metadata" api:"required"`
 	// Display name for the tenant
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Current status of the tenant:
 	//
 	// - `active` - Normal operation
@@ -141,9 +141,9 @@ type Tenant struct {
 	// - `archived` - Soft-deleted
 	//
 	// Any of "active", "suspended", "archived".
-	Status TenantStatus `json:"status,required"`
+	Status TenantStatus `json:"status" api:"required"`
 	// When the tenant was last updated
-	UpdatedAt time.Time `json:"updatedAt,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -221,9 +221,9 @@ const (
 )
 
 type TenantNewResponse struct {
-	Data    Tenant         `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    Tenant         `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -241,9 +241,9 @@ func (r *TenantNewResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantGetResponse struct {
-	Data    Tenant         `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    Tenant         `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -261,9 +261,9 @@ func (r *TenantGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantUpdateResponse struct {
-	Data    Tenant         `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    Tenant         `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -281,9 +281,9 @@ func (r *TenantUpdateResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantDeleteResponse struct {
-	Data    TenantDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta           `json:"meta,required"`
-	Success bool                     `json:"success,required"`
+	Data    TenantDeleteResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta           `json:"meta" api:"required"`
+	Success bool                     `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -301,7 +301,7 @@ func (r *TenantDeleteResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantDeleteResponseData struct {
-	Deleted bool `json:"deleted,required"`
+	Deleted bool `json:"deleted" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Deleted     respjson.Field
@@ -318,7 +318,7 @@ func (r *TenantDeleteResponseData) UnmarshalJSON(data []byte) error {
 
 type TenantNewParams struct {
 	// Display name for the tenant (e.g., your customer's company name)
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Custom key-value pairs. Useful for storing references to your internal systems.
 	//
 	// **Limits:**
