@@ -18,6 +18,29 @@ import (
 	"github.com/ArkHQ-io/ark-go/shared"
 )
 
+// Manage track domains for open and click tracking.
+//
+// Track domains enable you to track when recipients:
+//
+// - Open your emails (tracking pixel)
+// - Click links in your emails
+//
+// **Setup Process:**
+//
+// 1. Create a track domain with `POST /tracking`
+// 2. Add the CNAME record to your DNS
+// 3. Verify DNS with `POST /tracking/{id}/verify`
+// 4. Track domain is ready when `dnsOk` is true
+//
+// **Quick Reference:**
+//
+// - `POST /tracking` - Create a new track domain
+// - `GET /tracking` - List all track domains
+// - `GET /tracking/{id}` - Get track domain details
+// - `POST /tracking/{id}/verify` - Verify DNS configuration
+// - `PATCH /tracking/{id}` - Enable/disable tracking features
+// - `DELETE /tracking/{id}` - Remove a track domain
+//
 // TenantTrackingService contains methods and other services that help with
 // interacting with the ark API.
 //

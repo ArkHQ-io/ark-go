@@ -21,6 +21,16 @@ import (
 	"github.com/ArkHQ-io/ark-go/shared"
 )
 
+// Send and manage email messages.
+//
+// **Quick Reference:**
+//
+// - `POST /emails` - Send a single email
+// - `POST /emails/batch` - Send up to 100 emails
+// - `GET /emails/{emailId}` - Get email status and details
+// - `GET /emails` - List sent emails
+// - `POST /emails/{emailId}/retry` - Retry failed delivery
+//
 // EmailService contains methods and other services that help with interacting with
 // the ark API.
 //
