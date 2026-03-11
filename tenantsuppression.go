@@ -58,11 +58,11 @@ func (r *TenantSuppressionService) New(ctx context.Context, tenantID string, bod
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/suppressions", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Check if a specific email address is on the tenant's suppression list.
@@ -70,15 +70,15 @@ func (r *TenantSuppressionService) Get(ctx context.Context, email string, query 
 	opts = slices.Concat(r.Options, opts)
 	if query.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if email == "" {
 		err = errors.New("missing required email parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/suppressions/%s", query.TenantID, email)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get all email addresses on the tenant's suppression list. These addresses will
@@ -89,7 +89,7 @@ func (r *TenantSuppressionService) List(ctx context.Context, tenantID string, qu
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/suppressions", tenantID)
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -116,15 +116,15 @@ func (r *TenantSuppressionService) Delete(ctx context.Context, email string, bod
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if email == "" {
 		err = errors.New("missing required email parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/suppressions/%s", body.TenantID, email)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 type TenantSuppressionNewResponse struct {

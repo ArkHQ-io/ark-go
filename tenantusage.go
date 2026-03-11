@@ -85,11 +85,11 @@ func (r *TenantUsageService) Get(ctx context.Context, tenantID string, query Ten
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/usage", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns time-bucketed email statistics for a specific tenant.
@@ -112,11 +112,11 @@ func (r *TenantUsageService) GetTimeseries(ctx context.Context, tenantID string,
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/usage/timeseries", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Tenant usage statistics

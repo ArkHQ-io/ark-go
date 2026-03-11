@@ -59,11 +59,11 @@ func (r *EmailService) Get(ctx context.Context, emailID string, query EmailGetPa
 	opts = slices.Concat(r.Options, opts)
 	if emailID == "" {
 		err = errors.New("missing required emailId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("emails/%s", emailID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieve a paginated list of sent emails. Results are ordered by send time,
@@ -145,11 +145,11 @@ func (r *EmailService) GetDeliveries(ctx context.Context, emailID string, opts .
 	opts = slices.Concat(r.Options, opts)
 	if emailID == "" {
 		err = errors.New("missing required emailId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("emails/%s/deliveries", emailID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Retry delivery of a failed or soft-bounced email. Creates a new delivery
@@ -160,11 +160,11 @@ func (r *EmailService) Retry(ctx context.Context, emailID string, opts ...option
 	opts = slices.Concat(r.Options, opts)
 	if emailID == "" {
 		err = errors.New("missing required emailId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("emails/%s/retry", emailID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Send a single email message. The email is accepted for immediate delivery and
@@ -188,7 +188,7 @@ func (r *EmailService) Send(ctx context.Context, params EmailSendParams, opts ..
 	opts = slices.Concat(r.Options, opts)
 	path := "emails"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Send up to 100 emails in a single request. Useful for sending personalized
@@ -205,7 +205,7 @@ func (r *EmailService) SendBatch(ctx context.Context, params EmailSendBatchParam
 	opts = slices.Concat(r.Options, opts)
 	path := "emails/batch"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Send a pre-formatted RFC 2822 MIME message. Use this for advanced use cases or
@@ -218,7 +218,7 @@ func (r *EmailService) SendRaw(ctx context.Context, body EmailSendRawParams, opt
 	opts = slices.Concat(r.Options, opts)
 	path := "emails/raw"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 type EmailGetResponse struct {

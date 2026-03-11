@@ -85,7 +85,7 @@ func (r *UsageService) Get(ctx context.Context, query UsageGetParams, opts ...op
 	opts = slices.Concat(r.Options, opts)
 	path := "usage"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Export email usage data for all tenants in CSV or JSON Lines format. Designed
@@ -115,7 +115,7 @@ func (r *UsageService) Export(ctx context.Context, query UsageExportParams, opts
 	opts = slices.Concat(r.Options, opts)
 	path := "usage/export"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns email usage statistics for all tenants in your organization. Results are

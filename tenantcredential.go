@@ -54,11 +54,11 @@ func (r *TenantCredentialService) New(ctx context.Context, tenantID string, body
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/credentials", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get details of a specific credential.
@@ -70,11 +70,11 @@ func (r *TenantCredentialService) Get(ctx context.Context, credentialID int64, p
 	opts = slices.Concat(r.Options, opts)
 	if params.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/credentials/%v", params.TenantID, credentialID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Update a credential's name or hold status.
@@ -89,11 +89,11 @@ func (r *TenantCredentialService) Update(ctx context.Context, credentialID int64
 	opts = slices.Concat(r.Options, opts)
 	if params.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/credentials/%v", params.TenantID, credentialID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List all SMTP and API credentials for a tenant. Credentials are used to send
@@ -107,7 +107,7 @@ func (r *TenantCredentialService) List(ctx context.Context, tenantID string, que
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/credentials", tenantID)
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -140,11 +140,11 @@ func (r *TenantCredentialService) Delete(ctx context.Context, credentialID int64
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/credentials/%v", body.TenantID, credentialID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 type TenantCredentialNewResponse struct {

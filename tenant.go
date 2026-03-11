@@ -200,7 +200,7 @@ func (r *TenantService) New(ctx context.Context, body TenantNewParams, opts ...o
 	opts = slices.Concat(r.Options, opts)
 	path := "tenants"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get a tenant by ID.
@@ -208,11 +208,11 @@ func (r *TenantService) Get(ctx context.Context, tenantID string, opts ...option
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Update a tenant's name, metadata, or status. At least one field is required.
@@ -222,11 +222,11 @@ func (r *TenantService) Update(ctx context.Context, tenantID string, body Tenant
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // List all tenants with pagination. Filter by `status` if needed.
@@ -257,11 +257,11 @@ func (r *TenantService) Delete(ctx context.Context, tenantID string, opts ...opt
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 type Tenant struct {

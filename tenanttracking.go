@@ -68,11 +68,11 @@ func (r *TenantTrackingService) New(ctx context.Context, tenantID string, body T
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get details of a specific track domain including DNS configuration.
@@ -80,15 +80,15 @@ func (r *TenantTrackingService) Get(ctx context.Context, trackingID string, quer
 	opts = slices.Concat(r.Options, opts)
 	if query.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s", query.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Update track domain settings.
@@ -103,15 +103,15 @@ func (r *TenantTrackingService) Update(ctx context.Context, trackingID string, p
 	opts = slices.Concat(r.Options, opts)
 	if params.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s", params.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List all track domains configured for a tenant. Track domains enable open and
@@ -120,11 +120,11 @@ func (r *TenantTrackingService) List(ctx context.Context, tenantID string, opts 
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete a track domain. This will disable tracking for any emails using this
@@ -133,15 +133,15 @@ func (r *TenantTrackingService) Delete(ctx context.Context, trackingID string, b
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s", body.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Check DNS configuration for the track domain.
@@ -152,15 +152,15 @@ func (r *TenantTrackingService) Verify(ctx context.Context, trackingID string, b
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s/verify", body.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 type TrackDomain struct {

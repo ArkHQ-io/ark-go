@@ -69,11 +69,11 @@ func (r *TenantDomainService) New(ctx context.Context, tenantID string, body Ten
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get detailed information about a domain including DNS record status.
@@ -81,15 +81,15 @@ func (r *TenantDomainService) Get(ctx context.Context, domainID string, query Te
 	opts = slices.Concat(r.Options, opts)
 	if query.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains/%s", query.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get all sending domains for a specific tenant with their verification status.
@@ -97,11 +97,11 @@ func (r *TenantDomainService) List(ctx context.Context, tenantID string, opts ..
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Remove a sending domain from a tenant. You will no longer be able to send emails
@@ -112,15 +112,15 @@ func (r *TenantDomainService) Delete(ctx context.Context, domainID string, body 
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains/%s", body.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Check if DNS records are correctly configured and verify the domain. Returns the
@@ -131,15 +131,15 @@ func (r *TenantDomainService) Verify(ctx context.Context, domainID string, body 
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains/%s/verify", body.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // A DNS record that needs to be configured in your domain's DNS settings.
