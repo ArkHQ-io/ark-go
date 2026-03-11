@@ -38,7 +38,7 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 		}),
 	)
-	client.Emails.Send(context.Background(), ark.EmailSendParams{
+	_, _ = client.Emails.Send(context.Background(), ark.EmailSendParams{
 		From:    "hello@yourdomain.com",
 		Subject: "Hello World",
 		To:      []string{"user@example.com"},
