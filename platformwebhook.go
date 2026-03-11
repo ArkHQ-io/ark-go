@@ -67,7 +67,7 @@ func (r *PlatformWebhookService) New(ctx context.Context, body PlatformWebhookNe
 	opts = slices.Concat(r.Options, opts)
 	path := "platform/webhooks"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get detailed information about a specific platform webhook.
@@ -75,11 +75,11 @@ func (r *PlatformWebhookService) Get(ctx context.Context, webhookID string, opts
 	opts = slices.Concat(r.Options, opts)
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("platform/webhooks/%s", webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Update a platform webhook's configuration.
@@ -94,11 +94,11 @@ func (r *PlatformWebhookService) Update(ctx context.Context, webhookID string, b
 	opts = slices.Concat(r.Options, opts)
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("platform/webhooks/%s", webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get all platform webhook endpoints configured for your organization.
@@ -110,7 +110,7 @@ func (r *PlatformWebhookService) List(ctx context.Context, opts ...option.Reques
 	opts = slices.Concat(r.Options, opts)
 	path := "platform/webhooks"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete a platform webhook. This stops all event delivery to the webhook URL.
@@ -119,11 +119,11 @@ func (r *PlatformWebhookService) Delete(ctx context.Context, webhookID string, o
 	opts = slices.Concat(r.Options, opts)
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("platform/webhooks/%s", webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get a paginated list of platform webhook delivery attempts.
@@ -177,11 +177,11 @@ func (r *PlatformWebhookService) ReplayDelivery(ctx context.Context, deliveryID 
 	opts = slices.Concat(r.Options, opts)
 	if deliveryID == "" {
 		err = errors.New("missing required deliveryId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("platform/webhooks/deliveries/%s/replay", deliveryID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get detailed information about a specific platform webhook delivery.
@@ -191,11 +191,11 @@ func (r *PlatformWebhookService) GetDelivery(ctx context.Context, deliveryID str
 	opts = slices.Concat(r.Options, opts)
 	if deliveryID == "" {
 		err = errors.New("missing required deliveryId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("platform/webhooks/deliveries/%s", deliveryID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Send a test payload to your platform webhook endpoint.
@@ -212,11 +212,11 @@ func (r *PlatformWebhookService) Test(ctx context.Context, webhookID string, bod
 	opts = slices.Concat(r.Options, opts)
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("platform/webhooks/%s/test", webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 type PlatformWebhookNewResponse struct {

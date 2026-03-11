@@ -82,11 +82,11 @@ func (r *LogService) Get(ctx context.Context, requestID string, opts ...option.R
 	opts = slices.Concat(r.Options, opts)
 	if requestID == "" {
 		err = errors.New("missing required requestId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("logs/%s", requestID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieve a paginated list of API request logs for debugging and monitoring.

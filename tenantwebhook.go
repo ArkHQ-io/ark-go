@@ -113,11 +113,11 @@ func (r *TenantWebhookService) New(ctx context.Context, tenantID string, body Te
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get webhook details
@@ -125,15 +125,15 @@ func (r *TenantWebhookService) Get(ctx context.Context, webhookID string, query 
 	opts = slices.Concat(r.Options, opts)
 	if query.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks/%s", query.TenantID, webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Update a webhook
@@ -141,15 +141,15 @@ func (r *TenantWebhookService) Update(ctx context.Context, webhookID string, par
 	opts = slices.Concat(r.Options, opts)
 	if params.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks/%s", params.TenantID, webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Get all configured webhook endpoints for a tenant.
@@ -157,11 +157,11 @@ func (r *TenantWebhookService) List(ctx context.Context, tenantID string, opts .
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete a webhook
@@ -169,15 +169,15 @@ func (r *TenantWebhookService) Delete(ctx context.Context, webhookID string, bod
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks/%s", body.TenantID, webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get a paginated list of delivery attempts for a specific webhook.
@@ -200,15 +200,15 @@ func (r *TenantWebhookService) ListDeliveries(ctx context.Context, webhookID str
 	opts = slices.Concat(r.Options, opts)
 	if params.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks/%s/deliveries", params.TenantID, webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Re-send a webhook delivery to your endpoint.
@@ -231,19 +231,19 @@ func (r *TenantWebhookService) ReplayDelivery(ctx context.Context, deliveryID st
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if body.WebhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	if deliveryID == "" {
 		err = errors.New("missing required deliveryId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks/%s/deliveries/%s/replay", body.TenantID, body.WebhookID, deliveryID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get detailed information about a specific webhook delivery attempt.
@@ -260,19 +260,19 @@ func (r *TenantWebhookService) GetDelivery(ctx context.Context, deliveryID strin
 	opts = slices.Concat(r.Options, opts)
 	if query.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if query.WebhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	if deliveryID == "" {
 		err = errors.New("missing required deliveryId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks/%s/deliveries/%s", query.TenantID, query.WebhookID, deliveryID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Send a test payload to your webhook endpoint and verify it receives the data
@@ -291,15 +291,15 @@ func (r *TenantWebhookService) Test(ctx context.Context, webhookID string, param
 	opts = slices.Concat(r.Options, opts)
 	if params.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if webhookID == "" {
 		err = errors.New("missing required webhookId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/webhooks/%s/test", params.TenantID, webhookID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 type TenantWebhookNewResponse struct {

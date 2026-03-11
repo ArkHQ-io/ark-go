@@ -72,7 +72,7 @@ func (r *LimitService) Get(ctx context.Context, opts ...option.RequestOption) (r
 	opts = slices.Concat(r.Options, opts)
 	path := "limits"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Current usage and limit information
