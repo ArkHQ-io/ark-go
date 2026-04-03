@@ -71,7 +71,7 @@ func (r *PageNumberPagination[T]) GetNextPage() (res *PageNumberPagination[T], e
 		return nil, nil
 	}
 	currentPage := r.Page
-	if currentPage >= r.TotalPages {
+	if r.TotalPages > 0 && currentPage >= r.TotalPages {
 		return nil, nil
 	}
 	cfg := r.cfg.Clone(context.Background())
