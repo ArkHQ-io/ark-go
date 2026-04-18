@@ -18,6 +18,29 @@ import (
 	"github.com/ArkHQ-io/ark-go/shared"
 )
 
+// Manage track domains for open and click tracking.
+//
+// Track domains enable you to track when recipients:
+//
+// - Open your emails (tracking pixel)
+// - Click links in your emails
+//
+// **Setup Process:**
+//
+// 1. Create a track domain with `POST /tracking`
+// 2. Add the CNAME record to your DNS
+// 3. Verify DNS with `POST /tracking/{id}/verify`
+// 4. Track domain is ready when `dnsOk` is true
+//
+// **Quick Reference:**
+//
+// - `POST /tracking` - Create a new track domain
+// - `GET /tracking` - List all track domains
+// - `GET /tracking/{id}` - Get track domain details
+// - `POST /tracking/{id}/verify` - Verify DNS configuration
+// - `PATCH /tracking/{id}` - Enable/disable tracking features
+// - `DELETE /tracking/{id}` - Remove a track domain
+//
 // TenantTrackingService contains methods and other services that help with
 // interacting with the ark API.
 //
@@ -45,11 +68,11 @@ func (r *TenantTrackingService) New(ctx context.Context, tenantID string, body T
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get details of a specific track domain including DNS configuration.
@@ -57,15 +80,15 @@ func (r *TenantTrackingService) Get(ctx context.Context, trackingID string, quer
 	opts = slices.Concat(r.Options, opts)
 	if query.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s", query.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Update track domain settings.
@@ -80,15 +103,15 @@ func (r *TenantTrackingService) Update(ctx context.Context, trackingID string, p
 	opts = slices.Concat(r.Options, opts)
 	if params.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s", params.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List all track domains configured for a tenant. Track domains enable open and
@@ -97,11 +120,11 @@ func (r *TenantTrackingService) List(ctx context.Context, tenantID string, opts 
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete a track domain. This will disable tracking for any emails using this
@@ -110,15 +133,15 @@ func (r *TenantTrackingService) Delete(ctx context.Context, trackingID string, b
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s", body.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Check DNS configuration for the track domain.
@@ -129,51 +152,51 @@ func (r *TenantTrackingService) Verify(ctx context.Context, trackingID string, b
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if trackingID == "" {
 		err = errors.New("missing required trackingId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/tracking/%s/verify", body.TenantID, trackingID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 type TrackDomain struct {
 	// Track domain ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// When the track domain was created
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// Whether the tracking CNAME record is correctly configured. Must be true to use
 	// tracking features.
-	DNSOk bool `json:"dnsOk,required"`
+	DNSOk bool `json:"dnsOk" api:"required"`
 	// ID of the parent sending domain
-	DomainID string `json:"domainId,required"`
+	DomainID string `json:"domainId" api:"required"`
 	// Full domain name
-	FullName string `json:"fullName,required"`
+	FullName string `json:"fullName" api:"required"`
 	// Subdomain name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Whether SSL is enabled for tracking URLs
-	SslEnabled bool `json:"sslEnabled,required"`
+	SslEnabled bool `json:"sslEnabled" api:"required"`
 	// Whether click tracking is enabled
-	TrackClicks bool `json:"trackClicks,required"`
+	TrackClicks bool `json:"trackClicks" api:"required"`
 	// Whether open tracking is enabled
-	TrackOpens bool `json:"trackOpens,required"`
+	TrackOpens bool `json:"trackOpens" api:"required"`
 	// When DNS was last checked
-	DNSCheckedAt time.Time `json:"dnsCheckedAt,nullable" format:"date-time"`
+	DNSCheckedAt time.Time `json:"dnsCheckedAt" api:"nullable" format:"date-time"`
 	// DNS error message if verification failed
-	DNSError string `json:"dnsError,nullable"`
+	DNSError string `json:"dnsError" api:"nullable"`
 	// Required DNS record configuration
-	DNSRecord TrackDomainDNSRecord `json:"dnsRecord,nullable"`
+	DNSRecord TrackDomainDNSRecord `json:"dnsRecord" api:"nullable"`
 	// Current DNS verification status
 	//
 	// Any of "ok", "missing", "invalid".
-	DNSStatus TrackDomainDNSStatus `json:"dnsStatus,nullable"`
+	DNSStatus TrackDomainDNSStatus `json:"dnsStatus" api:"nullable"`
 	// Domains excluded from click tracking
-	ExcludedClickDomains string `json:"excludedClickDomains,nullable"`
+	ExcludedClickDomains string `json:"excludedClickDomains" api:"nullable"`
 	// When the track domain was last updated
-	UpdatedAt time.Time `json:"updatedAt,nullable" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                   respjson.Field
@@ -236,9 +259,9 @@ const (
 )
 
 type TenantTrackingNewResponse struct {
-	Data    TrackDomain    `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    TrackDomain    `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -256,9 +279,9 @@ func (r *TenantTrackingNewResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingGetResponse struct {
-	Data    TrackDomain    `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    TrackDomain    `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -276,9 +299,9 @@ func (r *TenantTrackingGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingUpdateResponse struct {
-	Data    TrackDomain    `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    TrackDomain    `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -296,9 +319,9 @@ func (r *TenantTrackingUpdateResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingListResponse struct {
-	Data    TenantTrackingListResponseData `json:"data,required"`
-	Meta    shared.APIMeta                 `json:"meta,required"`
-	Success bool                           `json:"success,required"`
+	Data    TenantTrackingListResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                 `json:"meta" api:"required"`
+	Success bool                           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -316,7 +339,7 @@ func (r *TenantTrackingListResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingListResponseData struct {
-	TrackDomains []TrackDomain `json:"trackDomains,required"`
+	TrackDomains []TrackDomain `json:"trackDomains" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		TrackDomains respjson.Field
@@ -332,9 +355,9 @@ func (r *TenantTrackingListResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingDeleteResponse struct {
-	Data    TenantTrackingDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta                   `json:"meta,required"`
-	Success bool                             `json:"success,required"`
+	Data    TenantTrackingDeleteResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                   `json:"meta" api:"required"`
+	Success bool                             `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -352,7 +375,7 @@ func (r *TenantTrackingDeleteResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingDeleteResponseData struct {
-	Message string `json:"message,required"`
+	Message string `json:"message" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Message     respjson.Field
@@ -368,9 +391,9 @@ func (r *TenantTrackingDeleteResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingVerifyResponse struct {
-	Data    TenantTrackingVerifyResponseData `json:"data,required"`
-	Meta    shared.APIMeta                   `json:"meta,required"`
-	Success bool                             `json:"success,required"`
+	Data    TenantTrackingVerifyResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                   `json:"meta" api:"required"`
+	Success bool                             `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -389,21 +412,21 @@ func (r *TenantTrackingVerifyResponse) UnmarshalJSON(data []byte) error {
 
 type TenantTrackingVerifyResponseData struct {
 	// Track domain ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Whether DNS is correctly configured
-	DNSOk bool `json:"dnsOk,required"`
+	DNSOk bool `json:"dnsOk" api:"required"`
 	// Current DNS verification status
 	//
 	// Any of "ok", "missing", "invalid".
-	DNSStatus string `json:"dnsStatus,required"`
+	DNSStatus string `json:"dnsStatus" api:"required"`
 	// Full domain name
-	FullName string `json:"fullName,required"`
+	FullName string `json:"fullName" api:"required"`
 	// When DNS was last checked
-	DNSCheckedAt time.Time `json:"dnsCheckedAt,nullable" format:"date-time"`
+	DNSCheckedAt time.Time `json:"dnsCheckedAt" api:"nullable" format:"date-time"`
 	// DNS error message if verification failed
-	DNSError string `json:"dnsError,nullable"`
+	DNSError string `json:"dnsError" api:"nullable"`
 	// Required DNS record configuration
-	DNSRecord TenantTrackingVerifyResponseDataDNSRecord `json:"dnsRecord,nullable"`
+	DNSRecord TenantTrackingVerifyResponseDataDNSRecord `json:"dnsRecord" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID           respjson.Field
@@ -447,9 +470,9 @@ func (r *TenantTrackingVerifyResponseDataDNSRecord) UnmarshalJSON(data []byte) e
 
 type TenantTrackingNewParams struct {
 	// ID of the sending domain to attach this track domain to
-	DomainID int64 `json:"domainId,required"`
+	DomainID int64 `json:"domainId" api:"required"`
 	// Subdomain name (e.g., 'track' for track.yourdomain.com)
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Enable SSL for tracking URLs (accepts null, defaults to true)
 	SslEnabled param.Opt[bool] `json:"sslEnabled,omitzero"`
 	// Enable click tracking (accepts null, defaults to true)
@@ -468,12 +491,12 @@ func (r *TenantTrackingNewParams) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingGetParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantTrackingUpdateParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	// Comma-separated list of domains to exclude from click tracking (accepts null)
 	ExcludedClickDomains param.Opt[string] `json:"excludedClickDomains,omitzero"`
 	// Enable or disable SSL for tracking URLs (accepts null)
@@ -494,11 +517,11 @@ func (r *TenantTrackingUpdateParams) UnmarshalJSON(data []byte) error {
 }
 
 type TenantTrackingDeleteParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantTrackingVerifyParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }

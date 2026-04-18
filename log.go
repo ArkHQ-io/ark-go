@@ -22,6 +22,27 @@ import (
 	"github.com/ArkHQ-io/ark-go/shared"
 )
 
+// Access API request logs for debugging and monitoring.
+//
+// Every API request is logged with details including:
+//
+// - Request method, path, and endpoint
+// - Response status code and duration
+// - Error details (code, message) for failed requests
+// - SDK information (name, version)
+// - Rate limit state at time of request
+// - Request and response bodies (for single log retrieval)
+//
+// **Retention:** Logs are retained for 90 days.
+//
+// **Body storage:** Request and response bodies are stored encrypted and truncated
+// at 25KB. Bodies are only returned when retrieving a single log entry.
+//
+// **Quick Reference:**
+//
+// - `GET /logs` - List API request logs with filters
+// - `GET /logs/{requestId}` - Get full details including request/response bodies
+//
 // LogService contains methods and other services that help with interacting with
 // the ark API.
 //
@@ -61,11 +82,11 @@ func (r *LogService) Get(ctx context.Context, requestID string, opts ...option.R
 	opts = slices.Concat(r.Options, opts)
 	if requestID == "" {
 		err = errors.New("missing required requestId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("logs/%s", requestID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieve a paginated list of API request logs for debugging and monitoring.
@@ -138,33 +159,33 @@ func (r *LogService) ListAutoPaging(ctx context.Context, query LogListParams, op
 // API request log entry (list view)
 type LogEntry struct {
 	// Request context information
-	Context LogEntryContext `json:"context,required"`
+	Context LogEntryContext `json:"context" api:"required"`
 	// API credential information
-	Credential LogEntryCredential `json:"credential,required"`
+	Credential LogEntryCredential `json:"credential" api:"required"`
 	// Request duration in milliseconds
-	DurationMs int64 `json:"durationMs,required"`
+	DurationMs int64 `json:"durationMs" api:"required"`
 	// Semantic endpoint name
-	Endpoint string `json:"endpoint,required"`
+	Endpoint string `json:"endpoint" api:"required"`
 	// HTTP method
 	//
 	// Any of "GET", "POST", "PUT", "PATCH", "DELETE".
-	Method LogEntryMethod `json:"method,required"`
+	Method LogEntryMethod `json:"method" api:"required"`
 	// Request path
-	Path string `json:"path,required"`
+	Path string `json:"path" api:"required"`
 	// Rate limit state at time of request
-	RateLimit LogEntryRateLimit `json:"rateLimit,required"`
+	RateLimit LogEntryRateLimit `json:"rateLimit" api:"required"`
 	// Unique request identifier
-	RequestID string `json:"requestId,required"`
+	RequestID string `json:"requestId" api:"required"`
 	// HTTP response status code
-	StatusCode int64 `json:"statusCode,required"`
+	StatusCode int64 `json:"statusCode" api:"required"`
 	// When the request was made (ISO 8601)
-	Timestamp time.Time `json:"timestamp,required" format:"date-time"`
+	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
 	// Email-specific data (for email endpoints)
-	Email LogEntryEmail `json:"email,nullable"`
+	Email LogEntryEmail `json:"email" api:"nullable"`
 	// Error details (null if request succeeded)
-	Error LogEntryError `json:"error,nullable"`
+	Error LogEntryError `json:"error" api:"nullable"`
 	// SDK information (null if not using an SDK)
-	SDK LogEntrySDK `json:"sdk,nullable"`
+	SDK LogEntrySDK `json:"sdk" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Context     respjson.Field
@@ -194,13 +215,13 @@ func (r *LogEntry) UnmarshalJSON(data []byte) error {
 // Request context information
 type LogEntryContext struct {
 	// Idempotency key if provided
-	IdempotencyKey string `json:"idempotencyKey,nullable"`
+	IdempotencyKey string `json:"idempotencyKey" api:"nullable"`
 	// Client IP address
-	IPAddress string `json:"ipAddress,nullable"`
+	IPAddress string `json:"ipAddress" api:"nullable"`
 	// Query parameters
-	QueryParams map[string]any `json:"queryParams,nullable"`
+	QueryParams map[string]any `json:"queryParams" api:"nullable"`
 	// User-Agent header
-	UserAgent string `json:"userAgent,nullable"`
+	UserAgent string `json:"userAgent" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		IdempotencyKey respjson.Field
@@ -221,9 +242,9 @@ func (r *LogEntryContext) UnmarshalJSON(data []byte) error {
 // API credential information
 type LogEntryCredential struct {
 	// Credential ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// API key prefix (first 8 characters)
-	KeyPrefix string `json:"keyPrefix,nullable"`
+	KeyPrefix string `json:"keyPrefix" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -253,13 +274,13 @@ const (
 // Rate limit state at time of request
 type LogEntryRateLimit struct {
 	// Rate limit ceiling
-	Limit int64 `json:"limit,nullable"`
+	Limit int64 `json:"limit" api:"nullable"`
 	// Whether the request was rate limited
 	Limited bool `json:"limited"`
 	// Remaining requests in window
-	Remaining int64 `json:"remaining,nullable"`
+	Remaining int64 `json:"remaining" api:"nullable"`
 	// Unix timestamp when limit resets
-	Reset int64 `json:"reset,nullable"`
+	Reset int64 `json:"reset" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Limit       respjson.Field
@@ -282,7 +303,7 @@ type LogEntryEmail struct {
 	// Email message identifier (token)
 	ID string `json:"id"`
 	// Number of recipients
-	RecipientCount int64 `json:"recipientCount,nullable"`
+	RecipientCount int64 `json:"recipientCount" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID             respjson.Field
@@ -303,7 +324,7 @@ type LogEntryError struct {
 	// Error code
 	Code string `json:"code"`
 	// Error message
-	Message string `json:"message,nullable"`
+	Message string `json:"message" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Code        respjson.Field
@@ -324,7 +345,7 @@ type LogEntrySDK struct {
 	// SDK name
 	Name string `json:"name"`
 	// SDK version
-	Version string `json:"version,nullable"`
+	Version string `json:"version" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Name        respjson.Field
@@ -365,9 +386,9 @@ func (r *LogEntryDetail) UnmarshalJSON(data []byte) error {
 // Request body information
 type LogEntryDetailRequest struct {
 	// Decrypted request body (JSON or string). Bodies over 25KB are truncated.
-	Body LogEntryDetailRequestBodyUnion `json:"body,nullable"`
+	Body LogEntryDetailRequestBodyUnion `json:"body" api:"nullable"`
 	// Original request body size in bytes
-	BodySize int64 `json:"bodySize,nullable"`
+	BodySize int64 `json:"bodySize" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Body        respjson.Field
@@ -422,9 +443,9 @@ func (r *LogEntryDetailRequestBodyUnion) UnmarshalJSON(data []byte) error {
 // Response body information
 type LogEntryDetailResponse struct {
 	// Decrypted response body (JSON or string). Bodies over 25KB are truncated.
-	Body LogEntryDetailResponseBodyUnion `json:"body,nullable"`
+	Body LogEntryDetailResponseBodyUnion `json:"body" api:"nullable"`
 	// Response body size in bytes
-	BodySize int64 `json:"bodySize,nullable"`
+	BodySize int64 `json:"bodySize" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Body        respjson.Field
@@ -479,9 +500,9 @@ func (r *LogEntryDetailResponseBodyUnion) UnmarshalJSON(data []byte) error {
 // Detailed API request log with request/response bodies
 type LogGetResponse struct {
 	// Full API request log entry with bodies
-	Data    LogEntryDetail `json:"data,required"`
-	Meta    shared.APIMeta `json:"meta,required"`
-	Success bool           `json:"success,required"`
+	Data    LogEntryDetail `json:"data" api:"required"`
+	Meta    shared.APIMeta `json:"meta" api:"required"`
+	Success bool           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

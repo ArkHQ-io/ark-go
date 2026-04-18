@@ -16,7 +16,7 @@ type paramObj = param.APIObject
 
 type APIMeta struct {
 	// Unique request identifier for debugging and support
-	RequestID string `json:"requestId,required"`
+	RequestID string `json:"requestId" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		RequestID   respjson.Field

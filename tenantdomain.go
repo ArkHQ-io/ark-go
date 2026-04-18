@@ -18,6 +18,21 @@ import (
 	"github.com/ArkHQ-io/ark-go/shared"
 )
 
+// Manage sending domains.
+//
+// Before you can send emails, you need to:
+//
+// 1. Add a domain
+// 2. Configure DNS records (SPF, DKIM, Return Path)
+// 3. Verify the domain
+//
+// **Quick Reference:**
+//
+// - `POST /domains` - Add a new domain
+// - `GET /domains` - List all domains
+// - `POST /domains/{id}/verify` - Check DNS and verify domain
+// - `DELETE /domains/{id}` - Remove a domain
+//
 // TenantDomainService contains methods and other services that help with
 // interacting with the ark API.
 //
@@ -54,11 +69,11 @@ func (r *TenantDomainService) New(ctx context.Context, tenantID string, body Ten
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Get detailed information about a domain including DNS record status.
@@ -66,15 +81,15 @@ func (r *TenantDomainService) Get(ctx context.Context, domainID string, query Te
 	opts = slices.Concat(r.Options, opts)
 	if query.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains/%s", query.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get all sending domains for a specific tenant with their verification status.
@@ -82,11 +97,11 @@ func (r *TenantDomainService) List(ctx context.Context, tenantID string, opts ..
 	opts = slices.Concat(r.Options, opts)
 	if tenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains", tenantID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Remove a sending domain from a tenant. You will no longer be able to send emails
@@ -97,15 +112,15 @@ func (r *TenantDomainService) Delete(ctx context.Context, domainID string, body 
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains/%s", body.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Check if DNS records are correctly configured and verify the domain. Returns the
@@ -116,15 +131,15 @@ func (r *TenantDomainService) Verify(ctx context.Context, domainID string, body 
 	opts = slices.Concat(r.Options, opts)
 	if body.TenantID == "" {
 		err = errors.New("missing required tenantId parameter")
-		return
+		return nil, err
 	}
 	if domainID == "" {
 		err = errors.New("missing required domainId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("tenants/%s/domains/%s/verify", body.TenantID, domainID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // A DNS record that needs to be configured in your domain's DNS settings.
@@ -145,20 +160,20 @@ func (r *TenantDomainService) Verify(ctx context.Context, domainID string, body 
 type DNSRecord struct {
 	// The complete fully-qualified domain name (FQDN). Use this as a reference to
 	// verify the record is configured correctly.
-	FullName string `json:"fullName,required"`
+	FullName string `json:"fullName" api:"required"`
 	// The relative hostname to enter in your DNS provider. Most DNS providers
 	// auto-append the zone name, so you only need to enter this relative part.
 	//
 	// - `"@"` means the apex/root of the zone (for root domains)
 	// - `"mail"` for a subdomain like `mail.example.com`
 	// - `"ark-xyz._domainkey.mail"` for DKIM on a subdomain
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// The DNS record type to create
 	//
 	// Any of "TXT", "CNAME", "MX".
-	Type DNSRecordType `json:"type,required"`
+	Type DNSRecordType `json:"type" api:"required"`
 	// The value to set for the DNS record
-	Value string `json:"value,required"`
+	Value string `json:"value" api:"required"`
 	// Current verification status of this DNS record:
 	//
 	// - `OK` - Record is correctly configured and verified
@@ -167,7 +182,7 @@ type DNSRecord struct {
 	// - `null` - Record has not been checked yet
 	//
 	// Any of "OK", "Missing", "Invalid".
-	Status DNSRecordStatus `json:"status,nullable"`
+	Status DNSRecordStatus `json:"status" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		FullName    respjson.Field
@@ -210,9 +225,9 @@ const (
 )
 
 type TenantDomainNewResponse struct {
-	Data    TenantDomainNewResponseData `json:"data,required"`
-	Meta    shared.APIMeta              `json:"meta,required"`
-	Success bool                        `json:"success,required"`
+	Data    TenantDomainNewResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta              `json:"meta" api:"required"`
+	Success bool                        `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -231,9 +246,9 @@ func (r *TenantDomainNewResponse) UnmarshalJSON(data []byte) error {
 
 type TenantDomainNewResponseData struct {
 	// Unique domain identifier
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// Timestamp when the domain was added
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// DNS records that must be added to your domain's DNS settings. Null if records
 	// are not yet generated.
 	//
@@ -246,20 +261,20 @@ type TenantDomainNewResponseData struct {
 	// - SPF `name` would be `mail` (not `@`)
 	// - DKIM `name` would be `ark-xyz._domainkey.mail`
 	// - Return Path `name` would be `psrp.mail`
-	DNSRecords TenantDomainNewResponseDataDNSRecords `json:"dnsRecords,required"`
+	DNSRecords TenantDomainNewResponseDataDNSRecords `json:"dnsRecords" api:"required"`
 	// The domain name used for sending emails
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// UUID of the domain
-	Uuid string `json:"uuid,required" format:"uuid"`
+	Uuid string `json:"uuid" api:"required" format:"uuid"`
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
-	Verified bool `json:"verified,required"`
+	Verified bool `json:"verified" api:"required"`
 	// ID of the tenant this domain belongs to
 	TenantID string `json:"tenant_id"`
 	// Name of the tenant this domain belongs to
 	TenantName string `json:"tenant_name"`
 	// Timestamp when the domain ownership was verified, or null if not yet verified
-	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
+	VerifiedAt time.Time `json:"verifiedAt" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -310,7 +325,7 @@ type TenantDomainNewResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	Dkim DNSRecord `json:"dkim,nullable"`
+	Dkim DNSRecord `json:"dkim" api:"nullable"`
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -326,7 +341,7 @@ type TenantDomainNewResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	ReturnPath DNSRecord `json:"returnPath,nullable"`
+	ReturnPath DNSRecord `json:"returnPath" api:"nullable"`
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -342,7 +357,7 @@ type TenantDomainNewResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	Spf DNSRecord `json:"spf,nullable"`
+	Spf DNSRecord `json:"spf" api:"nullable"`
 	// The DNS zone (registrable domain) where records should be added. This is the
 	// root domain that your DNS provider manages. For `mail.example.com`, the zone is
 	// `example.com`. For `example.co.uk`, the zone is `example.co.uk`.
@@ -365,9 +380,9 @@ func (r *TenantDomainNewResponseDataDNSRecords) UnmarshalJSON(data []byte) error
 }
 
 type TenantDomainGetResponse struct {
-	Data    TenantDomainGetResponseData `json:"data,required"`
-	Meta    shared.APIMeta              `json:"meta,required"`
-	Success bool                        `json:"success,required"`
+	Data    TenantDomainGetResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta              `json:"meta" api:"required"`
+	Success bool                        `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -386,9 +401,9 @@ func (r *TenantDomainGetResponse) UnmarshalJSON(data []byte) error {
 
 type TenantDomainGetResponseData struct {
 	// Unique domain identifier
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// Timestamp when the domain was added
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// DNS records that must be added to your domain's DNS settings. Null if records
 	// are not yet generated.
 	//
@@ -401,20 +416,20 @@ type TenantDomainGetResponseData struct {
 	// - SPF `name` would be `mail` (not `@`)
 	// - DKIM `name` would be `ark-xyz._domainkey.mail`
 	// - Return Path `name` would be `psrp.mail`
-	DNSRecords TenantDomainGetResponseDataDNSRecords `json:"dnsRecords,required"`
+	DNSRecords TenantDomainGetResponseDataDNSRecords `json:"dnsRecords" api:"required"`
 	// The domain name used for sending emails
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// UUID of the domain
-	Uuid string `json:"uuid,required" format:"uuid"`
+	Uuid string `json:"uuid" api:"required" format:"uuid"`
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
-	Verified bool `json:"verified,required"`
+	Verified bool `json:"verified" api:"required"`
 	// ID of the tenant this domain belongs to
 	TenantID string `json:"tenant_id"`
 	// Name of the tenant this domain belongs to
 	TenantName string `json:"tenant_name"`
 	// Timestamp when the domain ownership was verified, or null if not yet verified
-	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
+	VerifiedAt time.Time `json:"verifiedAt" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -465,7 +480,7 @@ type TenantDomainGetResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	Dkim DNSRecord `json:"dkim,nullable"`
+	Dkim DNSRecord `json:"dkim" api:"nullable"`
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -481,7 +496,7 @@ type TenantDomainGetResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	ReturnPath DNSRecord `json:"returnPath,nullable"`
+	ReturnPath DNSRecord `json:"returnPath" api:"nullable"`
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -497,7 +512,7 @@ type TenantDomainGetResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	Spf DNSRecord `json:"spf,nullable"`
+	Spf DNSRecord `json:"spf" api:"nullable"`
 	// The DNS zone (registrable domain) where records should be added. This is the
 	// root domain that your DNS provider manages. For `mail.example.com`, the zone is
 	// `example.com`. For `example.co.uk`, the zone is `example.co.uk`.
@@ -520,9 +535,9 @@ func (r *TenantDomainGetResponseDataDNSRecords) UnmarshalJSON(data []byte) error
 }
 
 type TenantDomainListResponse struct {
-	Data    TenantDomainListResponseData `json:"data,required"`
-	Meta    shared.APIMeta               `json:"meta,required"`
-	Success bool                         `json:"success,required"`
+	Data    TenantDomainListResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta               `json:"meta" api:"required"`
+	Success bool                         `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -540,7 +555,7 @@ func (r *TenantDomainListResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantDomainListResponseData struct {
-	Domains []TenantDomainListResponseDataDomain `json:"domains,required"`
+	Domains []TenantDomainListResponseDataDomain `json:"domains" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Domains     respjson.Field
@@ -557,12 +572,12 @@ func (r *TenantDomainListResponseData) UnmarshalJSON(data []byte) error {
 
 type TenantDomainListResponseDataDomain struct {
 	// Unique domain identifier
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// The domain name used for sending emails
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
-	Verified bool `json:"verified,required"`
+	Verified bool `json:"verified" api:"required"`
 	// ID of the tenant this domain belongs to (included when filtering by tenant_id)
 	TenantID string `json:"tenant_id"`
 	// Name of the tenant this domain belongs to (included when filtering by tenant_id)
@@ -586,9 +601,9 @@ func (r *TenantDomainListResponseDataDomain) UnmarshalJSON(data []byte) error {
 }
 
 type TenantDomainDeleteResponse struct {
-	Data    TenantDomainDeleteResponseData `json:"data,required"`
-	Meta    shared.APIMeta                 `json:"meta,required"`
-	Success bool                           `json:"success,required"`
+	Data    TenantDomainDeleteResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                 `json:"meta" api:"required"`
+	Success bool                           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -606,7 +621,7 @@ func (r *TenantDomainDeleteResponse) UnmarshalJSON(data []byte) error {
 }
 
 type TenantDomainDeleteResponseData struct {
-	Message string `json:"message,required"`
+	Message string `json:"message" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Message     respjson.Field
@@ -622,9 +637,9 @@ func (r *TenantDomainDeleteResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type TenantDomainVerifyResponse struct {
-	Data    TenantDomainVerifyResponseData `json:"data,required"`
-	Meta    shared.APIMeta                 `json:"meta,required"`
-	Success bool                           `json:"success,required"`
+	Data    TenantDomainVerifyResponseData `json:"data" api:"required"`
+	Meta    shared.APIMeta                 `json:"meta" api:"required"`
+	Success bool                           `json:"success" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -643,9 +658,9 @@ func (r *TenantDomainVerifyResponse) UnmarshalJSON(data []byte) error {
 
 type TenantDomainVerifyResponseData struct {
 	// Unique domain identifier
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// Timestamp when the domain was added
-	CreatedAt time.Time `json:"createdAt,required" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" api:"required" format:"date-time"`
 	// DNS records that must be added to your domain's DNS settings. Null if records
 	// are not yet generated.
 	//
@@ -658,20 +673,20 @@ type TenantDomainVerifyResponseData struct {
 	// - SPF `name` would be `mail` (not `@`)
 	// - DKIM `name` would be `ark-xyz._domainkey.mail`
 	// - Return Path `name` would be `psrp.mail`
-	DNSRecords TenantDomainVerifyResponseDataDNSRecords `json:"dnsRecords,required"`
+	DNSRecords TenantDomainVerifyResponseDataDNSRecords `json:"dnsRecords" api:"required"`
 	// The domain name used for sending emails
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// UUID of the domain
-	Uuid string `json:"uuid,required" format:"uuid"`
+	Uuid string `json:"uuid" api:"required" format:"uuid"`
 	// Whether all DNS records (SPF, DKIM, Return Path) are correctly configured.
 	// Domain must be verified before sending emails.
-	Verified bool `json:"verified,required"`
+	Verified bool `json:"verified" api:"required"`
 	// ID of the tenant this domain belongs to
 	TenantID string `json:"tenant_id"`
 	// Name of the tenant this domain belongs to
 	TenantName string `json:"tenant_name"`
 	// Timestamp when the domain ownership was verified, or null if not yet verified
-	VerifiedAt time.Time `json:"verifiedAt,nullable" format:"date-time"`
+	VerifiedAt time.Time `json:"verifiedAt" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -722,7 +737,7 @@ type TenantDomainVerifyResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	Dkim DNSRecord `json:"dkim,nullable"`
+	Dkim DNSRecord `json:"dkim" api:"nullable"`
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -738,7 +753,7 @@ type TenantDomainVerifyResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	ReturnPath DNSRecord `json:"returnPath,nullable"`
+	ReturnPath DNSRecord `json:"returnPath" api:"nullable"`
 	// A DNS record that needs to be configured in your domain's DNS settings.
 	//
 	// The `name` field contains the relative hostname to enter in your DNS provider
@@ -754,7 +769,7 @@ type TenantDomainVerifyResponseDataDNSRecords struct {
 	//
 	// - `name`: `"@"` (DNS shorthand for apex/root)
 	// - `fullName`: `"example.com"`
-	Spf DNSRecord `json:"spf,nullable"`
+	Spf DNSRecord `json:"spf" api:"nullable"`
 	// The DNS zone (registrable domain) where records should be added. This is the
 	// root domain that your DNS provider manages. For `mail.example.com`, the zone is
 	// `example.com`. For `example.co.uk`, the zone is `example.co.uk`.
@@ -778,7 +793,7 @@ func (r *TenantDomainVerifyResponseDataDNSRecords) UnmarshalJSON(data []byte) er
 
 type TenantDomainNewParams struct {
 	// Domain name (e.g., "mail.example.com")
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	paramObj
 }
 
@@ -791,16 +806,16 @@ func (r *TenantDomainNewParams) UnmarshalJSON(data []byte) error {
 }
 
 type TenantDomainGetParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantDomainDeleteParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }
 
 type TenantDomainVerifyParams struct {
-	TenantID string `path:"tenantId,required" json:"-"`
+	TenantID string `path:"tenantId" api:"required" json:"-"`
 	paramObj
 }

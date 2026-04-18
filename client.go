@@ -16,11 +16,90 @@ import (
 // interacting with the ark API. You should not instantiate this client directly,
 // and instead use the [NewClient] method instead.
 type Client struct {
-	Options  []option.RequestOption
-	Emails   EmailService
-	Logs     LogService
-	Usage    UsageService
-	Limits   LimitService
+	Options []option.RequestOption
+	// Send and manage email messages.
+	//
+	// **Quick Reference:**
+	//
+	// - `POST /emails` - Send a single email
+	// - `POST /emails/batch` - Send up to 100 emails
+	// - `GET /emails/{emailId}` - Get email status and details
+	// - `GET /emails` - List sent emails
+	// - `POST /emails/{emailId}/retry` - Retry failed delivery
+	Emails EmailService
+	// Access API request logs for debugging and monitoring.
+	//
+	// Every API request is logged with details including:
+	//
+	// - Request method, path, and endpoint
+	// - Response status code and duration
+	// - Error details (code, message) for failed requests
+	// - SDK information (name, version)
+	// - Rate limit state at time of request
+	// - Request and response bodies (for single log retrieval)
+	//
+	// **Retention:** Logs are retained for 90 days.
+	//
+	// **Body storage:** Request and response bodies are stored encrypted and truncated
+	// at 25KB. Bodies are only returned when retrieving a single log entry.
+	//
+	// **Quick Reference:**
+	//
+	// - `GET /logs` - List API request logs with filters
+	// - `GET /logs/{requestId}` - Get full details including request/response bodies
+	Logs LogService
+	// Per-tenant usage analytics and bulk reporting.
+	//
+	// Track email sending statistics for each tenant to power billing, dashboards, and
+	// monitoring.
+	//
+	// **Single Tenant Usage:**
+	//
+	// - `GET /tenants/{id}/usage` - Get usage stats for a specific tenant
+	// - `GET /tenants/{id}/usage/timeseries` - Get time-bucketed data for charts
+	//
+	// **Bulk Usage:**
+	//
+	// - `GET /usage/tenants` - Get usage for all tenants (paginated, sortable)
+	// - `GET /usage/export` - Export usage data as CSV, JSONL, or JSON
+	//
+	// **Period Formats:**
+	//
+	//   - Shortcuts: `today`, `yesterday`, `this_month`, `last_month`, `last_7_days`,
+	//     `last_30_days`
+	//   - Month: `2024-01`
+	//   - Date range: `2024-01-01..2024-01-15`
+	Usage UsageService
+	// Check account rate limits and send limits.
+	//
+	// The limits endpoint returns current status for operational limits:
+	//
+	// - **Rate limit:** API requests per second (currently 10/sec)
+	// - **Send limit:** Emails per hour (default 100/hour for new accounts)
+	// - **Billing:** Credit balance and auto-recharge configuration
+	//
+	// **AI Integration Note:** This endpoint is designed for AI agents and MCP servers
+	// to understand account constraints before taking actions. Call this endpoint
+	// first when planning batch operations to avoid hitting limits unexpectedly.
+	//
+	// **Quick Reference:**
+	//
+	// - `GET /limits` - Get current rate limits and send limits
+	// - `GET /usage` - (Deprecated) Use `/limits` instead
+	Limits LimitService
+	// Manage tenants (your customers).
+	//
+	// Create a tenant for each of your customers to track their email sending
+	// separately. Store the tenant `id` in your database and use `metadata` for any
+	// custom data.
+	//
+	// **Quick Reference:**
+	//
+	// - `POST /tenants` - Create a new tenant
+	// - `GET /tenants` - List all tenants (paginated)
+	// - `GET /tenants/{id}` - Get tenant details
+	// - `PATCH /tenants/{id}` - Update tenant name, metadata, or status
+	// - `DELETE /tenants/{id}` - Delete a tenant
 	Tenants  TenantService
 	Platform PlatformService
 }

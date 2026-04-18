@@ -149,6 +149,7 @@ func TestEmailSendWithOptionalParams(t *testing.T) {
 		},
 		ReplyTo:        ark.String("dev@stainless.com"),
 		Tag:            ark.String("tag"),
+		TenantID:       ark.String("cm6abc123def456"),
 		Text:           ark.String("text"),
 		IdempotencyKey: ark.String("user_123_order_456"),
 	})
@@ -198,6 +199,7 @@ func TestEmailSendBatchWithOptionalParams(t *testing.T) {
 			Text: ark.String("text"),
 		}},
 		From:           "notifications@myapp.com",
+		TenantID:       ark.String("cm6abc123def456"),
 		IdempotencyKey: ark.String("user_123_order_456"),
 	})
 	if err != nil {
@@ -226,6 +228,7 @@ func TestEmailSendRawWithOptionalParams(t *testing.T) {
 		RawMessage: "x",
 		To:         []string{"user@example.com"},
 		Bounce:     ark.Bool(true),
+		TenantID:   ark.String("cm6abc123def456"),
 	})
 	if err != nil {
 		var apierr *ark.Error
