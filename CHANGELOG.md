@@ -1,5 +1,55 @@
 # Changelog
 
+## 0.19.0 (2026-04-18)
+
+Full Changelog: [v0.18.1...v0.19.0](https://github.com/ArkHQ-io/ark-go/compare/v0.18.1...v0.19.0)
+
+### Features
+
+* **api:** add tenantId to send ([87f7e60](https://github.com/ArkHQ-io/ark-go/commit/87f7e60b3bea70683ee3379f77db939c71969fc5))
+* **internal:** support comma format in multipart form encoding ([dfb8f82](https://github.com/ArkHQ-io/ark-go/commit/dfb8f8280956cc50555308f8dd59ebb69dc9efc0))
+
+
+### Bug Fixes
+
+* allow canceling a request while it is waiting to retry ([f8b7f54](https://github.com/ArkHQ-io/ark-go/commit/f8b7f5401325ff2bf1781754293c1e581a0eb94d))
+* **client:** use correct format specifier for header serialization ([83f0257](https://github.com/ArkHQ-io/ark-go/commit/83f02579e712ffdb40afbc63f562ed4a3937790c))
+* fixes for pagination and iteration, plus iter.Seq support ([1cfca47](https://github.com/ArkHQ-io/ark-go/commit/1cfca478f9ca1ef7d41e31734b24927e4c3f4889))
+* prevent duplicate ? in query params ([efaa427](https://github.com/ArkHQ-io/ark-go/commit/efaa427cd24addafc85ab0a7c24e036045af3c61))
+
+
+### Chores
+
+* **ci:** skip lint on metadata-only changes ([3b11c2f](https://github.com/ArkHQ-io/ark-go/commit/3b11c2f9141798aabd576356c176efef8b5b7757))
+* **ci:** skip uploading artifacts on stainless-internal branches ([84bbafd](https://github.com/ArkHQ-io/ark-go/commit/84bbafd241085c45a0b2f93fe68f51b077779bbc))
+* **ci:** support opting out of skipping builds on metadata-only commits ([8c7210a](https://github.com/ArkHQ-io/ark-go/commit/8c7210a1960872833154c00b740696bce35f5fae))
+* **client:** fix multipart serialisation of Default() fields ([d0a12c9](https://github.com/ArkHQ-io/ark-go/commit/d0a12c9da0f3e47dc878048d1125f5e9ea8914b6))
+* **internal:** codegen related update ([44699f5](https://github.com/ArkHQ-io/ark-go/commit/44699f5720fff87010bde0747d8f41c0b68c6769))
+* **internal:** codegen related update ([58093ea](https://github.com/ArkHQ-io/ark-go/commit/58093ea52bbc645a5bdaaaa8b705234b164ae695))
+* **internal:** minor cleanup ([7081fcc](https://github.com/ArkHQ-io/ark-go/commit/7081fccda980946e9f6b40f1b4635e1a9973ea4a))
+* **internal:** move custom custom `json` tags to `api` ([23837f9](https://github.com/ArkHQ-io/ark-go/commit/23837f92b51813054acf0f3357ab61f584d32dab))
+* **internal:** support default value struct tag ([5817254](https://github.com/ArkHQ-io/ark-go/commit/58172549cc4e8b536981e361cdf91ffc3a38cf14))
+* **internal:** tweak CI branches ([a8a04b8](https://github.com/ArkHQ-io/ark-go/commit/a8a04b80e88dc4ad5b157f8518edbcd1e8167f80))
+* **internal:** update gitignore ([bb1a340](https://github.com/ArkHQ-io/ark-go/commit/bb1a3405ff41573c133403fedcb88ecac4f20ec0))
+* **internal:** use explicit returns ([00e57a4](https://github.com/ArkHQ-io/ark-go/commit/00e57a4fcc1c71cffa750931a0387ba6633ddc2f))
+* **internal:** use explicit returns in more places ([5cbbb26](https://github.com/ArkHQ-io/ark-go/commit/5cbbb2656003d3ce3929468a47be1e67da3b7c63))
+* remove unnecessary error check for url parsing ([5c4a43d](https://github.com/ArkHQ-io/ark-go/commit/5c4a43dd838ff12a9e92f6b74deabeba024d41fa))
+* **test:** do not count install time for mock server timeout ([e8cb037](https://github.com/ArkHQ-io/ark-go/commit/e8cb0377cd7554d58f0877767a461953f7e319a0))
+* **tests:** bump steady to v0.19.4 ([9671262](https://github.com/ArkHQ-io/ark-go/commit/9671262fca7aa6c29eb9bd3b8c7ea04b0d6703b3))
+* **tests:** bump steady to v0.19.5 ([2345e53](https://github.com/ArkHQ-io/ark-go/commit/2345e53e7e568c4d3a7287360d8ffbad8fb91abe))
+* **tests:** bump steady to v0.19.6 ([0a20cf3](https://github.com/ArkHQ-io/ark-go/commit/0a20cf38ac67735013b4bbf564b1ce3e37bcf108))
+* **tests:** bump steady to v0.19.7 ([48d4d9d](https://github.com/ArkHQ-io/ark-go/commit/48d4d9de684ac2af111295e9d05b798d08dc0add))
+* **tests:** bump steady to v0.20.1 ([51762ee](https://github.com/ArkHQ-io/ark-go/commit/51762ee98c217373b2e91939680abfd4ac71458b))
+* **tests:** bump steady to v0.20.2 ([e09ff01](https://github.com/ArkHQ-io/ark-go/commit/e09ff01f287247c221fcef784b863672bba1cdce))
+* **tests:** bump steady to v0.22.1 ([8363ad4](https://github.com/ArkHQ-io/ark-go/commit/8363ad4901667fe2689324ff83f1ce882d49b357))
+* update docs for api:"required" ([69e480e](https://github.com/ArkHQ-io/ark-go/commit/69e480eb1864d430b4c6a9ca139ac62e9fb2aa10))
+* update mock server docs ([412d3e7](https://github.com/ArkHQ-io/ark-go/commit/412d3e7b706e679820b83eb68a4a04f57be39559))
+
+
+### Refactors
+
+* **tests:** switch from prism to steady ([134b963](https://github.com/ArkHQ-io/ark-go/commit/134b963c0cc77aa09a0d23f679101e9757349f48))
+
 ## 0.18.1 (2026-02-18)
 
 Full Changelog: [v0.18.0...v0.18.1](https://github.com/ArkHQ-io/ark-go/compare/v0.18.0...v0.18.1)
